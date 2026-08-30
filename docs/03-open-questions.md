@@ -77,6 +77,19 @@ problem whose cause is three stages upstream.
 Already computed as `ScoreReport.recall_at_pack`; this is a one-line change to
 the gate table, not new work.
 
+**Update, 30 August — the ask is now sharper.** Building the evidence pack showed
+that *two* pack numbers exist and they disagree:
+
+| | visible | holdout |
+|---|---:|---:|
+| `recall_at_pack` — what the retriever ranked | 94.0% | 76.7% |
+| `delivered_recall` — what the pack carried | 100.0% | 96.3% |
+
+The gap is sibling expansion, which adds windows after ranking (R-025). Gating
+the first would gate something no learner experiences. **The ask is therefore for
+delivered recall**, and the same run also produced citation completeness at 97.2%
+/ 96.3% against §14's existing ≥95% bar, so the two rows can be read together.
+
 ---
 
 ## Also worth confirming — scope

@@ -6,69 +6,101 @@ Build Guide** (revised 22 August 2026).
 This repository is Track B. It does not modify, refactor or migrate Foxxy's
 `retrieval` module, which stays live and demoed.
 
-## Status — Phase 0 complete on fixtures; first real-content run done (30 August 2026)
+## Status — 30 August 2026
 
-Built and passing:
+A grounded retrieval pipeline runs end to end over two real NCERT chapters:
+parse, compose, chunk, embed, rank, decide whether the question can be answered
+at all, assemble a cited evidence pack, and record what produced it.
+
+| | visible 60 | holdout 38 |
+|---|---:|---:|
+| Unanswerable questions refused | 10/10 | **8/8** |
+| Answerable questions answered | 48/50 | **27/30** |
+| Citation completeness (§14 bar ≥95%) | 97.2% | **96.3%** |
+| Citation ID resolution (§14 bar 100%) | 100% | **100%** |
+| Lineage failures (§14 bar 0) | 0 | **0** |
+
+The holdout cases were written after every threshold was fixed and were not
+consulted while choosing any of them, so **the holdout column is the one that
+should be quoted** (R-024).
+
+**Nothing here is releasable.** Every number was produced under an evaluation
+licence over `QUARANTINED` content (R-011), no source has a rights record, the
+gold set is 98 cases against §6.4's 300-500, and no human has adjudicated any of
+it. See `RELEASE_EVIDENCE.md`.
+
+## What is built
 
 | Build guide | Delivered here |
 |---|---|
 | §6.2 typed learning objects | `src/agts/contracts/objects.py` |
 | §6.3 runtime contracts | `src/agts/contracts/runtime.py` |
-| §6.4 evaluation case schema | `src/agts/evaluation/cases.py` |
-| §6.5 test the tester | `tests/test_scorer_detects_broken_retrievers.py` |
-| §8.1 plan builder (Phase-0 seed) | `src/agts/evaluation/planning.py` |
-
-| §7.1/§7.2 parsing, two strategies | `src/agts/parsing/` |
+| §6.4 evaluation cases, §6.5 test the tester | `src/agts/evaluation/` |
+| §7.1 / §7.2 parsing, two strategies, dual-parse diff | `src/agts/parsing/` |
 | §7.4 composition | `src/agts/composition.py` |
-| Evaluation licence for quarantined sources | `src/agts/evaluation/corpus.py` (R-011) |
+| §7.3 search representations, BM25, embeddings, hybrid, rerank | `src/agts/retrieval/` |
+| §8.3 evidence packs, §8.4 sufficiency gate | `src/agts/retrieval/packing.py`, `sufficiency.py` |
+| §11 traces, §14 lineage gate | `src/agts/retrieval/provenance.py` |
+| §7.1 persistence | `migrations/`, `src/agts/platform/repository.py` |
+| Provider ports (no provider name escapes them) | `src/agts/platform/` |
 
-**Two real chapters are parsed and scored** — NCERT Class 10 Science ch1 and
-Class 10 Maths ch4 — under `artifacts/*-quarantine/`. They are `QUARANTINED`:
-measurable, never publishable, `FORBIDDEN_PENDING_RIGHTS_RECORD` in every
-manifest.
-
-Run the real-content baseline:
-
-```
-PYTHONPATH=src python scripts/real_content_baseline.py
-```
-
-**What it found:** the keyword baseline reaches 96% pack recall, and **abstention
-does not separate at all** — margin −0.497, because composition yields 38
-section-sized objects for 728 blocks. §7.3 search representations are the next
-build step (R-015).
-
-Not started, and blocked — see `docs/03-open-questions.md`:
-
-- the real 300-500 case gold set (60 drafted cases exist; the named pilot
-  curriculum and two adjudicators do not)
-- source *registration* — parsing runs, approval needs signed rights records
-- everything from §8.2 onward
+Not built, and why: **generation and the teaching loop** (§9) are scope-blocked
+on Q5, which also makes §14's citation *precision* row unmeasurable — it asks
+whether a citation supports a sentence, and there are no sentences (R-026).
 
 ## Run it
 
 ```
 pip install -e ".[dev]"
-python -m pytest -q
-python scripts/baseline.py
+python -m pytest -q                      # 131 pass, 7 skip without a database
+python scripts/baseline.py               # the §6.5 detection suite on fixtures
 ```
 
-`scripts/baseline.py` prints the current baseline against the four broken
-retrievers. That table is the only reason to believe any later number.
+Against the real chapters (they are not committed — see below):
 
-## The corpus here is fake
+```
+VOYAGE_API_KEY=... python scripts/embed_representations.py   # once, then cached
+python scripts/real_content_baseline.py    # retrievers, gate, slices
+python scripts/holdout_validation.py       # the number that gets quoted
+python scripts/citation_report.py          # §14 citation and lineage rows
+python scripts/rerank_benchmark.py         # measured, and switched off (R-027)
+```
+
+With a database:
+
+```
+docker compose -f docker/compose.yml up -d
+AGTS_DATABASE_URL=postgresql://agts:agts_dev_password@localhost:5434/agts_dev \
+    python scripts/import_corpus.py        # imports, reads back, re-scores
+```
+
+## The content is not committed
+
+`artifacts/*-quarantine/` holds the parsed chapters. The blocks **are** the
+chapter text and the assets are page crops, both quarantined pending rights
+records, so they are gitignored: a local commit is not publication, but history
+outlives the decision to push. Regenerate with
+`scripts/assemble_*_quarantine.py` and `scripts/compose_*.py`.
 
 `src/agts/evaluation/fixtures.py` is synthetic, carries no curriculum content and
-must never reach a student. Build guide §5 permits scaffolding against disposable
-fixtures while decisions are pending; it is deleted the moment an approved pilot
-source is registered.
+must never reach a student.
 
 ## Layout
 
 ```
 src/agts/contracts/     frozen schemas - every workstream handoff goes through these
-src/agts/evaluation/    the ruler: cases, corpus, retrievers, scorer
-tests/                  contract invariants + the §6.5 detection suite
+src/agts/evaluation/    the ruler: cases, corpus, retrievers, scorer, citations
+src/agts/parsing/       Docling and opendataloader adapters, dual-parse diff
+src/agts/retrieval/     chunking, BM25, dense, hybrid, rerank, sufficiency, packing
+src/agts/platform/      embedding and rerank ports, Postgres repository
+migrations/             core schema, and pgvector as a separate opt-in
+tests/                  contract invariants, the §6.5 suite, integration tests
 docs/                   authority order, gates, workstreams, open questions
-scripts/                runnable reports
+scripts/                every number in the ledger is reproducible from one of these
 ```
+
+## Where to start reading
+
+`EVALUATION_LEDGER.md` for what was measured and what it cost, `DECISION_LOG.md`
+for why each thing is the way it is — including the hypotheses that were wrong
+(R-022, R-027, R-030, R-032), which are recorded so they are not re-tried.

@@ -14,7 +14,8 @@ instead of importing a contract breaks the §4 execution model.
 | `RetrievalTrace` | `contracts/runtime.py` | at most one corrective retrieval; filters and versions non-empty |
 | `VerificationResult` | `contracts/runtime.py` | cannot report `pass` while a gate fails |
 | `LearningEvidence` | `contracts/runtime.py` | idempotency key and a named validator required; no mastery field exists |
-| `ReleaseManifest` | `contracts/runtime.py` | non-empty object and source sets; checksum shape |
+| `ReleaseManifest` | `contracts/runtime.py` | non-empty object and source sets; checksum shape. Built by hashing the corpus, never by hand (R-033) |
+| `RetrievedItem` | `contracts/runtime.py` | a handoff between `retrieval/` and `evaluation/`, so it lives in neither. Carries the blocks a retriever actually used, not its parent object |
 
 ## §6.2 typed learning objects
 
@@ -25,7 +26,7 @@ instead of importing a contract breaks the §4 execution model.
 | `SourceBlock` | `contracts/objects.py` | must carry text, latex or an image; records its parse strategy |
 | `CurriculumIdentity` | `contracts/objects.py` | curriculum truth, defined before embeddings exist |
 | `LearningObject` | `contracts/objects.py` | solutions, answers and rubrics may not be `PUBLIC` |
-| `SearchRepresentation` | `contracts/objects.py` | non-empty search text and vector; separate from the object |
+| `SearchRepresentation` | `contracts/objects.py` | non-empty search text; **vector optional** and paired with the model that produced it (R-016); `representation_version` names the chunking function; separate from the object |
 
 ## Supporting
 
@@ -33,7 +34,18 @@ instead of importing a contract breaks the §4 execution model.
 |---|---|---|
 | `DisclosurePolicy` | `contracts/runtime.py` | may lower the ceiling implied by assessment state, never raise it |
 | `FallbackPolicy` | `contracts/runtime.py` | at most one corrective retrieval; terminal state must be safe |
-| `EvalCase` / `GoldSet` | `evaluation/cases.py` | gold matches answerability; unique case ids |
+| `EvalCase` / `GoldSet` | `evaluation/cases.py` | gold matches answerability; unique case ids; `slice_keys` crosses all nine axes pairwise (R-031) |
+| `EvaluationLicence` | `evaluation/corpus.py` | names sources individually, unlocks `QUARANTINED` only, never `RETIRED` or `WITHDRAWN` (R-011) |
+| `SufficiencyDecision` | `retrieval/sufficiency.py` | carries the reasons for a refusal, not only the verdict (R-020) |
+
+## Persisted shape
+
+`migrations/001_core.sql` stores these contracts and adds nothing of its own: a
+column with no field is a bug rather than a feature. Two invariants are repeated
+as CHECK constraints because the database outlives the process that validates —
+an `APPROVED` source without rights and a scan cannot exist, and neither can a
+`PUBLIC` assessment solution. `002_pgvector.sql` pins embeddings to
+`vector(1024)`, so another provider's width cannot be stored by accident.
 
 ## Versioning
 

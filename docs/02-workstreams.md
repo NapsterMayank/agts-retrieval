@@ -12,8 +12,26 @@ versioned contracts, never copied implementations.
 | Platform and security | `src/agts/platform/`, migrations, jobs, adapters, observability | Curriculum decisions |
 | Evaluation and assurance | `src/agts/evaluation/`, `tests/`, `EVALUATION_LEDGER.md` | Sole model-as-judge release authority |
 
-Only two directories exist so far. The rest are created by the workstream that
-owns them, when it starts.
+Five directories exist now:
+
+| Path | Workstream | State |
+|---|---|---|
+| `src/agts/contracts/` | Architecture and contracts | frozen, versioned |
+| `src/agts/evaluation/` | Evaluation and assurance | ruler, licence, citation scorers |
+| `src/agts/parsing/` | Content and curriculum | two strategies, dual-parse diff |
+| `src/agts/retrieval/` | Retrieval and verification | chunking, BM25, dense, hybrid, rerank, sufficiency, packing, provenance |
+| `src/agts/platform/` | Platform and security | embedding and rerank ports, Postgres repository, migrations |
+
+`src/agts/teaching/` does not exist and will not until Q5 answers whether this
+repository builds §9 or consumes it.
+
+**One boundary was crossed knowingly.** The same agent has been writing both the
+retrieval stages and the ruler that scores them, which is exactly what the
+workstream split exists to prevent. The mitigation is that every retrieval change
+was measured against an unchanged scorer and a control (an identity reranker, a
+no-carry-in baseline, four floor derivations), and that the §6.5 detection suite
+never stopped passing. It is a weaker guarantee than two teams and it is written
+down rather than assumed away.
 
 ## The boundary that matters most
 
