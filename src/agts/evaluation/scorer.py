@@ -144,6 +144,41 @@ class ScoreReport:
                 failing.append(f"{key}: {sl.violations.total} invariant violations")
         return failing
 
+    def distinctive_failures(
+        self,
+        *,
+        candidate_floor: float = 0.95,
+        pack_floor: float = 0.90,
+    ) -> list[str]:
+        """Failing slices that are not already explained by a failing axis.
+
+        The pairwise matrix restates one problem many times: when
+        `answerable=true` fails, so does every crossing containing it, and a
+        release reading 63 lines that are one fact will start skimming. What the
+        matrix exists to find is the other case — a crossing that fails while
+        **both** of its axes pass, which is a hole no single axis can show.
+
+        Reported alongside `failing_slices`, never instead of it: a gate is
+        still a gate, and a crossing whose parent also fails is still failing.
+        """
+        failing = set(self.failing_slices(candidate_floor=candidate_floor, pack_floor=pack_floor))
+        failing_axes = {line.split(":")[0] for line in failing if "×" not in line.split(":")[0]}
+
+        distinctive: list[str] = []
+        for line in sorted(failing):
+            key = line.split(":")[0]
+            if "×" not in key:
+                distinctive.append(line)
+                continue
+            axes, values = key.split("=", 1) if "=" in key else (key, "")
+            first_axis, second_axis = axes.split("×", 1)
+            first_value, second_value = (values.split("×", 1) + [""])[:2] if values else ("", "")
+            parents = {f"{first_axis}={first_value}", f"{second_axis}={second_value}"}
+            if parents & failing_axes:
+                continue
+            distinctive.append(f"{line}   (both axes pass alone)")
+        return distinctive
+
     def is_materially_worse_than(
         self, baseline: ScoreReport, *, margin: float = 0.15
     ) -> bool:
@@ -192,6 +227,11 @@ class AbstentionCalibration:
     highest_unanswerable: float
     n_answerable: int
     n_unanswerable: int
+    #: The false-abstain budget the threshold was derived under, if any.
+    false_abstain_budget: float | None = None
+    #: What the threshold actually costs and buys on the calibration set.
+    false_abstain_rate: float = 0.0
+    unanswerable_refused_rate: float = 0.0
 
     @property
     def separable(self) -> bool:
@@ -200,8 +240,13 @@ class AbstentionCalibration:
         return self.margin > 0.0
 
     def summary(self) -> str:
+        budget = (
+            "" if self.false_abstain_budget is None
+            else f" budget={self.false_abstain_budget:.0%} "
+                 f"costs={self.false_abstain_rate:.0%} buys={self.unanswerable_refused_rate:.0%}"
+        )
         return (
-            f"threshold={self.threshold:.3f} margin={self.margin:.3f} "
+            f"threshold={self.threshold:.3f}{budget} margin={self.margin:.3f} "
             f"(answerable floor {self.lowest_answerable:.3f}, "
             f"unanswerable ceiling {self.highest_unanswerable:.3f}; "
             f"n={self.n_answerable}/{self.n_unanswerable})"
@@ -216,10 +261,26 @@ def calibrate_abstention(
     k_candidates: int = 20,
     include_holdout: bool = False,
     curriculum_version: str = "pilot-0",
+    false_abstain_budget: float | None = None,
 ) -> AbstentionCalibration:
     """Derive an abstention threshold from the visible set.
 
     Never run on the holdout: calibrating on the sealed set is tuning on it.
+
+    Two ways to place the threshold:
+
+    **Midpoint** (default, `false_abstain_budget=None`) sits halfway between the
+    lowest answerable score and the highest unanswerable one. It is the honest
+    thing to report when the two distributions separate, and a poor thing to
+    gate on when they do not: both ends are single outliers, so one unusual case
+    moves the threshold for every other case. A holdout case here missed the
+    midpoint floor by 0.002.
+
+    **Budgeted** places it at the quantile of the answerable distribution that
+    refuses at most `false_abstain_budget` of answerable cases, then reports what
+    that buys in refusals. Foxxy learned the same thing the same way (its D-216):
+    a midpoint threshold wrongly refused 24% of answerable questions, and a
+    measured 5% budget did not.
     """
     cases = gold_set.cases if include_holdout else gold_set.visible
 
@@ -239,13 +300,32 @@ def calibrate_abstention(
 
     floor = min(answerable_tops)
     ceiling = max(unanswerable_tops)
+
+    if false_abstain_budget is None:
+        threshold = (floor + ceiling) / 2.0
+    else:
+        if not 0.0 <= false_abstain_budget < 1.0:
+            raise ValueError("false_abstain_budget must be in [0, 1)")
+        ordered = sorted(answerable_tops)
+        # The highest threshold that still refuses no more than the budget.
+        # int() truncates, so a budget of 0.05 over 50 cases allows 2, not 3.
+        allowed = int(false_abstain_budget * len(ordered))
+        threshold = ordered[allowed] if allowed < len(ordered) else ordered[-1]
+
     return AbstentionCalibration(
-        threshold=(floor + ceiling) / 2.0,
+        threshold=threshold,
         margin=floor - ceiling,
         lowest_answerable=floor,
         highest_unanswerable=ceiling,
         n_answerable=len(answerable_tops),
         n_unanswerable=len(unanswerable_tops),
+        false_abstain_budget=false_abstain_budget,
+        false_abstain_rate=(
+            sum(1 for t in answerable_tops if t < threshold) / len(answerable_tops)
+        ),
+        unanswerable_refused_rate=(
+            sum(1 for t in unanswerable_tops if t < threshold) / len(unanswerable_tops)
+        ),
     )
 
 

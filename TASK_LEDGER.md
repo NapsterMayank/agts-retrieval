@@ -97,9 +97,17 @@
 - [x] **Persistence verified against a real server** (R-029) - own container on
       5434, 7 integration tests passing, pgvector migration applied, 728 blocks
       round-tripped with retrieval scoring identically from files and database
-- [ ] Re-derive the floor on a larger gold set. One holdout case missed it by
-      0.002, which is brittleness, and hand-tightening it would be fitting
-- [ ] Real slice axes wired to §11.2's pairwise matrix
+- [x] Floor re-derivation measured: budgeted calibration built, four budgets
+      compared on the holdout, **midpoint kept** because every looser floor
+      leaks an unanswerable case (R-030)
+- [x] Pairwise slice axes (§11.2): 9 axes, 36 crossings, 166 slices. Distinctive
+      failures separated from restatements, and the matrix immediately found
+      `single_hop × explain` failing while both axes pass (R-031)
+
+## Next, unblocked
+
+- [ ] Fill the gold-set gaps the matrix named: four crossings sit at n=18-19,
+      one or two cases short of gating
 - [ ] Two named adjudicators for the 48 release-critical cases (§6.4)
 - [ ] Real slice axes wired to §11.2's pairwise matrix rather than the six ad-hoc
       axes now in `EvalCase.slice_keys`

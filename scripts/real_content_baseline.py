@@ -164,9 +164,11 @@ def main() -> None:
         rows.append(report)
         print(f"\n{report.summary()}")
         failing = report.failing_slices()
+        distinctive = report.distinctive_failures()
         if failing:
-            print("  failing gating slices:")
-            for line in failing:
+            print(f"  failing gating slices: {len(failing)} "
+                  f"({len(distinctive)} distinctive — the rest restate a failing axis)")
+            for line in distinctive:
                 print(f"    {line}")
 
     if embedder is not None:

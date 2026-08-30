@@ -661,3 +661,47 @@ can use.
 **Verified end to end:** 728 blocks and 77 representations written and read
 back, with retrieval from the database scoring identically to retrieval from
 files (bm25 92.0%, dense 94.0% pack recall in both).
+
+---
+
+### R-030 - The abstention floor stays at the midpoint, measured against the alternative
+**Status:** Active - 30 August 2026
+
+A holdout case missed the floor by 0.002. The midpoint sits between two single
+outliers, so the brittleness is structural, and Foxxy solved the same problem
+with a measured false-abstain budget (D-216).
+
+Four budgets were measured against the holdout. **The midpoint won.** A 2% budget
+lowers the floor to 0.726, buys one answered question and **leaks one
+unanswerable case**; 5% and above refuse more real questions without refusing
+more unanswerable ones.
+
+**Decision:** the midpoint stays, and the budgeted calibration ships as an
+option that reports what a threshold costs and buys. The 0.002 brittleness is
+answered by more gold cases, not by a different formula over the same fifty.
+
+Recorded because the opposite conclusion was expected, and a rejected hypothesis
+that leaves no trace gets re-tried by the next person.
+
+---
+
+### R-031 - Slices are pairwise, and the report separates the distinctive failures
+**Status:** Active - 30 August 2026
+
+`slice_keys` carried six ad-hoc axes. It now carries nine single axes and all 36
+pairwise crossings (section 11.2). Accessibility and provider are **absent
+rather than filled with a constant**: a slice with one value cannot fail, and a
+slice that cannot fail looks like coverage.
+
+The matrix restates itself - a failing axis drags down every crossing containing
+it, turning 12 facts into 63 lines - so `distinctive_failures()` reports a
+crossing only when both its axes pass alone, alongside the full list rather than
+instead of it.
+
+**It found one on the first run:** `single_hop × explain` fails pack recall at
+0.875 while `single_hop` and `explain` each pass. That interaction is invisible
+to single-axis reporting, which is the entire argument for the matrix.
+
+**Consequence:** 166 slices, 66 gating at n >= 20 and 100 reporting only. The
+report-only crossings are a map of the gold set's gaps: the four largest sit at
+n = 18 or 19, one or two cases short of gating.

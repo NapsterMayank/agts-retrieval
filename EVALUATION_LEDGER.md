@@ -606,6 +606,79 @@ Both are exactly the class of defect R-010 records: a fixture that encodes an
 assumption about a system instead of that system's actual behaviour. The test
 suite was green against SQLite-shaped expectations and wrong.
 
+## The floor, re-derived and left alone - 30 August 2026
+
+A holdout case missed the abstention floor by 0.002, which is brittleness worth
+attacking. The floor is the midpoint between the lowest answerable score and the
+highest unanswerable one - both single outliers, so one unusual case moves the
+threshold for every other case.
+
+Foxxy hit this exact problem and solved it with a measured false-abstain budget
+(its D-216: a midpoint threshold wrongly refused 24% of answerable questions).
+So a budgeted calibration was implemented and measured against the holdout:
+
+| floor derivation | floor | visible refuse | visible answer | holdout refuse | holdout answer |
+|---|---:|---:|---:|---:|---:|
+| **midpoint (current)** | 0.737 | 10/10 | 48/50 | **8/8** | **27/30** |
+| budget 2% | 0.726 | 10/10 | 49/50 | 7/8 | 28/30 |
+| budget 5% | 0.749 | 10/10 | 48/50 | 8/8 | 25/30 |
+| budget 10% | 0.778 | 10/10 | 45/50 | 8/8 | 23/30 |
+| budget 15% | 0.782 | 10/10 | 43/50 | 8/8 | 22/30 |
+
+**The hypothesis was wrong and the midpoint stays.** Lowering the floor to 0.726
+buys one more answered question and **leaks one unanswerable case**, which is the
+wrong trade for a tutor; raising it refuses more real questions for no gain in
+refusals. The 0.002 brittleness is real and the answer to it is more gold cases,
+not a different formula over the same fifty.
+
+The budgeted calibration ships anyway as an option, because it reports what a
+threshold *costs and buys* rather than only where it sits - and because the next
+corpus may not behave like this one.
+
+## Pairwise slices, and a real interaction - 30 August 2026
+
+`EvalCase.slice_keys` carried six ad-hoc axes. It now carries nine single axes
+and all 36 of their pairwise crossings (section 11.2). Two of section 11.2's
+axes are deliberately **absent rather than faked**: accessibility has no field
+and no content to vary, and provider belongs to a run rather than a case. A
+slice with one constant value can never fail, which looks like coverage and is
+not.
+
+On the two-chapter corpus: **166 slices, 66 of them gating at n >= 20, 100
+reporting only.**
+
+### The matrix restates itself, so it also reports what is distinctive
+
+A failing axis drags every crossing containing it down with it: one run showed
+63 failing slices that were 12 underlying facts. `distinctive_failures()` reports
+a crossing only when **both of its axes pass alone** - the hole a single axis
+cannot show - alongside the full list rather than instead of it.
+
+It found one immediately, on the visible set:
+
+    question_type × teaching_action = single_hop × explain
+    recall@pack = 0.875   (both axes pass alone)
+
+`single_hop` passes. `explain` passes. Their intersection does not. That is the
+failure the pairwise matrix exists to find, and no amount of single-axis
+reporting would have surfaced it.
+
+### What the matrix also shows about the gold set
+
+The largest report-only crossings are the gaps worth filling first, because they
+are one or two cases short of gating:
+
+| n | crossing |
+|---:|---|
+| 19 | question_type × subject = single_hop × mathematics |
+| 18 | language × modality = en × equation |
+| 18 | answerable × modality = true × equation |
+| 18 | answerable × modality = false × text |
+
+A crossing that never reaches n=20 is a gap in the gold set rather than a
+property of the system, and being able to name which ones those are is the
+reason to compute the matrix now rather than after the set is written.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

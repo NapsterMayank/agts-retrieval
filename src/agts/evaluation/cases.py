@@ -83,18 +83,51 @@ class EvalCase(BaseModel):
         """Release-critical cases require two adjudicators before they gate."""
         return self.holdout or not self.answerable
 
-    def slice_keys(self) -> dict[str, str]:
-        """The axes this case is scored on. Rule 9: every slice gets its own
-        number, and a blended average may not hide a failing one."""
+    def axes(self) -> dict[str, str]:
+        """The single axes of section 11.2 that this repository can currently
+        populate.
+
+        Two of section 11.2's axes are deliberately absent rather than faked:
+        *accessibility* has no field on a case and no content to vary, and
+        *provider* belongs to a run rather than to a case — it is a property of
+        the retriever being scored, and the scorer already reports per retriever.
+        Inventing a constant value for either would add a slice that can never
+        fail, which is worse than not having it.
+        """
         return {
             "grade": self.grade,
             "subject": self.subject,
             "language": self.language.value,
             "question_type": self.question_type.value,
             "teaching_action": self.teaching_action.value,
+            "learner_state": self.learner_state.value,
+            "assessment_state": self.assessment_state.value,
             "modality": self.modality.value,
             "answerable": str(self.answerable).lower(),
         }
+
+    def slice_keys(self) -> dict[str, str]:
+        """Single axes **and their pairwise crossings** (section 11.2).
+
+        Rule 9: every slice gets its own number and a blended average may not
+        hide a failing one. Single axes alone cannot honour that — "science
+        passes" and "equations pass" can both be true while *science equations*
+        fail, which is exactly the kind of hole a pairwise matrix exists to
+        find.
+
+        Most crossings will sit below `GATING_MIN_N` and report without gating,
+        which is the bootstrapping allowance in `docs/01-acceptance-gates.md`
+        and open question Q2 — not a standing exemption. A crossing that never
+        reaches n=20 is a gap in the gold set, and being able to see which ones
+        those are is the reason to compute them now rather than later.
+        """
+        axes = self.axes()
+        keys = dict(axes)
+        names = sorted(axes)
+        for i, first in enumerate(names):
+            for second in names[i + 1:]:
+                keys[f"{first}×{second}"] = f"{axes[first]}×{axes[second]}"
+        return keys
 
 
 class GoldSet(BaseModel):
