@@ -1,0 +1,10 @@
+{
+  "resolution": 1.0,
+  "completeness": 0.9688888888888889,
+  "evidence_precision": 0.03011493870065193,
+  "packs": 98,
+  "answered": 75,
+  "abstained": 23,
+  "unresolved": [],
+  "note": "evidence_precision is a lower-bound proxy over gold blocks, NOT \u00a714's citation precision row, which needs generated sentences (Phase 3, Q5)."
+}

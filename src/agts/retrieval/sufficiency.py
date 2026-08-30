@@ -69,6 +69,13 @@ class SufficiencyDecision:
     threshold: float
     high_confidence: float = float("inf")
     anchored_on_teaching_object: bool = False
+    #: Which retriever produced `items`. Carried so an evidence item can name
+    #: its generator honestly (§11 provenance) instead of saying "retrieval".
+    primary_name: str = "retrieval"
+    #: Every authorised window's score, when the primary retriever can supply
+    #: them. The pack builder uses these to pull in sibling windows that clear
+    #: the same floor; without them it packs only the ranked windows.
+    window_scores: dict[str, float] = field(default_factory=dict)
     items: list[RetrievedItem] = field(default_factory=list)
     reasons: tuple[str, ...] = ()
 
@@ -152,7 +159,10 @@ class SufficiencyGate:
                 f"retrievers, which is what a concept that is named but not taught looks like"
             )
 
+        score_windows = getattr(self.primary, "score_windows", None)
         return SufficiencyDecision(
+            primary_name=getattr(self.primary, "name", "retrieval"),
+            window_scores=score_windows(plan, corpus) if score_windows else {},
             answerable=not reasons,
             top_score=top_score,
             corroboration=corroboration,

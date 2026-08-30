@@ -44,6 +44,22 @@ class DenseRetriever:
         self.name = name
         self.skipped = 0
 
+    def score_windows(self, plan: QueryPlan, corpus: Corpus) -> dict[str, float]:
+        """Every authorised window's score, keyed by representation id.
+
+        `retrieve` keeps one window per object, which is right for ranking and
+        wrong for citation: 31 of 31 missing gold blocks turned out to sit in a
+        sibling window of an object the pack had already selected. The pack
+        builder needs the siblings' scores to decide which of them clear the
+        same bar, so they are exposed rather than recomputed from a guess.
+        """
+        query_vector = self.embedder.embed_query(plan.query_text)
+        return {
+            rep.representation_id: (cosine(query_vector, rep.vector) + 1.0) / 2.0
+            for rep, _ in corpus.authorised_representations(plan)
+            if rep.vector is not None and rep.embedding_model == self.embedder.model
+        }
+
     def retrieve(self, plan: QueryPlan, corpus: Corpus, k: int) -> list[RetrievedItem]:
         query_vector = self.embedder.embed_query(plan.query_text)
         best: dict[str, RetrievedItem] = {}

@@ -473,6 +473,52 @@ in either set.**
 **Still true:** 98 cases against the 300-500 of section 6.4, agent-drafted, and
 adjudicated by nobody. This validates the mechanism, not the curriculum judgement.
 
+## Citation gates, first measurement - 30 August 2026
+
+Evidence packs are now assembled per case (§8.3) and the §14 citation rows are
+scored. Two of the three rows can be measured before a generation stage exists;
+the third is not claimed.
+
+| §14 row | bar | visible 60 | holdout 38 |
+|---|---:|---:|---:|
+| Citation ID resolution | 100% | **100%** | **100%** |
+| Citation completeness | >=95% | **97.2%** | **96.3%** |
+| Citation precision | >=98% | not measurable yet | not measurable yet |
+| *(proxy)* evidence precision | - | 3.4% | 2.4% |
+
+**Citation precision is not measured and is not claimed.** It asks whether a
+citation supports the sentence it is attached to, and there are no sentences: the
+teaching loop is Phase 3, scope-blocked on Q5. The proxy reported instead is the
+fraction of cited blocks that are gold, under its own name, because calling a
+proxy by the gate's name is how an unmet gate gets marked green.
+
+### Completeness failed first, at 77%, and the cause was structural
+
+The first run scored 77.1% against the 95% bar. Locating the misses rather than
+tuning: **31 of 31 missing gold blocks sat in a sibling window of a section the
+pack had already selected.** Retrieval had found the right section every single
+time; the one-window-per-object rule that keeps five slots holding five distinct
+sections had dropped the rest of each one.
+
+Four expansion strategies were measured:
+
+| strategy | completeness | evidence precision | blocks/pack |
+|---|---:|---:|---:|
+| best window per object (before) | 77.3% | 3.7% | 40 |
+| plus immediate neighbour windows | 93.3% | 2.1% | 80 |
+| **plus siblings that clear the floor** | **96.9%** | 3.0% | 73 |
+| plus every window of the object | 100.0% | 1.5% | 126 |
+
+Taking whole objects passes completeness by returning most of a chapter again -
+the failure R-015 was written about. Taking siblings that independently clear the
+same floor the section cleared passes the gate at 73 blocks a pack.
+
+**The evidence-precision proxy at 2-3% is not reassuring and is not meant to
+be.** A pack of 73 blocks carrying 2 gold ones is mostly context. That number is
+the argument for reranking and for per-sentence citation at generation time, and
+it is recorded here so the completeness pass is not read as citations being
+solved.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

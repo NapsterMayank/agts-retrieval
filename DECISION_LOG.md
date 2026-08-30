@@ -551,3 +551,47 @@ zero-tolerance gates in section 14 are about what gets answered wrongly, not
 about what gets refused conservatively. The floor is brittle - one holdout case
 missed it by 0.002 - and a larger gold set should re-derive it rather than have
 it tightened by hand.
+
+---
+
+### R-025 - The pack completes each section it selected; ranking and citation want opposite things
+**Status:** Active - 30 August 2026
+
+Ranking keeps one window per object so five slots hold five distinct sections.
+Citation needs the opposite, and the first citation run showed it: completeness
+77.1% against a 95% gate, with **31 of 31 missing gold blocks in a sibling window
+of a section already in the pack**.
+
+**Decision:** the pack builder pulls in sibling windows of a selected section
+**that clear the same floor the section cleared**. Not "adjacent", which reached
+93.3% and still failed, and not "every window of the object", which reaches 100%
+by handing over 126 blocks a pack - the bloat R-015 exists to prevent. A window
+that would have been retrieved on its own merits is evidence; one that would not
+is padding.
+
+Sibling scores come from `DenseRetriever.score_windows` through the decision, so
+the builder uses real scores rather than a proximity guess, and a retriever that
+cannot supply them gets no expansion rather than an invented one.
+
+**Result:** completeness 97.2% visible, 96.3% holdout, at 73 blocks a pack.
+
+---
+
+### R-026 - Citation precision is not measured, and the proxy is named differently
+**Status:** Active - 30 August 2026
+
+§14 gates citation precision at >=98%: does a citation support the sentence it is
+attached to. There are no sentences - generation is Phase 3, scope-blocked on Q5
+- so the row is **unmeasured and explicitly unclaimed**.
+
+`evidence_precision` is reported instead: the fraction of cited blocks that are
+gold. It is a lower bound (a block can be useful without being gold) and it is
+2-3%, because a 73-block pack carries two or three gold blocks.
+
+**Decision:** the proxy never borrows the gate's name, in the field names rather
+than in a footnote, and `CitationReport.failing_gates` deliberately does not
+evaluate the precision row. An unmeasured gate reports as unmeasured; the
+alternative is a green tick for something nobody checked.
+
+**Consequence:** 2-3% is the standing argument for reranking and for
+sentence-level citation once generation exists.
