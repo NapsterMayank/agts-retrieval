@@ -479,3 +479,75 @@ scores near the ceiling whatever the match quality — the numbers compress into
 BM25 scores directly. Any future fusion feeding a gate must be calibrated on its
 own distribution first, and a margin that improves while accuracy falls is the
 signature to look for.
+
+---
+
+### R-022 - A window carries the statement it continues, and nothing else
+**Status:** Active - 30 August 2026 - **replaces a wrong diagnosis**
+
+Three maths cases scored below the abstention floor. They were recorded as
+formula-text damage (R-008) with Mathpix as the fix. Reading the gold blocks
+disproved that: two of the three are clean prose. The cause was a window boundary
+- "Example 6 : Find the dimensions of the prayer hall" ended one window and its
+answer began the next, which never repeats the phrase.
+
+**Decision:** a window carries forward the last block of the previous window
+**only when that block opens a statement** (Example, Activity, Problem,
+Question). The carried text goes into `search_text` and never into `block_ids`,
+so a window can be found by it and can never cite it.
+
+**Why not carry unconditionally**, which was tried first: pack recall fell from
+94% to 90% for dense and 94% to 84% for BM25, because every window became
+findable by its neighbour's words and the retriever returned continuations for
+queries answered by the block before. Narrowing to statement openers keeps the
+recall and the gate improvement.
+
+**Consequence:** `REPRESENTATION_VERSION` is `block-window-v2`. The vector cache
+is keyed by text hash, so stale vectors could not be silently reused.
+
+---
+
+### R-023 - Corroboration may be weak when it is anchored on a teaching object
+**Status:** Active - 30 August 2026
+
+Requiring two shared objects among the top three refused three textbook
+definitions: dense ranks the definition section first, BM25 ranks the exercises
+first, and they share only the summary - one shared object, indistinguishable by
+count from "completing the square".
+
+**Decision:** answer when the two retrievers share two of their top three, **or**
+share at least one *and* either ranks an object typed `DEFINITION` or `CONCEPT`
+first. Those types come from the hand-written section map (R-009): a human
+curriculum judgement, not a parser output and not a model's opinion.
+
+Measured against every looser alternative on the visible set. Relaxing depth
+instead - top-5 overlap, primary-#1-in-top-5, overlap >= 1 - reaches the same
+48/50 on answerable cases and lets one unanswerable through every time.
+Anchoring is the only variant that keeps 10/10.
+
+**Why it holds:** a concept the chapter teaches has a section that defines it. One
+that is merely named does not, so the agreement has nothing to anchor on - which
+is the mentioned-versus-taught distinction, asked structurally.
+
+---
+
+### R-024 - The holdout number is the one that gets quoted
+**Status:** Active - 30 August 2026
+
+38 cases were written after the gate's constants were fixed and were not
+consulted while choosing them. Constants derived from the visible 60 only.
+
+| | unanswerable refused | answerable answered |
+|---|---:|---:|
+| visible 60 (tuned on) | 10/10 | 48/50 - 96% |
+| holdout 38 | 8/8 | 27/30 - 90% |
+
+**Decision:** 90% is the acceptance figure that leaves this repository, not 96%.
+The visible number is an upper bound on itself, and is reported beside the
+holdout rather than instead of it.
+
+Refusal held at 100% on unseen cases, which is the direction that matters: the
+zero-tolerance gates in section 14 are about what gets answered wrongly, not
+about what gets refused conservatively. The floor is brittle - one holdout case
+missed it by 0.002 - and a larger gold set should re-derive it rather than have
+it tightened by hand.

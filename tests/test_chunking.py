@@ -153,3 +153,37 @@ def test_page_furniture_is_left_out() -> None:
     assigned = {bid for rep in reps for bid in rep.block_ids}
     assert blocks[0].block_id not in assigned
     assert blocks[1].block_id in assigned
+
+
+def test_a_window_carries_the_previous_one_s_last_prose_block_as_context() -> None:
+    """The prayer-hall failure: "Example 6 : Find the dimensions of the prayer
+    hall" ended one window and its answer began the next, which never repeats
+    the phrase. Retrieval was correct and scored below the abstention floor for
+    want of two words."""
+    # Sized so the window closes *after* the Example line, putting the
+    # statement at the end of one window and the answer at the start of the next.
+    blocks = [
+        block(0, "Body about factorisation. " * 25),
+        block(1, "Example 6 : Find the dimensions of the prayer hall discussed in Section 4.1."),
+        block(2, "Thus, the breadth of the hall is 12 m. Its length is 25 m. " * 12),
+    ]
+    reps = represent(obj(blocks), blocks)
+
+    assert len(reps) > 1, "fixture must straddle a window boundary"
+    assert blocks[1].block_id in reps[0].block_ids, "Example line must end the first window"
+    later = reps[1]
+    assert "prayer hall" in later.search_text
+    # Context, not lineage.
+    assert blocks[1].block_id not in later.block_ids
+
+
+def test_carried_context_is_never_a_formula() -> None:
+    """Carrying degraded formula text forward adds noise, not meaning."""
+    blocks = [
+        block(0, "Prose that introduces the working. " * 20),
+        block(1, "2 x 2 - 24 x + 25 x - 300 = 0", block_type=BlockType.FORMULA),
+        block(2, "Second window body text here. " * 30),
+    ]
+    reps = represent(obj(blocks), blocks)
+    if len(reps) > 1:
+        assert "300 = 0" not in reps[1].search_text.split(reps[1].search_text[-50:])[0][:200]

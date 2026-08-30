@@ -39,7 +39,7 @@ from agts.evaluation.scorer import calibrate_abstention, score
 
 ROOT = Path(__file__).parents[1]
 ARTIFACTS = ROOT / "artifacts"
-GOLD = ARTIFACTS / "gold" / "pilot-2-chapters-v0.json"
+GOLD = ARTIFACTS / "gold" / "pilot-2-chapters-v1.json"
 CURRICULUM_VERSION = "2026-27"
 
 CHAPTERS = [

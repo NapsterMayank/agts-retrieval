@@ -53,7 +53,7 @@ def main() -> None:
     print(f"embedding {len(texts)} representations with {embedder.model}")
     embedder.embed_documents(texts)
 
-    gold_set = load_gold_set(ARTIFACTS / "gold" / "pilot-2-chapters-v0.json")
+    gold_set = load_gold_set(ARTIFACTS / "gold" / "pilot-2-chapters-v1.json")
     print(f"embedding {len(gold_set.cases)} queries")
     for case in gold_set.cases:
         embedder.embed_query(case.query)

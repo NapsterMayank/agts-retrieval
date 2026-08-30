@@ -23,6 +23,16 @@ parent that answers and cites. Four rules, each earned:
    window loses by being small, it is short, and it is what makes "1.2.2
    Decomposition Reaction" findable from the paragraph that never repeats the
    word.
+5. **A window carries the last prose block of the one before it as context.**
+   Measured, not assumed: "Example 6 : Find the dimensions of the prayer hall"
+   ends one window and its answer — "the breadth of the hall is 12 m" — begins
+   the next, which never repeats the phrase. The continuation was retrieved
+   correctly and scored below the abstention floor for want of two words.
+
+   The carried text is **context, not lineage**: it is in `search_text` and not
+   in `block_ids`, so a window can be *found* by it and can never *cite* it. A
+   formula block is never carried, because carrying degraded formula text as
+   context adds noise rather than meaning.
 
 Deterministic and model-free: same blocks in, same representations out, so a
 representation id is stable across runs and a rechunk is a diff rather than a
@@ -40,7 +50,7 @@ from agts.contracts.objects import LearningObject, SearchRepresentation, SourceB
 
 #: Bump when the chunking function changes. Representation ids embed it, so two
 #: versions can coexist in one store and be compared on the same gold set.
-REPRESENTATION_VERSION = "block-window-v1"
+REPRESENTATION_VERSION = "block-window-v2"
 
 #: Target characters per window. Not a token count: tokenisation belongs to a
 #: provider, and this stage is provider-independent on purpose (§7.3).
@@ -50,12 +60,30 @@ TARGET_CHARS = 700
 #: a single oversized block is allowed to stand alone rather than be split.
 MAX_CHARS = 1400
 
+#: How many trailing blocks of the previous window are carried in as context.
+#: One is enough for the failure this exists to fix — a worked example whose
+#: statement and answer straddle a boundary — and more would start duplicating
+#: whole windows into their neighbours.
+CONTEXT_BLOCKS = 1
+
 #: Windows shorter than this are merged into the neighbour rather than shipped.
 #: A twelve-character representation matches almost nothing and, when it does,
 #: matches it at a confidence the score cannot justify.
 MIN_CHARS = 120
 
 _FORMULA_LIKE = {BlockType.FORMULA, BlockType.CODE}
+
+#: Openers that mark a *statement* a later window is the continuation of. Only
+#: these are carried forward. Carrying the previous block unconditionally was
+#: measured and rejected: it made every window findable by its neighbour's
+#: words, so the retriever returned continuations for queries whose evidence was
+#: in the block before, and pack recall fell 94% to 90%.
+_STATEMENT_OPENERS = ("example", "activity", "problem", "question")
+
+
+def _is_exercise_statement(text: str) -> bool:
+    head = text.strip().lower()
+    return any(head.startswith(opener) for opener in _STATEMENT_OPENERS)
 
 
 def _text_of(block: SourceBlock) -> str:
@@ -160,12 +188,23 @@ def represent(
         return []
 
     representations: list[SearchRepresentation] = []
-    for number, window in enumerate(_windows(_group(owned)), start=1):
+    windows = _windows(_group(owned))
+    for number, window in enumerate(windows, start=1):
         body = "\n".join(_text_of(b) for b in window if _text_of(b))
         if not body.strip():
             continue
+        # Rule 5: carry the previous window's last prose block. It goes into
+        # search_text and never into block_ids -- this window can be found by
+        # that sentence and can never cite it.
+        carried = ""
+        if number > 1:
+            for block in reversed(windows[number - 2][-4:]):
+                text = _text_of(block)
+                if block.block_type not in _FORMULA_LIKE and _is_exercise_statement(text):
+                    carried = text
+                    break
         # Rule 4: the heading is context the window cannot carry on its own.
-        search_text = f"{obj.heading_path}\n{body}" if obj.heading_path else body
+        search_text = "\n".join(p for p in (obj.heading_path, carried, body) if p)
         representations.append(
             SearchRepresentation(
                 representation_id=f"{obj.object_id}:{version}:{number}",

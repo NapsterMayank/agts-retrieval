@@ -6,7 +6,7 @@ Build guide §18 bands, with what is actually done.
 |---|---|---|
 | Phase 0 — ruler and contracts | Hour 0-8 | **Partially done.** Contracts, evaluation spine and the §6.5 detection suite are built and passing. The 300-500 case gold set is blocked on Q1. |
 | Phase 1 — governed content | Hour 8-24 | **Blocked** on Q1 and Q3 for *registration*. Parsing and composition are built and exercised on two real chapters, held `QUARANTINED`; nothing is registered or publishable. |
-| Phase 2 — retrieval fabric | Hour 16-36 | **Substantially built.** Representations (R-017), BM25 (R-019), embeddings and hybrid (R-021), and a working §8.4 sufficiency gate (R-020) — 10/10 unanswerable refused, 44/50 answerable answered on the two chapters. Constants are fitted to the visible set and need a holdout. |
+| Phase 2 — retrieval fabric | Hour 16-36 | **Substantially built and holdout-validated.** Representations (R-017, R-022), BM25 (R-019), embeddings and hybrid (R-021), and a §8.4 sufficiency gate with anchored corroboration (R-020, R-023). On 38 unseen cases: **8/8 unanswerable refused, 27/30 answered** (R-024). |
 | Phase 3 — grounded teaching loop | Hour 24-48 | Not started. Scope pending (Q5). |
 | Phase 4 — security and operations | Hour 36-56 | Not started. |
 | Phase 5 — combinatorial assurance | Hour 48-68 | Not started. |

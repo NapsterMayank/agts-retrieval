@@ -39,6 +39,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from agts.contracts.common import ObjectType
 from agts.contracts.runtime import QueryPlan, RetrievedItem
 from agts.evaluation.corpus import Corpus
 
@@ -52,6 +53,11 @@ MIN_CORROBORATION = 2
 #: twenty is agreement about the corpus, not about the answer.
 CORROBORATION_DEPTH = 3
 
+#: Object types that mean "this section teaches the concept" rather than
+#: "this section mentions it". They come from the hand-written section map
+#: (R-009) — a curriculum judgement made by a human, not a parser or a model.
+TEACHING_TYPES = frozenset({ObjectType.DEFINITION, ObjectType.CONCEPT})
+
 
 @dataclass(frozen=True)
 class SufficiencyDecision:
@@ -62,6 +68,7 @@ class SufficiencyDecision:
     corroboration: int
     threshold: float
     high_confidence: float = float("inf")
+    anchored_on_teaching_object: bool = False
     items: list[RetrievedItem] = field(default_factory=list)
     reasons: tuple[str, ...] = ()
 
@@ -89,6 +96,7 @@ class SufficiencyGate:
         high_confidence: float | None = None,
         min_corroboration: int = MIN_CORROBORATION,
         depth: int = CORROBORATION_DEPTH,
+        teaching_types: frozenset = TEACHING_TYPES,
     ) -> None:
         self.primary = primary
         self.corroborator = corroborator
@@ -99,6 +107,7 @@ class SufficiencyGate:
         self.high_confidence = float("inf") if high_confidence is None else high_confidence
         self.min_corroboration = min_corroboration
         self.depth = depth
+        self.teaching_types = teaching_types
 
     def decide(self, plan: QueryPlan, corpus: Corpus, k: int = 20) -> SufficiencyDecision:
         items = self.primary.retrieve(plan, corpus, k)
@@ -109,6 +118,21 @@ class SufficiencyGate:
             i.object_id for i in other[: self.depth]
         }
         corroboration = len(shared)
+
+        # Weak agreement is enough when it is anchored on a section the
+        # curriculum classifies as *teaching* the concept. Measured, not
+        # assumed: "What is a decomposition reaction?" has the definition
+        # section ranked first by one retriever and the exercises ranked first
+        # by the other, because a definition legitimately appears in the
+        # section, the summary and the exercises. Requiring two shared objects
+        # there refuses a textbook question. "Completing the square" has no
+        # definition section to anchor on -- both retrievers land on the
+        # introduction that names it in passing -- so it still abstains.
+        anchored = corroboration >= 1 and any(
+            corpus.objects[item.object_id].object_type in self.teaching_types
+            for item in (items[:1] + other[:1])
+            if item.object_id in corpus.objects
+        )
 
         reasons: list[str] = []
         if not items:
@@ -121,6 +145,7 @@ class SufficiencyGate:
             items
             and top_score < self.high_confidence
             and corroboration < self.min_corroboration
+            and not anchored
         ):
             reasons.append(
                 f"only {corroboration} of the top {self.depth} objects are shared by both "
@@ -131,6 +156,7 @@ class SufficiencyGate:
             answerable=not reasons,
             top_score=top_score,
             corroboration=corroboration,
+            anchored_on_teaching_object=anchored,
             threshold=self.threshold,
             high_confidence=self.high_confidence,
             items=items,

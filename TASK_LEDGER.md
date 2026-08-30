@@ -68,17 +68,29 @@
       answerable answered.** Completing the square, Pythagoras and the distance
       formula are all correctly refused, with reasons
 
+- [x] Rule 5 in the chunker (R-022) — carries a worked-example statement into the
+      window that continues it. **Replaced a wrong diagnosis:** those failures
+      were a window boundary, not formula damage, so Mathpix was never the fix
+- [x] Anchored corroboration (R-023) — 48/50 on the visible set with refusal
+      still at 10/10, where every looser rule leaked one unanswerable case
+- [x] 38 holdout cases written after the constants were fixed. **8/8 refused,
+      27/30 answered (R-024)** — 90% is the number that gets quoted, not 96%
+
+## Blocked on a credential
+
+- [ ] **Mathpix has no API key anywhere in this repo or Foxxy's env.** Still
+      worth doing for the maths formula crops, but its value is now unproven
+      rather than assumed — the failures blamed on formula text were not caused
+      by it. `maths-023` is the one case where inline formula damage is visibly
+      in the evidence
+
 ## Next, unblocked
 
-- [ ] **Mathpix on the maths formula crops.** Three of the six gate failures are
-      maths questions whose evidence is mangled formula text (R-008), not gate
-      defects. Needs an API key
-- [ ] Corroboration at **concept** level rather than object level — the other
-      three failures are definitions that legitimately live in three sections
-- [ ] More gold cases, then re-derive the floor and ceiling and seal a holdout.
-      Both constants are currently fitted to the set they are scored on
+- [ ] Re-derive the floor on a larger gold set. One holdout case missed it by
+      0.002, which is brittleness, and hand-tightening it would be fitting
 - [ ] Reranking, tuned on pack recall (Q4)
 - [ ] Postgres schema for sources, blocks, objects, representations
+- [ ] Two named adjudicators for the 48 release-critical cases (§6.4)
 - [ ] Extend the gold set past 60 cases, and get two named reviewers onto the 10
       release-critical ones
 

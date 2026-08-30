@@ -94,3 +94,69 @@ def test_the_corroborator_never_changes_what_is_returned(plan, corpus) -> None:
     other = [item("a", 0.95), item("q", 0.9), item("r", 0.85)]
     returned = gate(Fixed("p", primary), Fixed("c", other)).retrieve(plan, corpus, 5)
     assert [i.object_id for i in returned] == ["a", "b", "c"]
+
+
+def teaching_corpus():
+    """Two objects: one the curriculum classifies as a definition, one not."""
+    from agts.contracts.common import (
+        ApprovalState, AuthorityTier, Board, DisclosureClass, Language, Modality, ObjectType,
+    )
+    from agts.contracts.objects import CurriculumIdentity, LearningObject
+
+    curriculum = CurriculumIdentity(
+        board=Board.CBSE, curriculum_version="pilot-0", grade="10",
+        subject="science", unit_id="u1", concept_ids=["c1"],
+    )
+
+    def make(object_id: str, object_type: ObjectType, heading: str) -> LearningObject:
+        return LearningObject(
+            object_id=object_id, object_type=object_type, source_id="s1",
+            block_ids=[f"{object_id}-b"], curriculum=curriculum, heading_path=heading,
+            text="body", language=Language.EN, modality=Modality.TEXT,
+            authority_tier=AuthorityTier.BOARD_OFFICIAL,
+            disclosure_class=DisclosureClass.PUBLIC, composition_version="v1",
+            content_hash="0" * 64, approval_state=ApprovalState.QUARANTINED,
+        )
+
+    return Corpus(objects={
+        "definition": make("definition", ObjectType.DEFINITION, "1.2.2 Decomposition Reaction"),
+        "prose": make("prose", ObjectType.EXPLANATION, "4.1 Introduction"),
+        "other": make("other", ObjectType.EXPLANATION, "E X E R C I S E S"),
+    })
+
+
+def test_weak_agreement_is_enough_when_anchored_on_a_definition(plan) -> None:
+    """"What is a decomposition reaction?": one retriever ranks the definition
+    section first, the other the exercises, and they share only the summary.
+    Requiring two shared objects there refuses a textbook question."""
+    corpus = teaching_corpus()
+    primary = [item("definition", 0.6), item("other", 0.55), item("prose", 0.5)]
+    corroborator = [item("other", 0.6), item("x", 0.55), item("y", 0.5)]
+
+    decision = gate(Fixed("p", primary), Fixed("c", corroborator)).decide(plan, corpus)
+    assert decision.answerable
+    assert decision.anchored_on_teaching_object
+
+
+def test_weak_agreement_on_prose_alone_still_abstains(plan) -> None:
+    """"Completing the square" has no definition section to anchor on: both
+    retrievers land on the introduction that names it in passing."""
+    corpus = teaching_corpus()
+    primary = [item("prose", 0.6), item("other", 0.55), item("z", 0.5)]
+    corroborator = [item("prose", 0.6), item("q", 0.55), item("r", 0.5)]
+    # They share one object, and it is prose, so the anchor does not apply;
+    # sharing only one object is below the corroboration floor.
+    corroborator = [item("y", 0.6), item("prose", 0.55), item("r", 0.5)]
+
+    decision = gate(Fixed("p", primary), Fixed("c", corroborator)).decide(plan, corpus)
+    assert decision.abstained
+    assert not decision.anchored_on_teaching_object
+
+
+def test_the_anchor_still_requires_some_agreement(plan) -> None:
+    """A definition ranked first with zero overlap is one retriever's opinion."""
+    corpus = teaching_corpus()
+    primary = [item("definition", 0.6), item("a", 0.55), item("b", 0.5)]
+    corroborator = [item("x", 0.6), item("y", 0.55), item("z", 0.5)]
+
+    assert gate(Fixed("p", primary), Fixed("c", corroborator)).decide(plan, corpus).abstained

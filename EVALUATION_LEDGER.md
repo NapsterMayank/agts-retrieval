@@ -376,9 +376,17 @@ refused with a reason a human can read.
 ### The six failures, and they are not all the same kind
 
 Three are **below the floor**: the prayer-hall dimensions (0.687), the repeated
-factor (0.710), the rejected negative root (0.716). All three are *maths*
-questions whose evidence is mangled formula text (R-008). The floor is not the
-problem; the parse is, and Mathpix on the formula crops is the fix.
+factor (0.710), the rejected negative root (0.716).
+
+> **Correction, 30 August.** This entry originally attributed all three to
+> mangled formula text and named Mathpix as the fix. That was wrong, and reading
+> the actual gold blocks disproved it: for two of the three the evidence is clean
+> prose - *"Thus, the breadth of the hall is 12 m. Its length = 2x + 1 = 25 m."*
+> The real cause was a **window boundary**: "Example 6 : Find the dimensions of
+> the prayer hall" ended one window and its answer began the next, which never
+> repeats the phrase. Retrieval ranked the right window first and scored it below
+> the floor for want of two words. Fixed by rule 5 in the chunker (R-022), not by
+> an OCR engine.
 
 Three are **corroboration failures on definitional queries** — "What is a
 balanced chemical equation?", "…decomposition reaction?", "…displacement
@@ -396,6 +404,74 @@ adjudicated any of it. A gate calibrated on the same cases it is scored against
 is an upper bound on its own performance. It is honest as a mechanism and
 unvalidated as a number, and the first thing the real gold set must do is
 re-derive both constants and re-run this table.
+
+## Carry-in context, anchored corroboration, and a holdout - 30 August 2026
+
+Three changes, each measured before and after, and one hypothesis rejected.
+
+### Rule 5: a window carries the previous window's statement line
+
+**The first attempt carried the previous block unconditionally, and it was
+worse.** Every window became findable by its neighbour's words, so the retriever
+returned continuations for queries whose evidence was in the block before:
+
+| variant | dense recall@pack | bm25 recall@pack | gate (visible) |
+|---|---:|---:|---:|
+| no carry-in | 94% | 94% | 44/50 |
+| carry previous block always | **90%** | **84%** | 46/50 |
+| carry only *statement* openers | 94% | 92% | **45/50** |
+
+Narrowed to blocks opening with Example / Activity / Problem / Question - the
+worked-example statements a continuation window is the continuation *of* - it
+keeps the recall and takes the gate improvement.
+
+### Anchored corroboration
+
+The three definitional false abstains looked identical to a mention under the old
+rule: "What is a decomposition reaction?" has the *definition section* ranked
+first by dense and the *exercises* ranked first by BM25, sharing only the summary
+- one shared object, the same count as "completing the square".
+
+What differs is **what** they share and what sits at rank 1. Five rules were
+measured on the visible set:
+
+| rule | unanswerable refused | answerable answered |
+|---|---:|---:|
+| top3 overlap >= 2 | **10/10** | 45/50 |
+| primary #1 in corroborator top 5 | 9/10 | 48/50 |
+| top5 overlap >= 2 | 9/10 | 48/50 |
+| top3 overlap >= 1 | 9/10 | 48/50 |
+| **overlap >= 2, OR overlap >= 1 anchored on a definition** | **10/10** | **48/50** |
+
+Every loosening that reached 48/50 by relaxing depth also let one unanswerable
+through. Anchoring gets both, because it asks a different question: is the
+agreement resting on a section the *curriculum* classifies as teaching this
+concept (R-009's hand-written section map), rather than on prose that names it.
+"Completing the square" has no definition section to anchor on - both retrievers
+land on the introduction - so it still abstains.
+
+### The holdout
+
+38 cases written **after** the floor, ceiling and corroboration rule were fixed,
+and not consulted while choosing any of them. Constants derived from the visible
+60 only.
+
+| | unanswerable refused | answerable answered |
+|---|---:|---:|
+| visible 60 (tuned on - upper bound) | 10/10 | 48/50 - 96% |
+| **holdout 38 (never consulted)** | **8/8** | **27/30 - 90%** |
+
+**Refusal generalises perfectly; acceptance loses six points.** That gap is the
+cost of fitting two constants to sixty cases, and it is the number to quote - not
+the 96%.
+
+The three holdout misses are the two kinds already known: one below the floor by
+0.002 (`h-chem-06`, 0.735 against 0.737, which says the floor is brittle rather
+than wrong) and two corroboration failures. **No unanswerable case was answered
+in either set.**
+
+**Still true:** 98 cases against the 300-500 of section 6.4, agent-drafted, and
+adjudicated by nobody. This validates the mechanism, not the curriculum judgement.
 
 ## Holdout
 
