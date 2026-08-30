@@ -181,3 +181,36 @@ def test_completeness_below_the_floor_is_reported_as_a_failing_gate(case, corpus
     gold_set = GoldSet(gold_set_id="g", cases=[case])
     report = score_citations(gold_set, {"c1": pack_for(case, answered(), corpus)}, corpus)
     assert any("completeness" in line for line in report.failing_gates())
+
+
+def test_delivered_recall_counts_what_the_pack_carried_not_what_ranked(case, corpus) -> None:
+    """A case can miss `recall_at_pack` and still receive its evidence.
+
+    maths-004 is the real example: the gold block sits in window 2 of a section
+    whose window 1 outranked it, so the retriever's ranked list misses, and the
+    pack contains it anyway because sibling expansion runs after ranking. The
+    ruler has to be able to say which of the two happened.
+    """
+    gold_set = GoldSet(gold_set_id="g", cases=[case])
+
+    ranked_only = pack_for(case, answered(), corpus)
+    with_siblings = pack_for(case, answered({"o1:v:1": 0.9, "o1:v:2": 0.8}), corpus)
+
+    # Both deliver *some* gold, so delivered recall is 1.0 for each...
+    assert score_citations(gold_set, {"c1": ranked_only}, corpus).delivered_recall == 1.0
+    assert score_citations(gold_set, {"c1": with_siblings}, corpus).delivered_recall == 1.0
+    # ...while completeness separates them, which is the point of having both.
+    assert score_citations(gold_set, {"c1": ranked_only}, corpus).completeness == 0.5
+    assert score_citations(gold_set, {"c1": with_siblings}, corpus).completeness == 1.0
+
+
+def test_delivered_recall_is_zero_when_the_pack_carries_no_gold(case, corpus) -> None:
+    gold_set = GoldSet(gold_set_id="g", cases=[case])
+    decision = answered()
+    decision = SufficiencyDecision(
+        answerable=True, top_score=0.9, corroboration=2, threshold=0.7,
+        items=[RetrievedItem(object_id="o1", block_ids=("doc:docling:texts-2",), score=0.9,
+                             representation_id="o1:v:3")],
+    )
+    pack = pack_for(case, decision, corpus)
+    assert score_citations(gold_set, {"c1": pack}, corpus).delivered_recall == 0.0

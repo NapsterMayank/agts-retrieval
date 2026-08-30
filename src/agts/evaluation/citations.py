@@ -64,6 +64,12 @@ class CitationCaseResult:
 @dataclass(frozen=True)
 class CitationReport:
     resolution: float
+    #: Fraction of answered cases whose pack contains at least one gold block.
+    #: The pack-level counterpart of `recall_at_pack`, and the one that answers
+    #: "did the teaching loop receive the evidence" -- `recall_at_pack` scores
+    #: the retriever's ranked windows, and the pack adds sibling windows after
+    #: ranking (R-025). A case can miss on one and hit on the other.
+    delivered_recall: float | None
     completeness: float | None
     evidence_precision: float | None
     packs: int
@@ -93,7 +99,8 @@ class CitationReport:
 
         return (
             f"packs={self.packs} answered={self.answered} abstained={self.abstained} "
-            f"resolution={pct(self.resolution)} completeness={pct(self.completeness)} "
+            f"resolution={pct(self.resolution)} delivered_recall={pct(self.delivered_recall)} "
+            f"completeness={pct(self.completeness)} "
             f"evidence_precision={pct(self.evidence_precision)}"
         )
 
@@ -163,11 +170,16 @@ def score_citations(
         )
 
     answered = [r for r in results if r.answered]
+    delivered = [r for r in answered if r.gold_blocks]
     completeness = [r.completeness for r in answered if r.completeness is not None]
     precision = [r.evidence_precision for r in answered if r.evidence_precision is not None]
 
     return CitationReport(
         resolution=(sum(r.resolved for r in results) / len(results)) if results else 1.0,
+        delivered_recall=(
+            sum(1 for r in delivered if r.gold_blocks_cited) / len(delivered)
+            if delivered else None
+        ),
         completeness=(sum(completeness) / len(completeness)) if completeness else None,
         evidence_precision=(sum(precision) / len(precision)) if precision else None,
         packs=len(results),

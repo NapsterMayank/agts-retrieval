@@ -10,8 +10,9 @@ Reports citation ID resolution and completeness, which are gated, and
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from statistics import median
 
@@ -25,7 +26,9 @@ from agts.evaluation.quarantine import ChapterArtefact, load_corpus
 from agts.evaluation.scorer import calibrate_abstention
 from agts.platform.embedding import CachedEmbedding
 from agts.retrieval import BM25Representations, DenseRetriever
+from agts.retrieval.chunking import REPRESENTATION_VERSION
 from agts.retrieval.packing import build_pack
+from agts.retrieval.provenance import build_manifest, build_trace, lineage_failures
 from agts.retrieval.sufficiency import SufficiencyGate
 
 ROOT = Path(__file__).parents[1]
@@ -70,16 +73,47 @@ def main() -> None:
         dense, lexical, threshold=calibration.threshold, high_confidence=tops[len(tops) // 2]
     )
 
+    commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"], capture_output=True, text=True
+    ).stdout.strip() or "unknown"
+    manifest = build_manifest(
+        corpus,
+        manifest_id="rm-pilot-2-chapters-0001",
+        created_at=datetime(2026, 8, 30, tzinfo=UTC),
+        commit_sha=commit,
+        versions={
+            "representation": REPRESENTATION_VERSION,
+            "composition": "section-v1",
+            "embedding": "voyage-3",
+        },
+    )
+    print(f"release manifest {manifest.release_manifest_id}: "
+          f"{len(manifest.object_ids)} objects, {len(manifest.source_ids)} sources, "
+          f"checksum {manifest.checksum_sha256[:16]}..., "
+          f"approved by {manifest.approved_by or 'NOBODY (unsigned)'}")
+
     packs = {}
+    traces = {}
+    lineage = []
     for case in gold_set.cases:
         plan = plan_for_case(case, curriculum_version=CURRICULUM_VERSION)
         decision = gate.decide(plan, corpus)
-        packs[case.case_id] = build_pack(
+        pack = build_pack(
             plan, decision, corpus,
             pack_id=f"pack-{case.case_id}",
             trace_id=f"trace-{case.case_id}",
-            release_manifest_id="unreleased-quarantined",
+            release_manifest_id=manifest.release_manifest_id,
         )
+        packs[case.case_id] = pack
+        traces[case.case_id] = build_trace(
+            plan, decision, corpus, trace_id=f"trace-{case.case_id}", manifest=manifest
+        )
+        lineage.extend(lineage_failures(pack, manifest, corpus))
+
+    print(f"§14 approved-source and lineage resolution: "
+          f"{'PASS' if not lineage else f'FAIL ({len(lineage)})'}")
+    for line in lineage[:5]:
+        print(f"    {line}")
 
     for label, holdout in (("VISIBLE", False), ("HOLDOUT", True)):
         subset = gold_set.model_copy(
@@ -100,12 +134,19 @@ def main() -> None:
     everything = score_citations(gold_set, packs, corpus, include_holdout=True)
     out.write_text(json.dumps({
         "resolution": everything.resolution,
+        "delivered_recall": everything.delivered_recall,
         "completeness": everything.completeness,
         "evidence_precision": everything.evidence_precision,
         "packs": everything.packs,
         "answered": everything.answered,
         "abstained": everything.abstained,
         "unresolved": everything.unresolved,
+        "release_manifest_id": manifest.release_manifest_id,
+        "corpus_checksum": manifest.checksum_sha256,
+        "commit_sha": manifest.commit_sha,
+        "approved_by": manifest.approved_by,
+        "lineage_failures": lineage,
+        "traced_candidates": sum(len(t.candidates) for t in traces.values()),
         "note": (
             "evidence_precision is a lower-bound proxy over gold blocks, NOT §14's "
             "citation precision row, which needs generated sentences (Phase 3, Q5)."

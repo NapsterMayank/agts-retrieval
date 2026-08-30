@@ -679,6 +679,65 @@ A crossing that never reaches n=20 is a gap in the gold set rather than a
 property of the system, and being able to name which ones those are is the
 reason to compute the matrix now rather than after the set is written.
 
+## The interaction was a measurement gap, and lineage is now gated - 30 August 2026
+
+### `single_hop x explain` was the ruler, not the retrieval
+
+The pairwise matrix flagged `question_type x teaching_action = single_hop x
+explain` failing pack recall at 0.875 while both axes passed alone. Tracing the
+misses instead of tuning anything:
+
+For the retriever that ships, exactly one case failed - `maths-004`, *"How many
+roots can a quadratic equation have at most?"* Its gold block sits in **window 2**
+of section 4.3, and window 1 of that same section outranked it. One item per
+object is the ranking rule, so the retriever's list missed.
+
+**The delivered pack contained the gold block anyway**, because sibling expansion
+runs after ranking (R-025). The slice was failing on a number that does not
+describe what the teaching loop receives.
+
+**Fix: measure what is delivered.** `CitationReport.delivered_recall` scores the
+pack rather than the ranked list, and sits beside `recall_at_pack` rather than
+replacing it - one measures ranking, the other measures delivery, and a case can
+miss on one and hit on the other.
+
+| | visible | holdout |
+|---|---:|---:|
+| recall_at_pack (ranking) | 94.0% | 76.7% |
+| **delivered_recall (what the pack carried)** | **100.0%** | **96.3%** |
+| citation completeness | 97.2% | 96.3% |
+
+Every answered case on the visible set receives its gold evidence. The gap
+between 94.0% and 100.0% is entirely sibling expansion, which is exactly what it
+was built to do (31 of 31 missing blocks, R-025) and had not been measured
+end to end until now.
+
+### Release manifests and traces (sections 11 and 14)
+
+Two section 14 rows were unenforced by anything:
+
+**Approved-source and lineage resolution, 100%.** A `ReleaseManifest` is now
+built by hashing what is actually in the corpus - source checksums, object
+content hashes, representation hashes and their embedding model - rather than by
+recording what someone believed was in it. `lineage_failures()` refuses a pack
+that cites an object outside the serving release, cites an object whose source is
+not in the manifest, or claims a manifest it was not built against.
+
+**Result over 98 packs: 0 lineage failures.**
+
+**Reproducibility.** Every decision now emits a `RetrievalTrace` naming the
+corpus checksum, the commit, the abstention threshold, the high-confidence
+ceiling, the primary retriever and every filter applied - including the
+evaluation licence, so a run over quarantined content says so in its own trace
+rather than only in the report that quotes it. Rejected candidates are recorded
+with a reason: **375 admitted and 1,045 rejected with a stated cause** across the
+98 packs, because a trace of only the winners cannot answer the question anyone
+actually asks of it.
+
+The manifest reports `approved by NOBODY (unsigned)` and will keep saying so
+until named humans sign it. An unsigned manifest still answers "which corpus";
+calling it approved because it exists is how a release gate becomes decorative.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

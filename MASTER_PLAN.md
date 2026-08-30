@@ -8,7 +8,7 @@ Build guide §18 bands, with what is actually done.
 | Phase 1 — governed content | Hour 8-24 | **Blocked** on Q1 and Q3 for *registration*. Parsing and composition are built and exercised on two real chapters, held `QUARANTINED`; nothing is registered or publishable. |
 | Phase 2 — retrieval fabric | Hour 16-36 | **Substantially built and holdout-validated.** Representations (R-017, R-022), BM25 (R-019), embeddings and hybrid (R-021), and a §8.4 sufficiency gate with anchored corroboration (R-020, R-023). On 38 unseen cases: **8/8 unanswerable refused, 27/30 answered** (R-024). |
 | Phase 3 — grounded teaching loop | Hour 24-48 | Not started. Scope pending (Q5). |
-| Phase 4 — security and operations | Hour 36-56 | Not started. |
+| Phase 4 — security and operations | Hour 36-56 | **Started.** Release manifests, retrieval traces and the §14 lineage gate are built and passing (R-033). Rollback, secrets and abuse handling are not. |
 | Phase 5 — combinatorial assurance | Hour 48-68 | Not started. |
 | Phase 6 — release candidate | Hour 68-72 | Not started. |
 | Human assurance | Days 4-7 | Not started. Needs named reviewers. |

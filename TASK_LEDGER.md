@@ -104,6 +104,13 @@
       failures separated from restatements, and the matrix immediately found
       `single_hop × explain` failing while both axes pass (R-031)
 
+- [x] `single_hop x explain` traced to a measurement gap, not a retrieval defect:
+      delivered recall now measures the pack rather than the ranking (R-032).
+      100% visible, 96.3% holdout
+- [x] Release manifests, retrieval traces and the §14 lineage gate (R-033) —
+      0 lineage failures over 98 packs, 1,045 rejected candidates each carrying
+      a reason
+
 ## Next, unblocked
 
 - [ ] Fill the gold-set gaps the matrix named: four crossings sit at n=18-19,

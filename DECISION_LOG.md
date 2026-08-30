@@ -705,3 +705,54 @@ to single-axis reporting, which is the entire argument for the matrix.
 **Consequence:** 166 slices, 66 gating at n >= 20 and 100 reporting only. The
 report-only crossings are a map of the gold set's gaps: the four largest sit at
 n = 18 or 19, one or two cases short of gating.
+
+---
+
+### R-032 - Ranking recall and delivered recall are different numbers, and both are reported
+**Status:** Active - 30 August 2026
+
+The pairwise matrix flagged `single_hop x explain` failing pack recall while both
+axes passed. The cause was not retrieval: `maths-004`'s gold block sits in window
+2 of a section whose window 1 outranked it, so the retriever's ranked list missed
+it - **and the delivered pack contained it**, because sibling expansion runs
+after ranking (R-025).
+
+**Decision:** `CitationReport.delivered_recall` measures the pack, beside
+`recall_at_pack` which measures the ranking. Neither replaces the other: one
+answers "did the retriever order it correctly", the other answers "did the
+teaching loop receive it", and they are allowed to disagree.
+
+Delivered recall is 100% visible and 96.3% holdout, against 94.0% and 76.7% for
+ranking. The whole gap is sibling expansion doing what it was built to do, which
+had never been measured end to end.
+
+**The general point:** a slice that fails is a question, not a verdict. This one
+turned out to be a gap in the ruler rather than a defect in the system, and
+tuning retrieval to satisfy it would have optimised against a number that does
+not describe what a learner receives.
+
+---
+
+### R-033 - The release manifest is computed from the corpus, and signed by nobody until it is
+**Status:** Active - 30 August 2026
+
+Section 14 gates approved-source and lineage resolution at 100%, and nothing
+enforced it. A `ReleaseManifest` is now built by **hashing the corpus** - source
+checksums, object content hashes, representation hashes and their embedding
+model - rather than by recording what someone believed was in it. A hand-written
+manifest agrees with the corpus exactly until the first time it does not.
+
+`lineage_failures()` fails a pack three ways, each of which produces a plausible
+answer with an unaccountable origin: citing an object outside the serving
+release, citing an object whose source is not in the manifest, or claiming a
+manifest it was not built against. **0 failures over 98 packs.**
+
+`approved_by` stays empty until named humans sign it, and the report prints
+`approved by NOBODY (unsigned)`. The manifest is still useful unsigned - it
+answers "which corpus produced this" - and treating its existence as approval is
+how a release gate becomes decorative.
+
+Traces record the corpus checksum, commit, thresholds, primary retriever and
+every filter applied, including the evaluation licence. Rejected candidates carry
+a reason - 1,045 of them across 98 packs - because a trace of only the winners
+cannot answer why a passage was not used.
