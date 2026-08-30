@@ -1,0 +1,58 @@
+[
+  {
+    "retriever": "dense (control)",
+    "recall_at_20": 0.94,
+    "recall_at_pack": 0.94,
+    "recall_at_pack_holdout": 0.7666666666666667,
+    "blocks_per_pack": 39.58,
+    "violations": 0
+  },
+  {
+    "retriever": "dense + identity rerank",
+    "recall_at_20": 0.94,
+    "recall_at_pack": 0.94,
+    "recall_at_pack_holdout": 0.7666666666666667,
+    "blocks_per_pack": 39.58,
+    "violations": 0
+  },
+  {
+    "retriever": "dense + rerank-2",
+    "recall_at_20": 0.94,
+    "recall_at_pack": 0.94,
+    "recall_at_pack_holdout": 0.7666666666666667,
+    "blocks_per_pack": 37.52,
+    "violations": 0
+  },
+  {
+    "retriever": "bm25 (control)",
+    "recall_at_20": 0.92,
+    "recall_at_pack": 0.92,
+    "recall_at_pack_holdout": 0.8333333333333334,
+    "blocks_per_pack": 39.16,
+    "violations": 0
+  },
+  {
+    "retriever": "bm25 + rerank-2",
+    "recall_at_20": 0.92,
+    "recall_at_pack": 0.92,
+    "recall_at_pack_holdout": 0.8333333333333334,
+    "blocks_per_pack": 39.44,
+    "violations": 0
+  },
+  {
+    "retriever": "hybrid (control)",
+    "recall_at_20": 0.94,
+    "recall_at_pack": 0.94,
+    "recall_at_pack_holdout": 0.7666666666666667,
+    "blocks_per_pack": 39.82,
+    "violations": 0
+  },
+  {
+    "retriever": "hybrid + rerank-2",
+    "recall_at_20": 0.94,
+    "recall_at_pack": 0.94,
+    "recall_at_pack_holdout": 0.7666666666666667,
+    "blocks_per_pack": 38.2,
+    "violations": 0
+  }
+]

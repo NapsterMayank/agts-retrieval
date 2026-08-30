@@ -519,6 +519,54 @@ the argument for reranking and for per-sentence citation at generation time, and
 it is recorded here so the completeness pass is not read as citations being
 solved.
 
+## Reranking earns nothing at this scale - 30 August 2026
+
+Voyage `rerank-2` over the retriever's top 20, judged on pack recall because
+that is the failure Q4 describes: twenty correct candidates with the gold span
+ordered into position nine of a five-slot pack.
+
+| retriever | recall@20 | pack (visible) | pack (holdout) | blocks/pack |
+|---|---:|---:|---:|---:|
+| dense (control) | 94.0% | 94.0% | 76.7% | 39.6 |
+| dense + identity rerank | 94.0% | 94.0% | 76.7% | 39.6 |
+| dense + rerank-2 | 94.0% | 94.0% | 76.7% | 37.5 |
+| bm25 (control) | 92.0% | 92.0% | **83.3%** | 39.2 |
+| bm25 + rerank-2 | 92.0% | 92.0% | 83.3% | 39.4 |
+| hybrid (control) | 94.0% | 94.0% | 76.7% | 39.8 |
+| hybrid + rerank-2 | 94.0% | 94.0% | 38.2 blocks | 76.7% |
+
+**Not one pairing moved pack recall by a single case.** The reason is visible in
+the first column: `recall@20` and `recall@pack` are identical for every
+retriever, which means the gold object is already inside the top five whenever it
+is retrieved at all. There is nothing for a reranker to reorder. With 38 objects
+and one candidate per object, the candidate list is usually shorter than the
+pack.
+
+**Decision: the adapter ships, the stage does not** (R-027). It is wired,
+cached, tested and switched off, and the benchmark is the thing to re-run when
+the corpus is a curriculum rather than two chapters.
+
+An identity reranker was run alongside as the control, because "we added a
+reranker and the number went up" is not evidence unless the same harness ran
+without one. Here nothing went up, which is a cleaner answer.
+
+### The holdout column disagrees with the visible column
+
+BM25 beats dense on unseen cases - 83.3% against 76.7% pack recall - while
+losing on the cases the thresholds were fitted to. That inversion is worth more
+than the rerank result, so the obvious question was asked directly: should the
+sufficiency gate use BM25 as its primary retriever?
+
+| gate primary | visible refuse | visible answer | holdout refuse | holdout answer |
+|---|---:|---:|---:|---:|
+| **dense (current)** | 10/10 | 48/50 | **8/8** | **27/30** |
+| bm25 | 10/10 | 45/50 | 6/8 | 26/30 |
+
+**No.** Dense keeps the gate accurate on unseen cases where BM25 lets two
+unanswerable questions through. Better pack recall did not translate into a
+better gate, which is a reminder that a retriever is chosen for the decision it
+supports and not for its headline number.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

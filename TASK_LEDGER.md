@@ -84,12 +84,21 @@
       by it. `maths-023` is the one case where inline formula damage is visibly
       in the evidence
 
+- [x] Evidence packs (§8.3) and the §14 citation gates: resolution 100%,
+      completeness 97.2% visible / 96.3% holdout (R-025). Precision is
+      unmeasured and unclaimed until generation exists (R-026)
+- [x] Postgres schema and repository (§7.1) — §5 as CHECK constraints, the
+      authorisation filter in SQL. **Not yet run against a live server**
+- [x] Reranking built, measured, and switched off: not one pairing moved pack
+      recall (R-027). Gate keeps dense as primary, measured (R-028)
+
 ## Next, unblocked
 
+- [ ] Verify the persistence layer against a real Postgres. 6 integration tests
+      are written and skipping; the local server needs a password
 - [ ] Re-derive the floor on a larger gold set. One holdout case missed it by
       0.002, which is brittleness, and hand-tightening it would be fitting
-- [ ] Reranking, tuned on pack recall (Q4)
-- [ ] Postgres schema for sources, blocks, objects, representations
+- [ ] Real slice axes wired to §11.2's pairwise matrix
 - [ ] Two named adjudicators for the 48 release-critical cases (§6.4)
 - [ ] Real slice axes wired to §11.2's pairwise matrix rather than the six ad-hoc
       axes now in `EvalCase.slice_keys`

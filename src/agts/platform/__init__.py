@@ -7,11 +7,16 @@ from .embedding import (
     VoyageEmbedding,
     cosine,
 )
+from .reranking import CachedReranker, IdentityReranker, RerankPort, VoyageReranker
 
 __all__ = [
     "CachedEmbedding",
+    "CachedReranker",
     "DeterministicEmbedding",
     "EmbeddingPort",
+    "IdentityReranker",
+    "RerankPort",
     "VoyageEmbedding",
+    "VoyageReranker",
     "cosine",
 ]

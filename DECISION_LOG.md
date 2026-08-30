@@ -595,3 +595,46 @@ alternative is a green tick for something nobody checked.
 
 **Consequence:** 2-3% is the standing argument for reranking and for
 sentence-level citation once generation exists.
+
+---
+
+### R-027 - The reranker is built, measured, and switched off
+**Status:** Active - 30 August 2026
+
+Voyage `rerank-2` over the top 20, measured on pack recall against an identity
+reranker as the control. **No pairing moved pack recall by one case**: dense
+94.0% with and without, BM25 92.0% with and without, hybrid 94.0% with and
+without.
+
+The cause is in the data rather than in the reranker. `recall@20` and
+`recall@pack` are identical for every retriever here, so the gold object is
+already in the top five whenever it is retrieved at all - with 38 objects and one
+candidate per object, the candidate list is usually shorter than the pack itself.
+
+**Decision:** the port and the Voyage adapter ship, the stage stays off, and
+`scripts/rerank_benchmark.py` is the thing to re-run when the corpus is a
+curriculum instead of two chapters. Shipping a paid per-query call that provably
+changes nothing would be paying for a number that did not move.
+
+---
+
+### R-028 - The gate keeps dense as primary, and pack recall is not why
+**Status:** Active - 30 August 2026
+
+The rerank benchmark surfaced an inversion: BM25 has **better pack recall on the
+holdout** than dense (83.3% against 76.7%) while losing on the visible set. The
+tempting read is that BM25 generalises better and should lead.
+
+Measured instead of assumed:
+
+| gate primary | holdout refuse | holdout answer |
+|---|---:|---:|
+| dense | **8/8** | **27/30** |
+| bm25 | 6/8 | 26/30 |
+
+**Decision:** dense stays primary. BM25 lets two unanswerable questions through
+on unseen cases, and a wrong answer is the failure the whole system exists to
+prevent.
+
+**The general point:** a retriever is chosen for the decision it supports, not
+for its best headline metric. Pack recall improved and the gate got worse.

@@ -1,4 +1,4 @@
-"""Retrieval fabric (build guide §7.3, §8).
+"""Retrieval fabric (build guide sections 7.3 and 8).
 
 Owns the search representations and the retrievers over them. It does not own
 the ruler: a retrieval change that also edits `agts/evaluation/scorer.py` is
@@ -9,6 +9,7 @@ from .bm25 import BM25Representations
 from .chunking import REPRESENTATION_VERSION, represent, represent_all
 from .dense import DenseRetriever, HybridRetriever
 from .lexical import RepresentationKeyword
+from .rerank import RerankedRetriever
 
 __all__ = [
     "REPRESENTATION_VERSION",
@@ -16,6 +17,7 @@ __all__ = [
     "DenseRetriever",
     "HybridRetriever",
     "RepresentationKeyword",
+    "RerankedRetriever",
     "represent",
     "represent_all",
 ]
