@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+
+# Never commit corpus bytes, crops or credentials.
+corpus/
+*.pdf
+.env
+.venv-datalab/
+
+# Parsed chapter artefacts. The blocks ARE the chapter text and the assets are
+# page crops: quarantined content, FORBIDDEN_PENDING_RIGHTS_RECORD (§5, Q3).
+# A local commit is not publication, but history outlives the decision to push.
+# Regenerate with scripts/assemble_*_quarantine.py + scripts/compose_*.py.
+artifacts/*-quarantine/

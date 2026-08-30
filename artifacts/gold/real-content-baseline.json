@@ -1,0 +1,95 @@
+{
+  "gold_set": "pilot-2-chapters-v0",
+  "curriculum_version": "2026-27",
+  "evaluation_licence": "first real-content evaluation run; content quarantined pending rights records (Q3)",
+  "corpus": {
+    "sources": 2,
+    "blocks": 728,
+    "objects": 38
+  },
+  "abstention": {
+    "threshold": 0.6848322532183111,
+    "margin": -0.4969334511417478,
+    "answerable_floor": 0.4363655276474372,
+    "unanswerable_ceiling": 0.933298978789185
+  },
+  "runs": [
+    {
+      "retriever": "keyword-baseline",
+      "recall_at_candidates": 1.0,
+      "recall_at_pack": 0.96,
+      "abstention_accuracy": 0.9,
+      "violations": 0,
+      "failing_slices": []
+    },
+    {
+      "retriever": "broken-random-ranking",
+      "recall_at_candidates": 0.88,
+      "recall_at_pack": 0.36,
+      "abstention_accuracy": 0.0,
+      "violations": 0,
+      "failing_slices": [
+        "answerable=true: recall@20=0.880",
+        "grade=10: recall@20=0.880",
+        "language=en: recall@20=0.880",
+        "modality=text: recall@20=0.846",
+        "question_type=single_hop: recall@20=0.800",
+        "subject=mathematics: recall@pack=0.625",
+        "subject=science: recall@20=0.769",
+        "teaching_action=explain: recall@20=0.872"
+      ]
+    },
+    {
+      "retriever": "broken-wrong-grade",
+      "recall_at_candidates": 0.98,
+      "recall_at_pack": 0.94,
+      "abstention_accuracy": 0.7,
+      "violations": 484,
+      "failing_slices": [
+        "answerable=true: 389 invariant violations",
+        "grade=10: 484 invariant violations",
+        "language=en: 484 invariant violations",
+        "modality=text: 382 invariant violations",
+        "question_type=single_hop: 207 invariant violations",
+        "subject=mathematics: 388 invariant violations",
+        "subject=science: 96 invariant violations",
+        "teaching_action=explain: 339 invariant violations"
+      ]
+    },
+    {
+      "retriever": "broken-answer-only",
+      "recall_at_candidates": 0.98,
+      "recall_at_pack": 0.94,
+      "abstention_accuracy": 0.7,
+      "violations": 484,
+      "failing_slices": [
+        "answerable=true: 389 invariant violations",
+        "grade=10: 484 invariant violations",
+        "language=en: 484 invariant violations",
+        "modality=text: 382 invariant violations",
+        "question_type=single_hop: 207 invariant violations",
+        "subject=mathematics: 388 invariant violations",
+        "subject=science: 96 invariant violations",
+        "teaching_action=explain: 339 invariant violations"
+      ]
+    },
+    {
+      "retriever": "broken-cross-tenant",
+      "recall_at_candidates": 0.98,
+      "recall_at_pack": 0.94,
+      "abstention_accuracy": 0.7,
+      "violations": 484,
+      "failing_slices": [
+        "answerable=true: 389 invariant violations",
+        "grade=10: 484 invariant violations",
+        "language=en: 484 invariant violations",
+        "modality=text: 382 invariant violations",
+        "question_type=single_hop: 207 invariant violations",
+        "subject=mathematics: 388 invariant violations",
+        "subject=science: 96 invariant violations",
+        "teaching_action=explain: 339 invariant violations"
+      ]
+    }
+  ],
+  "gold_blocks_not_in_any_object": []
+}
