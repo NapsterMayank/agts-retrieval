@@ -263,6 +263,67 @@ assumption that they help.
 is a different unit trading recall for precision, and that check exists to catch
 sabotage, not to rank honest alternatives.
 
+## BM25, and why abstention is not a scoring problem — 30 August 2026
+
+Same corpus, same gold set, same unit as the previous run. Only the scoring
+function changed: IDF token overlap becomes BM25 with term saturation
+(`k1=1.2`) and length normalisation (`b=0.75`), divided by the query's own
+attainable ceiling so scores land in 0..1 and compare across queries.
+
+| retriever | unit | recall@20 | recall@pack5 | abstain | blocks/pack |
+|---|---|---:|---:|---:|---:|
+| keyword-baseline | object | 100.0% | 96.0% | 90.0% | 143 |
+| representation-keyword | window | 90.0% | 86.0% | 80.0% | 43 |
+| **representation-bm25** | window | 94.0% | **94.0%** | 90.0% | **40** |
+
+**BM25 recovers almost all of the recall the smaller unit cost, on a quarter of
+the evidence.** 94% pack recall against the object baseline's 96%, with 40
+blocks per pack against 143. Free, model-free, and it is now the number an
+embedding has to beat.
+
+### Abstention margin, three runs
+
+| unit | scorer | margin | answerable floor | unanswerable ceiling |
+|---|---|---:|---:|---:|
+| object | IDF overlap | −0.497 | 0.436 | 0.933 |
+| window | IDF overlap | −0.321 | 0.312 | 0.633 |
+| window | BM25 | **−0.219** | 0.183 | 0.402 |
+
+Each fix roughly halves the overlap and none crosses zero. That pattern is worth
+reading properly rather than extrapolating: it does not mean a third improvement
+lands it.
+
+### Which cases actually overlap
+
+Ten answerable cases sit below the highest-scoring unanswerable one. The
+unanswerable cases at the top of the band are **the four that were designed to be
+adjacent**:
+
+| score | case | why it scores |
+|---:|---|---|
+| 0.402 | *How do you solve a quadratic equation by completing the square?* | the phrase appears in ch4, attributed to Sridharacharya; the method is never taught |
+| 0.267 | *State the Pythagoras theorem and prove it* | invoked by name in Example 8, never stated |
+| 0.248 | *What is the distance formula between two points?* | "distance" saturates the pole-and-gates problem |
+| 0.205 | *State Ohm's law and give its mathematical form* | *law*, *form*, *state* are all cheap matches |
+
+And the answerable cases at the bottom are ones whose evidence does not repeat
+the query's words: the atom-count question whose answer is a **table** (0.183),
+"why is the negative root rejected" (0.250), rancidity (0.265).
+
+**This is not a scoring-function problem any more.** No lexical scorer
+distinguishes a concept that is *mentioned* from one that is *taught* — the
+tokens are identical, and BM25 correctly reports a strong lexical match. The
+distinction is semantic and structural, which means:
+
+1. **A sufficiency gate (§8.4) is the real answer**, not a better matcher. The
+   question "does this evidence actually answer the query" is the one §14 gates,
+   and it was always a separate stage — this run is the evidence that it cannot
+   be approximated by a retrieval score.
+2. **Embeddings should be measured against BM25 on the bottom of the answerable
+   band** — the table case, the paraphrased ones — because that is where they
+   plausibly help. Expecting them to fix the adjacent-unanswerable cases is
+   expecting the wrong thing from them.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

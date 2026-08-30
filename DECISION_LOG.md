@@ -404,3 +404,29 @@ zero-tolerance counters are separate numbers.
 **Consequence:** a recall improvement bought by returning more material is now
 visible as one. This is the same argument as Q4 (pack recall) one level down,
 and worth putting to the client alongside it.
+
+---
+
+### R-019 · BM25 is the lexical floor, and abstention is not a scoring problem
+**Status:** Active · 30 August 2026
+
+BM25 over representations, normalised by the query's attainable ceiling so
+scores are comparable across queries. It recovers pack recall from 86% to 94%
+against the object baseline's 96%, on 40 blocks per pack against 143.
+
+**Decision:** BM25 replaces IDF overlap as the lexical floor. Every later
+component — embeddings, hybrid fusion, reranking — is measured against it, and
+one that cannot beat it has not earned its cost or its dependency.
+
+**And the more important finding.** Three successive improvements moved the
+abstention margin −0.497 → −0.321 → −0.219 without crossing zero, and the
+diagnostic says why: the unanswerable cases that score highest are the ones the
+chapters *mention without teaching* — completing the square, Pythagoras,
+distance. A lexical scorer is correct to report a strong match there. The
+distinction between mentioned and taught is not in the tokens.
+
+**Consequence:** the abstention gate is built at §8.4 as a **sufficiency**
+decision over the retrieved pack, not as a threshold on a retrieval score.
+Chasing it with a better matcher would have kept producing improvements that
+never arrive at a working gate — which is exactly what the last three runs look
+like if the margin is read as a trend instead of a diagnosis.

@@ -55,12 +55,19 @@
 - [x] Recalibrated and re-ran: abstention margin −0.497 → **−0.321, still not
       separable**. Chunking necessary, not sufficient
 
+- [x] BM25 over representations (R-019) — pack recall 86% → **94%** at 40
+      blocks/pack, and it is now the floor every later component must beat
+- [x] Diagnosed the abstention overlap case by case: the offenders are concepts
+      the chapters *mention without teaching*, which no lexical scorer separates
+
 ## Next, unblocked
 
-- [ ] **The scoring function is now the blocker.** BM25 length normalisation
-      first — it is free and the current score rewards short generic overlap —
-      then a provider-independent embedding adapter measured against it
-- [ ] Reranking, and pack recall as the number it is tuned on (Q4)
+- [ ] **§8.4 sufficiency gate** — the real abstention mechanism (R-019). Does the
+      pack answer the query, asked of the evidence rather than of a score
+- [ ] Provider-independent embedding adapter, measured against BM25 and judged
+      on the bottom of the answerable band (the table case, the paraphrased ones)
+- [ ] Reranking, tuned on pack recall (Q4)
+- [ ] Postgres schema for sources, blocks, objects, representations
 - [ ] Extend the gold set past 60 cases, and get two named reviewers onto the 10
       release-critical ones
 

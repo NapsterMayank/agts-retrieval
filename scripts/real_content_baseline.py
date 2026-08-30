@@ -25,7 +25,7 @@ from agts.evaluation.cases import load_gold_set
 from agts.evaluation.corpus import EvaluationLicence
 from agts.evaluation.quarantine import ChapterArtefact, load_corpus
 from agts.evaluation.retrievers import KeywordBaseline, broken_retrievers
-from agts.retrieval import RepresentationKeyword
+from agts.retrieval import BM25Representations, RepresentationKeyword
 from agts.evaluation.scorer import calibrate_abstention, score
 
 
@@ -120,7 +120,7 @@ def main() -> None:
     # distribution, so quoting one retriever's threshold against another's
     # scores measures nothing.
     calibrations = {}
-    for retriever in (KeywordBaseline(), RepresentationKeyword()):
+    for retriever in (KeywordBaseline(), RepresentationKeyword(), BM25Representations()):
         calibration = calibrate_abstention(
             gold_set, retriever, corpus, curriculum_version=CURRICULUM_VERSION
         )
@@ -131,7 +131,12 @@ def main() -> None:
     default_threshold = calibrations["keyword-baseline"].threshold
 
     rows = []
-    retrievers = [KeywordBaseline(), RepresentationKeyword(), *broken_retrievers()]
+    retrievers = [
+        KeywordBaseline(),
+        RepresentationKeyword(),
+        BM25Representations(),
+        *broken_retrievers(),
+    ]
     for retriever in retrievers:
         calibration = calibrations.get(retriever.name)
         report = score(
