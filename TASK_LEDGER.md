@@ -91,16 +91,12 @@
 - [ ] Reranking, tuned on pack recall (Q4)
 - [ ] Postgres schema for sources, blocks, objects, representations
 - [ ] Two named adjudicators for the 48 release-critical cases (§6.4)
-- [ ] Extend the gold set past 60 cases, and get two named reviewers onto the 10
-      release-critical ones
+- [ ] Real slice axes wired to §11.2's pairwise matrix rather than the six ad-hoc
+      axes now in `EvalCase.slice_keys`
+- [ ] Citation precision and completeness scorers (§14, still unenforced)
 
-- [ ] Real slice axes wired to §11.2's pairwise matrix rather than the six ad-hoc axes now in `EvalCase.slice_keys`
-- [ ] Postgres schema + migrations for `sources`, `blocks`, `learning_objects`, `search_representations`
-- [ ] Dual-parse harness (§7.2) wired into the repo — Docling + opendataloader, both writing `SourceBlock`, with the bbox conversion (PDF points bottom-left → normalised top-left) and parse-strategy provenance
-- [ ] Formula objects carry crop + raw text + LaTeX, never LaTeX alone (R-008)
-- [ ] Mathpix comparison over the same 30 formula crops — needs an API key
-- [ ] Provider-independent embedding adapter, so no provider is hardcoded as architectural truth (§7.3)
-- [ ] Citation precision and completeness scorers (§14, currently unenforced)
+*(Dual-parse harness, formula crop retention and the provider-independent
+embedding adapter were listed here and are done — R-008, R-013, R-016.)*
 
 ## Next, needs Q1
 
