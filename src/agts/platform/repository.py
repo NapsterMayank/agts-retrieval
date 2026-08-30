@@ -212,6 +212,22 @@ def save_corpus(connection, corpus: Corpus) -> dict[str, int]:
 # --------------------------------------------------------------------------
 
 
+def _vector_from(value) -> list[float] | None:
+    """Read an embedding back as floats, whichever column type it came from.
+
+    float8[] arrives as a list. A pgvector column arrives as the **string**
+    "[0.1,0.2,...]" unless the pgvector adapter is registered, and feeding that
+    to a contract expecting numbers produces two thousand validation errors
+    about individual characters. Parsed here rather than by installing another
+    dependency for one column.
+    """
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return [float(part) for part in value.strip("[]").split(",") if part.strip()]
+    return [float(part) for part in value]
+
+
 def _block_from_row(row) -> SourceBlock:
     return SourceBlock(
         block_id=row[0], source_id=row[1], document_id=row[2], order_index=row[3],
@@ -300,7 +316,7 @@ def load_corpus(
                GROUP BY r.representation_id"""
         )
         for row in cursor.fetchall():
-            vector = list(row[9]) if row[9] is not None else None
+            vector = _vector_from(row[9])
             representations[row[0]] = SearchRepresentation(
                 representation_id=row[0], object_id=row[1], search_text=row[2],
                 representation_version=row[3], content_hash=row[4], heading_path=row[5],

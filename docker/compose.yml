@@ -1,0 +1,39 @@
+# A Postgres for this repository only.
+#
+# Deliberately not Foxxy's container and deliberately not the machine's native
+# server: an integration test that truncates or migrates someone else's
+# development database is a bad afternoon, and "it only writes its own tables"
+# is not a claim worth betting a colleague's data on.
+#
+# pgvector image, so migrations/002_pgvector.sql is exercised rather than
+# assumed to work. Port 5434 keeps out of the way of the native server (5432)
+# and Foxxy (5433).
+#
+#   docker compose -f docker/compose.yml up -d
+#   AGTS_DATABASE_URL=postgresql://agts:agts_dev_password@localhost:5434/agts_dev \
+#     python -m pytest -q tests/test_persistence.py
+#
+# The password is a local development credential for a container bound to
+# localhost, and it is committed on purpose so the tests are runnable. Nothing
+# in this stack ever holds anything but quarantined test content.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: agts-postgres
+    environment:
+      POSTGRES_USER: agts
+      POSTGRES_PASSWORD: agts_dev_password
+      POSTGRES_DB: agts_dev
+    ports:
+      - "5434:5432"
+    volumes:
+      - agts-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agts -d agts_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  agts-pgdata:

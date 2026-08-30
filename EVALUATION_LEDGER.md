@@ -567,6 +567,45 @@ unanswerable questions through. Better pack recall did not translate into a
 better gate, which is a reminder that a retriever is chosen for the decision it
 supports and not for its headline number.
 
+## Persistence, verified against a real server - 30 August 2026
+
+The corpus now lives in Postgres, in its own container (`docker/compose.yml`,
+port 5434, pgvector image) rather than in Foxxy's development database or the
+machine's native server. An integration test that migrates or truncates someone
+else's database is a bad afternoon.
+
+| | value |
+|---|---|
+| written | 2 sources, 728 blocks, 38 objects, 77 representations |
+| read back | identical ids, identical block order, 77/77 vectors |
+| bm25 pack recall, files vs database | 92.0% vs 92.0% |
+| dense pack recall, files vs database | 94.0% vs 94.0% |
+
+Writing rows only proves the schema accepts them. The check that matters is the
+second half: load the corpus back out and re-run the ruler over it. A
+persistence layer that stores everything and retrieves differently surfaces as a
+quality regression with no obvious cause, months later.
+
+### Two defects the real server caught that a mock would not
+
+**The pgvector width pin is real.** `002_pgvector` pins the column to
+`vector(1024)`. The fixtures used a convenient three-element vector, which
+passes on the core schema and fails the moment the migration is applied:
+`expected 1024 dimensions, not 3`. That is the constraint doing its job - a
+different provider's embeddings cannot be stored by accident - and there is now
+a test asserting it, skipped on the core schema where float8[] accepts any
+width.
+
+**A pgvector column reads back as a string.** Without the pgvector adapter
+registered, psycopg2 returns `"[0.1,0.2,...]"`, and handing that to a contract
+expecting numbers produces two thousand validation errors about individual
+characters. Parsed explicitly in the repository rather than by adding a
+dependency for one column.
+
+Both are exactly the class of defect R-010 records: a fixture that encodes an
+assumption about a system instead of that system's actual behaviour. The test
+suite was green against SQLite-shaped expectations and wrong.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

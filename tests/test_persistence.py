@@ -29,6 +29,12 @@ from agts.evaluation.cases import EvalCase
 
 DATABASE_URL = os.environ.get("AGTS_DATABASE_URL")
 
+#: voyage-3 width. 002_pgvector pins the column to vector(1024), so a fixture
+#: with a convenient three-element vector passes on the core schema and fails
+#: the moment the pgvector migration is applied -- which is how this constant
+#: came to exist.
+VECTOR = [round(0.001 * i, 4) for i in range(1024)]
+
 pytestmark = pytest.mark.skipif(
     not DATABASE_URL, reason="set AGTS_DATABASE_URL to run persistence tests"
 )
@@ -83,7 +89,7 @@ def build_corpus(*, approved: bool = False, tenant: str | None = None) -> Corpus
         search_text="1.2.2 Decomposition\nA paragraph about decomposition.",
         representation_version="block-window-v2", content_hash="0" * 64,
         heading_path="1.2.2 Decomposition", modality=Modality.TEXT,
-        embedding_model="voyage-3", embedding_version="voyage-3", vector=[0.1, 0.2, 0.3],
+        embedding_model="voyage-3", embedding_version="voyage-3", vector=VECTOR,
     )
     return Corpus(
         sources={source.source_id: source}, blocks={block.block_id: block},
@@ -103,20 +109,32 @@ def test_a_corpus_round_trips_without_loss(connection) -> None:
     assert restored.objects["pytest-o1"].block_ids == ["pytest-b1"]
     rep = restored.representations["pytest-r1"]
     assert rep.search_text == original.representations["pytest-r1"].search_text
-    assert rep.vector == pytest.approx([0.1, 0.2, 0.3])
+    assert rep.vector == pytest.approx(VECTOR)
     assert rep.embedding_model == "voyage-3"
 
 
 def test_saving_twice_changes_nothing(connection) -> None:
-    """The first thing anyone does after a failed import is run it again."""
+    """The first thing anyone does after a failed import is run it again.
+
+    Counts are scoped to this test's own rows. A configured database is a
+    working one -- it holds an imported corpus -- and a test that asserts a
+    global row count is asserting that nobody else uses the server.
+    """
     from agts.platform.repository import load_corpus, save_corpus
 
     corpus = build_corpus()
     save_corpus(connection, corpus)
     save_corpus(connection, corpus)
-    restored = load_corpus(connection)
 
-    assert len(restored.blocks) == 1
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT count(*) FROM blocks WHERE block_id = 'pytest-b1'")
+        assert cursor.fetchone()[0] == 1
+        cursor.execute(
+            "SELECT count(*) FROM learning_object_blocks WHERE object_id = 'pytest-o1'"
+        )
+        assert cursor.fetchone()[0] == 1
+
+    restored = load_corpus(connection)
     assert restored.objects["pytest-o1"].block_ids == ["pytest-b1"]
 
 
@@ -200,3 +218,31 @@ def test_an_unlicensed_quarantined_source_is_invisible_to_both(connection) -> No
 
     assert corpus.authorised(plan) == []
     assert authorised_object_ids(connection, plan) == []
+
+
+def test_the_vector_width_is_pinned_where_pgvector_is_installed(connection) -> None:
+    """A different provider with a different width cannot be stored by accident.
+
+    Skipped on the core schema, where embeddings are float8[] and any width is
+    accepted -- that difference between the two schemas is the point of the test.
+    """
+    import psycopg2
+
+    from agts.platform.repository import save_corpus
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """SELECT udt_name FROM information_schema.columns
+               WHERE table_name = 'search_representations' AND column_name = 'embedding'"""
+        )
+        udt = cursor.fetchone()[0]
+    if udt != "vector":
+        pytest.skip("core schema stores float8[]; width is only pinned by 002_pgvector")
+
+    corpus = build_corpus()
+    narrow = corpus.representations["pytest-r1"].model_copy(update={"vector": [0.1, 0.2, 0.3]})
+    corpus.representations["pytest-r1"] = narrow
+
+    with pytest.raises(psycopg2.Error):
+        save_corpus(connection, corpus)
+    connection.rollback()

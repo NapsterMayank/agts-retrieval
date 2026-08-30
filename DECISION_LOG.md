@@ -638,3 +638,26 @@ prevent.
 
 **The general point:** a retriever is chosen for the decision it supports, not
 for its best headline metric. Pack recall improved and the gate got worse.
+
+---
+
+### R-029 - This repository gets its own database container
+**Status:** Active - 30 August 2026
+
+The persistence tests needed a server. Three were available: the machine's
+native Postgres 17, Foxxy's compose container on 5433, and a new one.
+
+**Decision:** a new container - `docker/compose.yml`, port 5434, pgvector image,
+its own volume. Integration tests migrate schemas and roll back transactions,
+and "it only touches its own tables" is not a claim worth betting a colleague's
+development data on. The pgvector image also means `002_pgvector` is exercised
+rather than assumed to work, which is how the width pin was found.
+
+The container password is committed deliberately: it is a local development
+credential for a service bound to localhost, holding nothing but quarantined
+test content, and a test suite nobody can run is worse than a password nobody
+can use.
+
+**Verified end to end:** 728 blocks and 77 representations written and read
+back, with retrieval from the database scoring identically to retrieval from
+files (bm25 92.0%, dense 94.0% pack recall in both).

@@ -94,8 +94,9 @@
 
 ## Next, unblocked
 
-- [ ] Verify the persistence layer against a real Postgres. 6 integration tests
-      are written and skipping; the local server needs a password
+- [x] **Persistence verified against a real server** (R-029) - own container on
+      5434, 7 integration tests passing, pgvector migration applied, 728 blocks
+      round-tripped with retrieval scoring identically from files and database
 - [ ] Re-derive the floor on a larger gold set. One holdout case missed it by
       0.002, which is brittleness, and hand-tightening it would be fitting
 - [ ] Real slice axes wired to §11.2's pairwise matrix
