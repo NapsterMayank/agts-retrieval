@@ -7,11 +7,14 @@ marking its own homework (`docs/02-workstreams.md`).
 
 from .bm25 import BM25Representations
 from .chunking import REPRESENTATION_VERSION, represent, represent_all
+from .dense import DenseRetriever, HybridRetriever
 from .lexical import RepresentationKeyword
 
 __all__ = [
     "REPRESENTATION_VERSION",
     "BM25Representations",
+    "DenseRetriever",
+    "HybridRetriever",
     "RepresentationKeyword",
     "represent",
     "represent_all",

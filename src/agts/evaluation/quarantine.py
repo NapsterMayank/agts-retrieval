@@ -87,6 +87,7 @@ def load_corpus(
     *,
     licence: EvaluationLicence,
     with_representations: bool = True,
+    embedder=None,
 ) -> Corpus:
     """Build a corpus over `artefacts`, licensed for evaluation only.
 
@@ -113,7 +114,18 @@ def load_corpus(
 
     representations = {}
     if with_representations:
-        for rep in represent_all(objects.values(), list(blocks.values())):
+        built = represent_all(objects.values(), list(blocks.values()))
+        if embedder is not None:
+            vectors = embedder.embed_documents([rep.search_text for rep in built])
+            built = [
+                rep.model_copy(update={
+                    "vector": vector,
+                    "embedding_model": embedder.model,
+                    "embedding_version": embedder.version,
+                })
+                for rep, vector in zip(built, vectors)
+            ]
+        for rep in built:
             representations[rep.representation_id] = rep
 
     return Corpus(

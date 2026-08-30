@@ -18,3 +18,7 @@ corpus/
 # A local commit is not publication, but history outlives the decision to push.
 # Regenerate with scripts/assemble_*_quarantine.py + scripts/compose_*.py.
 artifacts/*-quarantine/
+
+# Vectors of quarantined chapter text. Regenerate with
+# scripts/embed_representations.py; the cache is keyed by text hash.
+artifacts/embeddings/

@@ -23,9 +23,17 @@ sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
 from agts.evaluation.cases import load_gold_set
 from agts.evaluation.corpus import EvaluationLicence
+from agts.evaluation.planning import plan_for_case
 from agts.evaluation.quarantine import ChapterArtefact, load_corpus
 from agts.evaluation.retrievers import KeywordBaseline, broken_retrievers
-from agts.retrieval import BM25Representations, RepresentationKeyword
+from agts.platform.embedding import CachedEmbedding
+from agts.retrieval import (
+    BM25Representations,
+    DenseRetriever,
+    HybridRetriever,
+    RepresentationKeyword,
+)
+from agts.retrieval.sufficiency import SufficiencyGate
 from agts.evaluation.scorer import calibrate_abstention, score
 
 
@@ -91,7 +99,14 @@ def uncited_gold(gold_set, corpus) -> list[str]:
 
 def main() -> None:
     gold_set = load_gold_set(GOLD)
-    corpus = load_corpus(CHAPTERS, licence=LICENCE)
+
+    # Read-only vector cache: this run reaches no network and spends nothing.
+    # Populate it with scripts/embed_representations.py.
+    cache_path = ARTIFACTS / "embeddings" / "voyage-3.json"
+    embedder = (
+        CachedEmbedding(None, cache_path, model="voyage-3") if cache_path.exists() else None
+    )
+    corpus = load_corpus(CHAPTERS, licence=LICENCE, embedder=embedder)
 
     print(f"corpus: {len(corpus.sources)} sources / {len(corpus.blocks)} blocks / "
           f"{len(corpus.objects)} objects / {len(corpus.representations)} representations"
@@ -120,7 +135,10 @@ def main() -> None:
     # distribution, so quoting one retriever's threshold against another's
     # scores measures nothing.
     calibrations = {}
-    for retriever in (KeywordBaseline(), RepresentationKeyword(), BM25Representations()):
+    honest = [KeywordBaseline(), RepresentationKeyword(), BM25Representations()]
+    if embedder is not None:
+        honest += [DenseRetriever(embedder), HybridRetriever(embedder)]
+    for retriever in honest:
         calibration = calibrate_abstention(
             gold_set, retriever, corpus, curriculum_version=CURRICULUM_VERSION
         )
@@ -131,12 +149,7 @@ def main() -> None:
     default_threshold = calibrations["keyword-baseline"].threshold
 
     rows = []
-    retrievers = [
-        KeywordBaseline(),
-        RepresentationKeyword(),
-        BM25Representations(),
-        *broken_retrievers(),
-    ]
+    retrievers = [*honest, *broken_retrievers()]
     for retriever in retrievers:
         calibration = calibrations.get(retriever.name)
         report = score(
@@ -155,6 +168,42 @@ def main() -> None:
             print("  failing gating slices:")
             for line in failing:
                 print(f"    {line}")
+
+    if embedder is not None:
+        dense = DenseRetriever(embedder)
+        calibration = calibrations["representation-dense"]
+        answerable_tops = sorted(
+            dense.retrieve(
+                plan_for_case(case, curriculum_version=CURRICULUM_VERSION), corpus, 20
+            )[0].score
+            for case in gold_set.visible
+            if case.answerable
+        )
+        ceiling = answerable_tops[len(answerable_tops) // 2]
+        gate = SufficiencyGate(
+            dense,
+            BM25Representations(),
+            threshold=calibration.threshold,
+            high_confidence=ceiling,
+        )
+        print(
+            f"\nsufficiency gate (§8.4): floor {calibration.threshold:.3f} calibrated, "
+            f"ceiling {ceiling:.3f} = median answerable top score, "
+            f"corroboration {gate.min_corroboration} of top {gate.depth}"
+        )
+        decisions = [
+            (case, gate.decide(plan_for_case(case, curriculum_version=CURRICULUM_VERSION), corpus))
+            for case in gold_set.visible
+        ]
+        held = [(c, d) for c, d in decisions if not c.answerable]
+        askable = [(c, d) for c, d in decisions if c.answerable]
+        abstained = sum(1 for _, d in held if d.abstained)
+        answered = sum(1 for _, d in askable if d.answerable)
+        print(f"  unanswerable correctly abstained: {abstained}/{len(held)}")
+        print(f"  answerable correctly answered   : {answered}/{len(askable)}")
+        for case, decision in askable:
+            if decision.abstained:
+                print(f"    false abstain — {case.case_id}: {decision.reasons[0]}")
 
     baseline = rows[0]
     print("\n§6.5 — does the ruler still separate broken retrievers on real content?")

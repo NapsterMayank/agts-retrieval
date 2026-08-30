@@ -60,12 +60,23 @@
 - [x] Diagnosed the abstention overlap case by case: the offenders are concepts
       the chapters *mention without teaching*, which no lexical scorer separates
 
+- [x] Provider-independent embedding port with Voyage, deterministic-fake and
+      disk-cache adapters. No provider name outside `platform/`
+- [x] Dense and hybrid (RRF) retrieval. Dense matches BM25 on recall and
+      separates far better; RRF is ranking-only (R-021)
+- [x] **§8.4 sufficiency gate (R-020): 10/10 unanswerable refused, 44/50
+      answerable answered.** Completing the square, Pythagoras and the distance
+      formula are all correctly refused, with reasons
+
 ## Next, unblocked
 
-- [ ] **§8.4 sufficiency gate** — the real abstention mechanism (R-019). Does the
-      pack answer the query, asked of the evidence rather than of a score
-- [ ] Provider-independent embedding adapter, measured against BM25 and judged
-      on the bottom of the answerable band (the table case, the paraphrased ones)
+- [ ] **Mathpix on the maths formula crops.** Three of the six gate failures are
+      maths questions whose evidence is mangled formula text (R-008), not gate
+      defects. Needs an API key
+- [ ] Corroboration at **concept** level rather than object level — the other
+      three failures are definitions that legitimately live in three sections
+- [ ] More gold cases, then re-derive the floor and ceiling and seal a holdout.
+      Both constants are currently fitted to the set they are scored on
 - [ ] Reranking, tuned on pack recall (Q4)
 - [ ] Postgres schema for sources, blocks, objects, representations
 - [ ] Extend the gold set past 60 cases, and get two named reviewers onto the 10

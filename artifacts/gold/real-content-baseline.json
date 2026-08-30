@@ -25,9 +25,23 @@
     },
     "representation-bm25": {
       "threshold": 0.2926654121902412,
-      "margin": -0.21927892670696492,
-      "answerable_floor": 0.18302594883675877,
+      "margin": -0.21927892670696494,
+      "answerable_floor": 0.18302594883675874,
       "unanswerable_ceiling": 0.4023048755437237,
+      "separable": false
+    },
+    "representation-dense": {
+      "threshold": 0.7250372430305316,
+      "margin": -0.07670194400834607,
+      "answerable_floor": 0.6866862710263586,
+      "unanswerable_ceiling": 0.7633882150347047,
+      "separable": false
+    },
+    "representation-hybrid": {
+      "threshold": 0.9880312339989759,
+      "margin": -0.02393753200204818,
+      "answerable_floor": 0.9760624679979518,
+      "unanswerable_ceiling": 1.0,
       "separable": false
     }
   },
@@ -77,21 +91,53 @@
       ]
     },
     {
+      "retriever": "representation-dense",
+      "recall_at_candidates": 0.94,
+      "recall_at_pack": 0.94,
+      "abstention_accuracy": 0.9,
+      "violations": 0,
+      "blocks_per_pack": 40.14,
+      "failing_slices": [
+        "answerable=true: recall@20=0.940",
+        "grade=10: recall@20=0.940",
+        "language=en: recall@20=0.940",
+        "modality=text: recall@20=0.923",
+        "subject=mathematics: recall@20=0.917",
+        "teaching_action=explain: recall@20=0.923"
+      ]
+    },
+    {
+      "retriever": "representation-hybrid",
+      "recall_at_candidates": 0.94,
+      "recall_at_pack": 0.94,
+      "abstention_accuracy": 0.5,
+      "violations": 0,
+      "blocks_per_pack": 40.18,
+      "failing_slices": [
+        "answerable=true: recall@20=0.940",
+        "grade=10: recall@20=0.940",
+        "language=en: recall@20=0.940",
+        "modality=text: recall@20=0.923",
+        "subject=mathematics: recall@20=0.917",
+        "teaching_action=explain: recall@20=0.923"
+      ]
+    },
+    {
       "retriever": "broken-random-ranking",
-      "recall_at_candidates": 0.86,
-      "recall_at_pack": 0.44,
+      "recall_at_candidates": 0.9,
+      "recall_at_pack": 0.46,
       "abstention_accuracy": 0.0,
       "violations": 0,
-      "blocks_per_pack": 99.12,
+      "blocks_per_pack": 93.62,
       "failing_slices": [
-        "answerable=true: recall@20=0.860",
-        "grade=10: recall@20=0.860",
-        "language=en: recall@20=0.860",
+        "answerable=true: recall@20=0.900",
+        "grade=10: recall@20=0.900",
+        "language=en: recall@20=0.900",
         "modality=text: recall@20=0.872",
         "question_type=single_hop: recall@20=0.850",
-        "subject=mathematics: recall@pack=0.708",
-        "subject=science: recall@20=0.731",
-        "teaching_action=explain: recall@20=0.821"
+        "subject=mathematics: recall@pack=0.667",
+        "subject=science: recall@20=0.808",
+        "teaching_action=explain: recall@20=0.872"
       ]
     },
     {

@@ -1,0 +1,148 @@
+"""The sufficiency gate (§8.4) — the real abstention mechanism (R-019).
+
+Three runs established that no retrieval score separates answerable from
+unanswerable on real content, and the diagnostic said why: the queries that
+score highest among the unanswerable are the ones these chapters **mention
+without teaching** — completing the square, the Pythagoras theorem, the distance
+formula. A scorer is right to report a strong match there. The distinction is
+not in the score.
+
+So the gate is two-tiered, and corroboration is required only where it is
+informative:
+
+**1. Is anything a good enough match?** A calibrated floor on the top score.
+Measured from the observed distributions, never picked by hand (§15). Below it,
+abstain.
+
+**Above the highest score any unanswerable query achieved**, answer. Nothing is
+gained by interrogating a match that no unanswerable query in the set has ever
+matched, and requiring corroboration there abstains on textbook questions like
+"What is a quadratic equation?" purely because two retrievers ranked two equally
+correct sections differently.
+
+**2. In the band between the two — do independent retrievers agree on where the
+answer lives?** This is the
+part that catches a mention. When a chapter *teaches* a concept it elaborates:
+several windows in one section discuss it, so lexical and semantic retrieval
+land on the same object. When a chapter merely *names* a concept, they diverge —
+lexical retrieval finds the single sentence containing the phrase, while
+semantic retrieval drifts to whatever section is actually about something
+similar. Corroboration measures that divergence without needing to know which
+retriever is right.
+
+A gate is a decision, so it returns its reasons. "Abstained" with no explanation
+is indistinguishable from a broken retriever, and the trace §11 requires has to
+say which of the two conditions failed.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
+from agts.contracts.runtime import QueryPlan, RetrievedItem
+from agts.evaluation.corpus import Corpus
+
+#: How many of the top three objects the two retrievers must share. Two of three
+#: is deliberately not three: requiring unanimity would abstain whenever a
+#: section is split across windows, which is a property of chunking rather than
+#: of the corpus lacking an answer.
+MIN_CORROBORATION = 2
+
+#: Depth at which agreement is measured. Small on purpose — agreement at depth
+#: twenty is agreement about the corpus, not about the answer.
+CORROBORATION_DEPTH = 3
+
+
+@dataclass(frozen=True)
+class SufficiencyDecision:
+    """Whether the pack may be answered from, and why."""
+
+    answerable: bool
+    top_score: float
+    corroboration: int
+    threshold: float
+    high_confidence: float = float("inf")
+    items: list[RetrievedItem] = field(default_factory=list)
+    reasons: tuple[str, ...] = ()
+
+    @property
+    def abstained(self) -> bool:
+        return not self.answerable
+
+
+class SufficiencyGate:
+    """Runs two retrievers and decides whether their agreement is good enough.
+
+    `primary` produces the pack that is returned; `corroborator` is only ever
+    consulted for agreement, so swapping it cannot silently change what a
+    learner is shown.
+    """
+
+    name = "sufficiency-gate"
+
+    def __init__(
+        self,
+        primary,
+        corroborator,
+        *,
+        threshold: float,
+        high_confidence: float | None = None,
+        min_corroboration: int = MIN_CORROBORATION,
+        depth: int = CORROBORATION_DEPTH,
+    ) -> None:
+        self.primary = primary
+        self.corroborator = corroborator
+        self.threshold = threshold
+        # Default of +inf means "always require corroboration", so an operator
+        # who does not supply the ceiling gets the strict gate rather than a
+        # silently permissive one.
+        self.high_confidence = float("inf") if high_confidence is None else high_confidence
+        self.min_corroboration = min_corroboration
+        self.depth = depth
+
+    def decide(self, plan: QueryPlan, corpus: Corpus, k: int = 20) -> SufficiencyDecision:
+        items = self.primary.retrieve(plan, corpus, k)
+        other = self.corroborator.retrieve(plan, corpus, max(k, self.depth))
+
+        top_score = items[0].score if items else 0.0
+        shared = {i.object_id for i in items[: self.depth]} & {
+            i.object_id for i in other[: self.depth]
+        }
+        corroboration = len(shared)
+
+        reasons: list[str] = []
+        if not items:
+            reasons.append("no candidate survived the authorisation filter")
+        if items and top_score < self.threshold:
+            reasons.append(
+                f"top score {top_score:.3f} below the calibrated floor {self.threshold:.3f}"
+            )
+        if (
+            items
+            and top_score < self.high_confidence
+            and corroboration < self.min_corroboration
+        ):
+            reasons.append(
+                f"only {corroboration} of the top {self.depth} objects are shared by both "
+                f"retrievers, which is what a concept that is named but not taught looks like"
+            )
+
+        return SufficiencyDecision(
+            answerable=not reasons,
+            top_score=top_score,
+            corroboration=corroboration,
+            threshold=self.threshold,
+            high_confidence=self.high_confidence,
+            items=items,
+            reasons=tuple(reasons),
+        )
+
+    def retrieve(self, plan: QueryPlan, corpus: Corpus, k: int) -> list[RetrievedItem]:
+        """Retriever interface: an abstention returns nothing.
+
+        The scorer reads an empty result as an abstention, which is the correct
+        reading — a gate that abstains has decided the pack must not be answered
+        from, and handing it back anyway would leave the decision advisory.
+        """
+        decision = self.decide(plan, corpus, k)
+        return decision.items if decision.answerable else []

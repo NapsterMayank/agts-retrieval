@@ -324,6 +324,79 @@ distinction is semantic and structural, which means:
    plausibly help. Expecting them to fix the adjacent-unanswerable cases is
    expecting the wrong thing from them.
 
+## Embeddings, hybrid, and a working sufficiency gate — 30 August 2026
+
+Same corpus, same 60 cases, same windows. Voyage `voyage-3` embeddings over the
+77 representations, cached on disk by text hash so a scored run reaches no
+network and costs nothing to repeat.
+
+| retriever | recall@20 | recall@pack5 | blocks/pack | abstention margin |
+|---|---:|---:|---:|---:|
+| keyword-baseline (object) | 100.0% | 96.0% | 143 | −0.497 |
+| representation-keyword | 90.0% | 86.0% | 43 | −0.321 |
+| representation-bm25 | 94.0% | 94.0% | 40 | −0.219 |
+| **representation-dense** | 94.0% | 94.0% | 40 | **−0.077** |
+| representation-hybrid (RRF) | 94.0% | 94.0% | 40 | −0.024 |
+
+**Dense matches BM25 on recall and is far better separated.** It does not beat
+BM25 on retrieval quality here, which is worth stating plainly — on 60 cases over
+two chapters, a paid embedding buys separation, not recall.
+
+**Hybrid's margin is the best number in the table and the most misleading.** RRF
+scores compress into 0.976–1.000 because rank fusion has no notion of match
+quality, so the "margin" is arithmetic, not confidence. Hybrid is usable for
+ranking and must never be used for the abstention decision. Its abstention
+accuracy of 50% against dense's 90% is that fact showing up.
+
+### The gate (§8.4)
+
+Two tiers, because a single threshold provably cannot work here:
+
+- below a **calibrated floor** (0.725, measured, not chosen) — abstain;
+- above a **ceiling** (0.826, the median top score over answerable cases) —
+  answer;
+- between them — require that the two retrievers **share 2 of their top 3
+  objects**.
+
+Corroboration is the part that catches a mention. A chapter that *teaches* a
+concept elaborates it, so lexical and semantic retrieval land on the same
+section. A chapter that merely *names* one sends them apart: BM25 finds the lone
+sentence containing the phrase, the embedding drifts to whatever section is
+genuinely about something similar.
+
+| | result |
+|---|---|
+| unanswerable correctly abstained | **10 / 10** |
+| answerable correctly answered | **44 / 50** |
+
+**The three cases that started this** — completing the square (0.763), the
+Pythagoras theorem, the distance formula — are all now correctly refused, and
+refused with a reason a human can read.
+
+### The six failures, and they are not all the same kind
+
+Three are **below the floor**: the prayer-hall dimensions (0.687), the repeated
+factor (0.710), the rejected negative root (0.716). All three are *maths*
+questions whose evidence is mangled formula text (R-008). The floor is not the
+problem; the parse is, and Mathpix on the formula crops is the fix.
+
+Three are **corroboration failures on definitional queries** — "What is a
+balanced chemical equation?", "…decomposition reaction?", "…displacement
+reaction?". Both retrievers found good evidence and ranked *different* correct
+sections, because a definition appears in the section, in the summary, and in the
+exercises. Same-object agreement is the wrong test when a concept legitimately
+lives in three places; agreement at concept level rather than object level is the
+obvious next refinement.
+
+### What these numbers are not
+
+**The floor and the ceiling are fitted to the visible set.** There is no holdout
+(Q2), the set is 60 cases and not the 300-500 §6.4 requires, and nobody has
+adjudicated any of it. A gate calibrated on the same cases it is scored against
+is an upper bound on its own performance. It is honest as a mechanism and
+unvalidated as a number, and the first thing the real gold set must do is
+re-derive both constants and re-run this table.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

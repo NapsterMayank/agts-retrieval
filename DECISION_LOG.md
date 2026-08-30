@@ -430,3 +430,52 @@ decision over the retrieved pack, not as a threshold on a retrieval score.
 Chasing it with a better matcher would have kept producing improvements that
 never arrive at a working gate — which is exactly what the last three runs look
 like if the margin is read as a trend instead of a diagnosis.
+
+---
+
+### R-020 · Abstention is a two-tier gate with corroboration, not a threshold
+**Status:** Active · 30 August 2026 · **the answer to the problem R-019 diagnosed**
+
+Below a calibrated floor, abstain. Above a ceiling defined as the median top
+score over answerable cases, answer. Between them, require that two independent
+retrievers — BM25 and dense — share two of their top three objects.
+
+**Why corroboration works where a score does not.** Teaching elaborates: a taught
+concept is discussed across several windows of one section, so lexical and
+semantic retrieval converge on it. A mention does not: BM25 finds the single
+sentence carrying the phrase while the embedding drifts to the section that is
+actually about something similar. The divergence is measurable without knowing
+which retriever is right, which is what makes it usable as a gate rather than as
+a preference.
+
+**Why the ceiling is a statistic of the answerable side.** It was first defined
+as the highest score any unanswerable query achieved — which let the worst case
+through by construction, since that case *was* the maximum. A threshold defined
+by the example it must catch is not a threshold. The median answerable top score
+is independent of the cases being caught.
+
+**Result on the two chapters:** 10/10 unanswerable refused, 44/50 answerable
+answered. The three cases that motivated this — completing the square,
+Pythagoras, the distance formula — are refused with a stated reason.
+
+**Limits, recorded because the number is quotable and the caveat is not.** Both
+constants are fitted to the 60 visible cases with no holdout (Q2) and no
+adjudication. Three of the six false abstains are maths questions whose evidence
+is mangled formula text (R-008) rather than a gate defect. The other three are
+definitional queries where both retrievers found *different correct* sections —
+agreement at concept level rather than object level is the next refinement.
+
+---
+
+### R-021 · Rank fusion is for ranking, never for the abstention decision
+**Status:** Active · 30 August 2026
+
+Hybrid RRF posts the best abstention margin in the table (−0.024) and it is an
+artefact. Reciprocal rank fusion sums `1/(k+rank)`, so every query's top result
+scores near the ceiling whatever the match quality — the numbers compress into
+0.976–1.000. Its abstention accuracy is 50% against dense's 90%.
+
+**Decision:** hybrid may order candidates; the sufficiency gate reads dense and
+BM25 scores directly. Any future fusion feeding a gate must be calibrated on its
+own distribution first, and a margin that improves while accuracy falls is the
+signature to look for.
