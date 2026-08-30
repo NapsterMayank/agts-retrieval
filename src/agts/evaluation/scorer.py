@@ -79,6 +79,12 @@ class CaseResult:
     abstained_correctly: bool | None
     top_score: float
     violations: InvariantViolations
+    #: How many distinct blocks the pack actually handed downstream. Recall
+    #: without this is not comparable across retrieval units: a retriever that
+    #: returns whole chapter sections scores a hit by handing over 143 blocks,
+    #: and one returning windows scores a miss on 43. The first is not better
+    #: retrieval, it is a larger claim.
+    blocks_at_pack: int = 0
 
 
 @dataclass(frozen=True)
@@ -108,6 +114,9 @@ class ScoreReport:
     recall_at_pack: float | None
     abstention_accuracy: float | None
     violations: InvariantViolations
+    #: Mean distinct blocks per pack over answerable cases. Reported beside
+    #: recall, never folded into it.
+    blocks_per_pack: float | None = None
     slices: dict[str, SliceScore] = field(default_factory=dict)
     cases: list[CaseResult] = field(default_factory=list)
     #: Set when the run measured quarantined content under an
@@ -159,7 +168,8 @@ class ScoreReport:
             f"{self.retriever}: recall@{self.k_candidates}={pct(self.recall_at_candidates)} "
             f"recall@pack{self.k_pack}={pct(self.recall_at_pack)} "
             f"abstain={pct(self.abstention_accuracy)} "
-            f"violations={self.violations.total}"
+            f"violations={self.violations.total} "
+            f"blocks/pack={'n/a' if self.blocks_per_pack is None else f'{self.blocks_per_pack:.0f}'}"
         )
         if self.evaluation_licence:
             line += f"  [quarantined content, evaluation licence: {self.evaluation_licence}]"
@@ -302,15 +312,15 @@ def score_case(
     blocks_at_candidates: set[str] = set()
     for item in items:
         blocks_at_candidates.update(item.block_ids)
-    blocks_at_pack: set[str] = set()
+    pack_blocks: set[str] = set()
     for item in items[:k_pack]:
-        blocks_at_pack.update(item.block_ids)
+        pack_blocks.update(item.block_ids)
 
     top_score = items[0].score if items else 0.0
 
     if case.answerable:
         hit_candidates = bool(gold & blocks_at_candidates)
-        hit_pack = bool(gold & blocks_at_pack)
+        hit_pack = bool(gold & pack_blocks)
         abstained = None
     else:
         hit_candidates = False
@@ -327,6 +337,7 @@ def score_case(
         abstained_correctly=abstained,
         top_score=top_score,
         violations=_violations_for(items, corpus, plan),
+        blocks_at_pack=len(pack_blocks),
     )
 
 
@@ -411,6 +422,11 @@ def score(
             sum(bool(r.abstained_correctly) for r in unanswerable), len(unanswerable)
         ),
         violations=violations,
+        blocks_per_pack=(
+            sum(r.blocks_at_pack for r in answerable) / len(answerable)
+            if answerable
+            else None
+        ),
         slices=slices,
         cases=results,
         evaluation_licence=(

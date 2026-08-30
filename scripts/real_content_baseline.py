@@ -25,6 +25,7 @@ from agts.evaluation.cases import load_gold_set
 from agts.evaluation.corpus import EvaluationLicence
 from agts.evaluation.quarantine import ChapterArtefact, load_corpus
 from agts.evaluation.retrievers import KeywordBaseline, broken_retrievers
+from agts.retrieval import RepresentationKeyword
 from agts.evaluation.scorer import calibrate_abstention, score
 
 
@@ -93,7 +94,8 @@ def main() -> None:
     corpus = load_corpus(CHAPTERS, licence=LICENCE)
 
     print(f"corpus: {len(corpus.sources)} sources / {len(corpus.blocks)} blocks / "
-          f"{len(corpus.objects)} objects   (all QUARANTINED, under evaluation licence)")
+          f"{len(corpus.objects)} objects / {len(corpus.representations)} representations"
+          "   (all QUARANTINED, under evaluation licence)")
     print(f"gold set: {gold_set.gold_set_id} — {len(gold_set.cases)} cases, "
           f"{sum(c.answerable for c in gold_set.cases)} answerable")
 
@@ -114,20 +116,31 @@ def main() -> None:
     print(f"\nunadjudicated release-critical cases: {len(unadjudicated)} "
           "(§6.4 wants two named reviewers each; this set has none)")
 
-    calibration = calibrate_abstention(
-        gold_set, KeywordBaseline(), corpus, curriculum_version=CURRICULUM_VERSION
-    )
-    print(f"\nabstention calibration: {calibration.summary()}")
-    print(f"separable: {calibration.separable}")
+    # One calibration per honest retriever. A threshold is a property of a score
+    # distribution, so quoting one retriever's threshold against another's
+    # scores measures nothing.
+    calibrations = {}
+    for retriever in (KeywordBaseline(), RepresentationKeyword()):
+        calibration = calibrate_abstention(
+            gold_set, retriever, corpus, curriculum_version=CURRICULUM_VERSION
+        )
+        calibrations[retriever.name] = calibration
+        print(f"\nabstention calibration — {retriever.name}: {calibration.summary()}")
+        print(f"  separable: {calibration.separable}")
+
+    default_threshold = calibrations["keyword-baseline"].threshold
 
     rows = []
-    retrievers = [KeywordBaseline(), *broken_retrievers()]
+    retrievers = [KeywordBaseline(), RepresentationKeyword(), *broken_retrievers()]
     for retriever in retrievers:
+        calibration = calibrations.get(retriever.name)
         report = score(
             gold_set,
             retriever,
             corpus,
-            abstain_threshold=calibration.threshold,
+            abstain_threshold=(
+                calibration.threshold if calibration else default_threshold
+            ),
             curriculum_version=CURRICULUM_VERSION,
         )
         rows.append(report)
@@ -154,11 +167,16 @@ def main() -> None:
             "blocks": len(corpus.blocks),
             "objects": len(corpus.objects),
         },
+        "corpus_representations": len(corpus.representations),
         "abstention": {
-            "threshold": calibration.threshold,
-            "margin": calibration.margin,
-            "answerable_floor": calibration.lowest_answerable,
-            "unanswerable_ceiling": calibration.highest_unanswerable,
+            name: {
+                "threshold": c.threshold,
+                "margin": c.margin,
+                "answerable_floor": c.lowest_answerable,
+                "unanswerable_ceiling": c.highest_unanswerable,
+                "separable": c.separable,
+            }
+            for name, c in calibrations.items()
         },
         "runs": [
             {
@@ -167,6 +185,7 @@ def main() -> None:
                 "recall_at_pack": r.recall_at_pack,
                 "abstention_accuracy": r.abstention_accuracy,
                 "violations": r.violations.total,
+                "blocks_per_pack": r.blocks_per_pack,
                 "failing_slices": r.failing_slices(),
             }
             for r in rows

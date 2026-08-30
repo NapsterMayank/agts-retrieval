@@ -208,6 +208,61 @@ Two consequences, both concrete:
 - The abstention design that looked calibrated at Hour 8 does not survive
   contact with a real chapter.
 
+## Search representations — 30 August 2026
+
+R-015 said a learning object is not a retrieval unit. §7.3 windows now exist:
+38 objects become **77 representations**, block-aligned, deterministic, no
+embedding involved. Same corpus, same gold set, same IDF scoring function — the
+*only* variable is what gets ranked.
+
+| retriever | unit | recall@20 | recall@pack5 | abstain | blocks/pack | violations |
+|---|---|---:|---:|---:|---:|---:|
+| keyword-baseline | object | 100.0% | 96.0% | 90.0% | **143** | 0 |
+| representation-keyword | window | 90.0% | 86.0% | 80.0% | **43** | 0 |
+| broken-random-ranking | object | 84.0% | 46.0% | 0.0% | 96 | 0 |
+| broken-wrong-grade | object | 98.0% | 94.0% | 70.0% | 147 | 484 |
+| broken-answer-only | object | 98.0% | 94.0% | 70.0% | 147 | 484 |
+| broken-cross-tenant | object | 98.0% | 94.0% | 70.0% | 147 | 484 |
+
+### Recall went *down*, and that is the finding
+
+Read alone, 96% → 86% says the change made things worse. The new column says
+otherwise: **the object-level pack hands the teaching loop 143 blocks** — most
+of a chapter — to answer one question. It scores a recall hit by returning
+nearly everything. The window pack answers with 43 and gets 86%.
+
+Gold-block coverage, measured directly, says the same: object-level packs
+contain 94% of the gold blocks for a case, windows 73%, at a third of the
+volume. Neither number is good enough to ship; the honest comparison is that
+recall alone cannot rank two retrieval units, which is why `blocks_per_pack` is
+now reported beside it and never folded into it (R-018).
+
+### Abstention: better, still broken
+
+| Date | Retriever | Threshold | Margin | Answerable floor | Unanswerable ceiling |
+|---|---|---:|---:|---:|---:|
+| 2026-08-30 | keyword-baseline (object) | 0.685 | −0.497 | 0.436 | 0.933 |
+| 2026-08-30 | representation-keyword (window) | 0.472 | **−0.321** | 0.312 | 0.633 |
+
+The unanswerable ceiling fell from 0.933 to 0.633 — smaller units genuinely stop
+a whole section matching any query in its subject. But the distributions still
+overlap, so **there is still no threshold**, and the 80% abstention figure is
+still an artefact of where the midpoint landed.
+
+**Chunking was necessary and is not sufficient.** What remains is the scoring
+function: IDF token overlap normalised by query mass gives "State Ohm's law and
+give its mathematical form" credit for matching *law*, *form* and *give* against
+a chemistry chapter. That is a lexical-matching artefact, and it is the case for
+the embedding and reranking stages — now with a number to beat rather than an
+assumption that they help.
+
+### Note on the §6.5 comparison
+
+`representation-keyword` reads as "NOT DETECTED" against
+`is_materially_worse_than`, which is correct — it is not a broken retriever. It
+is a different unit trading recall for precision, and that check exists to catch
+sabotage, not to rank honest alternatives.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

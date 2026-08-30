@@ -47,12 +47,20 @@
 - [ ] **Q2** Holdout seal timing confirmed → whether §14's holdout gate binds at 72h
 - [ ] **Q5** Scope: does this repository build §9, or consume it?
 
+- [x] **§7.3 search representations built** (R-016, R-017) — 77 block-aligned
+      windows over 38 objects, deterministic, unembedded, parent-resolved
+      authorisation. 14 new tests
+- [x] Evidence volume in the ruler (R-018): 143 blocks/pack at object level
+      against 43 at window level, which is what makes the two comparable
+- [x] Recalibrated and re-ran: abstention margin −0.497 → **−0.321, still not
+      separable**. Chunking necessary, not sufficient
+
 ## Next, unblocked
 
-- [ ] **§7.3 search representations — now the top item (R-015).** Retrieval units
-      derived from blocks, with the learning object as citation parent. The
-      abstention gate cannot be built until this exists
-- [ ] Recalibrate abstention against the new unit and re-run the baseline
+- [ ] **The scoring function is now the blocker.** BM25 length normalisation
+      first — it is free and the current score rewards short generic overlap —
+      then a provider-independent embedding adapter measured against it
+- [ ] Reranking, and pack recall as the number it is tuned on (Q4)
 - [ ] Extend the gold set past 60 cases, and get two named reviewers onto the 10
       release-critical ones
 

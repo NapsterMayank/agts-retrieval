@@ -337,3 +337,70 @@ later phase.
 keyword baseline — 96% pack recall against random ranking's 36% is a working
 retriever over a corpus shaped wrongly. Swapping in embeddings before fixing the
 unit would have moved the number without touching the cause.
+
+---
+
+### R-016 · A search representation may exist before it is embedded
+**Status:** Active · 30 August 2026
+
+`SearchRepresentation` required `vector`, `embedding_model` and
+`embedding_version`. That folds chunking and embedding into one step, and §7.3
+asks for provider independence — which is only real if a representation can be
+re-embedded by a different provider **without being re-chunked**.
+
+**Decision:** the three embedding fields are optional and validated in pairs (a
+vector without its model, or a model without a vector, is unreproducible and
+raises). `representation_version` names the chunking function, so two chunkings
+can coexist in one store and be compared on the same gold set. Rechunking bumps
+it; re-embedding does not.
+
+**Consequence:** the lexical run needs no fake vectors, and "which provider" is
+a decision recorded per representation rather than baked into the schema.
+
+---
+
+### R-017 · Windows are block-aligned, and four things are never separated
+**Status:** Active · 30 August 2026
+
+The §7.3 chunker, deterministic and model-free:
+
+1. **A block is never split** — it is the anchor for every citation (rule 4),
+   and a window ending mid-block cannot cite the half it used.
+2. **A caption travels with its figure or table** — `linked_block_id` is a
+   pairing the parser already resolved; rebuilding it from page proximity later
+   is guesswork.
+3. **A formula is never alone in a window.** Formula text is degraded by
+   construction (R-008): the maths chapter yields `a  0` for *a ≠ 0*. A window
+   of nothing but formulas is unsearchable; attached to the prose that
+   introduces it, it is reachable and still individually citable.
+4. **The heading path prefixes every window** — the one piece of context a small
+   window loses, and what makes a paragraph findable by a section name it never
+   repeats.
+
+Authorisation resolves through the **parent object**, never through a field
+copied onto the child: a duplicated disclosure class is a second answer to "may
+this be shown", and the two drift the first time an object is retired.
+
+**Consequence:** 728 blocks → 38 objects → 77 windows. Abstention margin
+improved from −0.497 to −0.321 and is still not separable; evidence volume per
+pack fell from 143 blocks to 43. Chunking was necessary and is not sufficient —
+the scoring function is next.
+
+---
+
+### R-018 · Evidence volume is reported beside recall, never folded into it
+**Status:** Active · 30 August 2026
+
+Comparing the two units exposed a hole in the ruler. Object-level retrieval
+scores 96% pack recall by handing over **143 blocks per pack**; window-level
+scores 86% with 43. On recall alone the first looks better, and it is not — it is
+a larger claim, and the teaching loop receiving most of a chapter as "evidence"
+is the failure §14's citation-precision gate exists to catch, arriving early.
+
+**Decision:** `CaseResult.blocks_at_pack` and `ScoreReport.blocks_per_pack`.
+Reported, never blended into a quality score — the same reason the
+zero-tolerance counters are separate numbers.
+
+**Consequence:** a recall improvement bought by returning more material is now
+visible as one. This is the same argument as Q4 (pack recall) one level down,
+and worth putting to the client alongside it.

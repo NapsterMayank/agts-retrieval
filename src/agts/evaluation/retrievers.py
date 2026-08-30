@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from agts.contracts.common import DISCLOSURE_RANK, DisclosureClass, ObjectType
-from agts.contracts.runtime import QueryPlan
+from agts.contracts.runtime import QueryPlan, RetrievedItem
 from agts.evaluation.corpus import Corpus
 
 _TOKEN = re.compile(r"[a-z0-9]+")
@@ -30,15 +30,6 @@ _TOKEN = re.compile(r"[a-z0-9]+")
 
 def _tokens(text: str) -> set[str]:
     return set(_TOKEN.findall(text.lower()))
-
-
-@dataclass(frozen=True)
-class RetrievedItem:
-    """One ranked candidate, carrying the block lineage the scorer needs."""
-
-    object_id: str
-    block_ids: tuple[str, ...]
-    score: float
 
 
 class Retriever(Protocol):
@@ -135,7 +126,7 @@ class RandomRanking:
         candidates = corpus.authorised(plan)
         rng.shuffle(candidates)
         return [
-            RetrievedItem(obj.object_id, tuple(obj.block_ids), 1.0 - i / max(len(candidates), 1))
+            RetrievedItem(object_id=obj.object_id, block_ids=tuple(obj.block_ids), score=1.0 - i / max(len(candidates), 1))
             for i, obj in enumerate(candidates[:k])
         ]
 

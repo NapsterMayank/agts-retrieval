@@ -15,7 +15,12 @@ from dataclasses import dataclass, field
 from datetime import date
 
 from agts.contracts.common import DISCLOSURE_RANK, ApprovalState
-from agts.contracts.objects import LearningObject, SourceBlock, SourceRecord
+from agts.contracts.objects import (
+    LearningObject,
+    SearchRepresentation,
+    SourceBlock,
+    SourceRecord,
+)
 from agts.contracts.runtime import QueryPlan
 
 
@@ -69,7 +74,25 @@ class Corpus:
     sources: dict[str, SourceRecord] = field(default_factory=dict)
     blocks: dict[str, SourceBlock] = field(default_factory=dict)
     objects: dict[str, LearningObject] = field(default_factory=dict)
+    representations: dict[str, SearchRepresentation] = field(default_factory=dict)
     evaluation_licence: EvaluationLicence | None = None
+
+    def authorised_representations(
+        self, plan: QueryPlan
+    ) -> list[tuple[SearchRepresentation, LearningObject]]:
+        """Representations whose **parent object** the actor may have ranked.
+
+        Authorisation resolves through the parent, never through a field copied
+        onto the child. A disclosure class duplicated onto a representation is a
+        second answer to "may this be shown", and the two drift the first time
+        an object is retired or reclassified.
+        """
+        allowed = {obj.object_id: obj for obj in self.authorised(plan)}
+        return [
+            (rep, allowed[rep.object_id])
+            for rep in self.representations.values()
+            if rep.object_id in allowed
+        ]
 
     def evaluation_licensed(self, obj: LearningObject) -> bool:
         """Whether `obj` is quarantined content this run is licensed to measure.

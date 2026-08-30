@@ -223,10 +223,26 @@ class SearchRepresentation(Frozen):
     object_id: str
     block_ids: list[str] = Field(min_length=1)
     search_text: str
-    embedding_model: str
-    embedding_version: str
-    vector: list[float] = Field(min_length=1)
+    representation_version: str = Field(
+        description="The chunking function that produced this. Rechunking bumps "
+        "it; re-embedding does not."
+    )
     content_hash: str
+
+    #: Embedding is a *later* stage, and these are None until it runs. §7.3 asks
+    #: for provider independence, which is only real if a representation can
+    #: exist unembedded and be re-embedded by a different provider without being
+    #: re-chunked. Requiring a vector here would have forced a fake one for every
+    #: lexical run and made "which provider" an unrepeatable decision.
+    embedding_model: str | None = None
+    embedding_version: str | None = None
+    vector: list[float] | None = Field(default=None, min_length=1)
+
+    #: Copied from the parent for reporting and slicing only. Authorisation
+    #: still resolves through the parent object -- duplicating a disclosure class
+    #: onto the child would create two answers to "may this be shown".
+    heading_path: str = ""
+    modality: Modality = Modality.TEXT
 
     @model_validator(mode="after")
     def _lineage_is_present(self) -> SearchRepresentation:
@@ -235,4 +251,14 @@ class SearchRepresentation(Frozen):
                 f"representation {self.representation_id}: empty search_text. "
                 "A published representation missing its text fails the run (§7.4)."
             )
+        if (self.vector is None) != (self.embedding_model is None):
+            raise ValueError(
+                f"representation {self.representation_id}: a vector without the "
+                "model that produced it, or a model without a vector. Neither "
+                "can be reproduced or re-embedded."
+            )
         return self
+
+    @property
+    def embedded(self) -> bool:
+        return self.vector is not None

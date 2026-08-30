@@ -19,6 +19,7 @@ from pathlib import Path
 from agts.contracts.common import ApprovalState, AuthorityTier, Board, Language
 from agts.contracts.objects import LearningObject, SourceBlock, SourceRecord
 from agts.evaluation.corpus import Corpus, EvaluationLicence
+from agts.retrieval.chunking import represent_all
 
 
 @dataclass(frozen=True)
@@ -82,7 +83,10 @@ class ChapterArtefact:
 
 
 def load_corpus(
-    artefacts: list[ChapterArtefact], *, licence: EvaluationLicence
+    artefacts: list[ChapterArtefact],
+    *,
+    licence: EvaluationLicence,
+    with_representations: bool = True,
 ) -> Corpus:
     """Build a corpus over `artefacts`, licensed for evaluation only.
 
@@ -107,6 +111,15 @@ def load_corpus(
         for obj in artefact.objects():
             objects[obj.object_id] = obj
 
+    representations = {}
+    if with_representations:
+        for rep in represent_all(objects.values(), list(blocks.values())):
+            representations[rep.representation_id] = rep
+
     return Corpus(
-        sources=sources, blocks=blocks, objects=objects, evaluation_licence=licence
+        sources=sources,
+        blocks=blocks,
+        objects=objects,
+        representations=representations,
+        evaluation_licence=licence,
     )

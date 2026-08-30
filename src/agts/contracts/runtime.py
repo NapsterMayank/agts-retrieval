@@ -278,6 +278,25 @@ class EvidencePack(Frozen):
 # --------------------------------------------------------------------------
 
 
+class RetrievedItem(Frozen):
+    """One ranked candidate, on its way from a retriever to the scorer.
+
+    A handoff between two workstreams, so it lives here rather than inside
+    either of them: `agts/retrieval/` produces it and `agts/evaluation/`
+    measures it, and neither may redefine it for its own convenience.
+
+    `block_ids` is the lineage, not decoration. Recall is measured on blocks
+    (rule 4), so a retriever that ranks a *part* of an object reports the blocks
+    it actually used — claiming the whole parent would score a hit for evidence
+    it never surfaced.
+    """
+
+    object_id: str
+    block_ids: tuple[str, ...]
+    score: float
+    representation_id: str | None = None
+
+
 class CandidateTrace(Frozen):
     object_id: str
     generator: str
