@@ -214,3 +214,47 @@ def test_delivered_recall_is_zero_when_the_pack_carries_no_gold(case, corpus) ->
     )
     pack = pack_for(case, decision, corpus)
     assert score_citations(gold_set, {"c1": pack}, corpus).delivered_recall == 0.0
+
+
+def test_a_block_whose_content_is_latex_is_served_not_just_cited(corpus, case) -> None:
+    """Reported by an outside reviewer and reproduced. The chunker makes a block
+    searchable on `text or latex`; the pack rendered `text` alone. A latex-only
+    formula was therefore ranked on its content, cited in the span, and served as
+    an empty line -- prose promising a formula, no formula, and a citation
+    vouching for the block that held it."""
+    from agts.contracts.objects import Region, SourceBlock
+
+    latex_only = SourceBlock(
+        block_id="doc:docling:texts-9", source_id="s1", document_id="doc", order_index=9,
+        block_type=BlockType.FORMULA,
+        region=Region(page=1, x=0.1, y=0.1, width=0.5, height=0.05),
+        text=None, latex="x = (-b +- sqrt(b^2-4ac)) / 2a",
+        parse_strategy="docling", parser_version="1",
+    )
+    corpus.blocks[latex_only.block_id] = latex_only
+    decision = SufficiencyDecision(
+        answerable=True, top_score=0.9, corroboration=2, threshold=0.7,
+        items=[RetrievedItem(object_id="o1", block_ids=("doc:docling:texts-0", latex_only.block_id),
+                             score=0.9, representation_id="o1:v:1")],
+    )
+    pack = pack_for(case, decision, corpus)
+    assert "sqrt" in pack.evidence[0].text, "the formula was cited but not served"
+
+
+def test_two_required_slots_of_the_same_role_are_not_satisfied_by_one_item(corpus, case) -> None:
+    """The gap check keyed on role, so a plan asking twice received once and the
+    pack still reported SUFFICIENT."""
+    from agts.contracts.common import EvidenceRole
+    from agts.contracts.runtime import EvidenceSlot
+
+    plan = plan_for_case(case)
+    two_slots = [
+        EvidenceSlot(slot_id="s1", role=EvidenceRole.EXPLANATION, required=True),
+        EvidenceSlot(slot_id="s2", role=EvidenceRole.EXPLANATION, required=True),
+    ]
+    plan = plan.model_copy(update={"evidence_slots": two_slots})
+    pack = build_pack(plan, answered(), corpus, pack_id="p", trace_id="t",
+                      release_manifest_id="m")
+
+    assert pack.status is not PackStatus.SUFFICIENT
+    assert any("s2" in reason for reason in pack.sufficiency.gap_reasons)

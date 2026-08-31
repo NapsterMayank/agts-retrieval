@@ -1001,6 +1001,77 @@ the standard R-036 already set when all three of that round's findings were
 checked before being accepted. The instinct to check applies to reviewers as
 much as to my own conclusions.
 
+## The reviewer's second pass, after it checked its own claims - 31 August 2026
+
+`opencode`'s first attempt produced eight claims and closed by saying it should
+verify them first. Re-run with a narrower brief, it did, and the result is the
+best review this repository has had: five findings, ordered by how directly each
+hands a wrong answer through the pack boundary.
+
+### Reproduced and fixed
+
+**A block whose content is `latex` was cited and not served.** The chunker makes
+a block searchable on `text or latex`; the pack rendered `text` alone. So a
+latex-only formula was ranked on its formula, its block id entered the span, the
+citation covered it - and the served evidence was:
+
+    The roots are given by the quadratic formula.
+
+A teaching model would receive prose promising a formula, no formula, and a
+citation vouching for the block that held one. It would have to invent the
+formula, and the citation would stand behind the invention. Reproduced in nine
+lines before being fixed, and now a test.
+
+This is a *different* defect from R-037. That one measured whether recovered
+formula text is readable; this one is the pack never reading the field at all.
+
+**Two required slots of the same role were satisfied by one item.** The gap check
+keyed on role rather than slot id, so a plan asking for two explanations received
+one and the pack still reported `SUFFICIENT`.
+
+### Accepted, recorded, not yet fixed
+
+**Corroboration is counted on objects while the retrievers rank windows.** The
+gate's stated reason for existing is that independent retrievers agree on *where
+the answer lives*. They are compared on `object_id`, and each retriever returns
+its own best window per object - so two retrievers can agree on a section while
+pointing at different passages inside it, and `corroboration == 2` passes. The
+docstring promises more than the code measures.
+
+**Sibling expansion admits band windows on the primary's score alone.** R-025
+pulls in sibling windows clearing the floor, using only `window_scores` from the
+primary. The corroborator is never consulted. So in exactly the band where the
+gate demands two retrievers agree, a sibling enters the pack on one retriever's
+say-so, is merged into the same `EvidenceItem`, and is covered by a single
+citation spanning the whole concatenation.
+
+**A carried statement is findable and unciteable, by design, with a consequence
+not previously written down.** Rule 5 puts a worked-example statement into
+`search_text` and never into `block_ids`, which is what lets the continuation
+window be found. When that window is packed, the statement is nowhere in the
+evidence - so a teaching model receives *"the breadth of the hall is 12 m"*
+without the problem it answers, and any restatement of the question is
+unsupported by the pack it was given.
+
+All three are real, none is a quick fix, and the last two interact: fixing
+sibling corroboration without fixing carried context would lose evidence that
+completeness currently depends on. They are recorded here rather than
+half-fixed.
+
+### Unchanged numbers, again
+
+| | visible | holdout |
+|---|---|---|
+| unanswerable refused | 10/10, supports >= 74% | 8/8, supports >= 69% |
+| answerable answered | 47/50, supports >= 85% | 26/29, supports >= 75% |
+| citation completeness | 97.2% | 96.2% |
+
+The latex defect changed no score because no gold block in this corpus is
+latex-only - the parser recovered symbol text for all of them, badly (R-037).
+It would have shown up the moment a formula recogniser started populating
+`latex` properly, which is to say: the fix for one defect would have activated
+another.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

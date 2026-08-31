@@ -948,3 +948,56 @@ of items tagged with a role nobody asked for.
 strongest contribution was closing with the observation that it should verify its
 own claims first. Findings are checked here before being accepted, and this round
 is why that rule exists.
+
+---
+
+### R-041 - The pack serves `text or latex`, because it was citing content it did not show
+**Status:** Active - 31 August 2026 - **found by `opencode`, reproduced before fixing**
+
+`chunking._text_of` makes a block searchable on `text or latex`. `build_pack`
+rendered `text` alone. A latex-only formula was therefore ranked on its formula,
+entered the span, was covered by the citation, and reached the teaching loop as
+an empty line: prose promising a formula, no formula, and a citation vouching for
+the block that held one.
+
+Distinct from R-037, which measures whether *recovered formula text* is readable.
+This is the pack never reading the field.
+
+**It changed no number**, because no gold block in this corpus is latex-only -
+the parser recovered symbol text for every formula, badly. The defect would have
+activated the first time a formula recogniser populated `latex` properly, which
+means **fixing R-037 would have triggered R-041**.
+
+Also fixed alongside: the unfilled-slot check keyed on role rather than slot id,
+so two required slots of the same role were satisfied by one item and the pack
+still reported `SUFFICIENT`.
+
+---
+
+### R-042 - Three findings accepted and left open, because half-fixing them is worse
+**Status:** Open · Accepted · 31 August 2026
+
+From the same review, all three verified as real:
+
+**Corroboration compares objects while retrievers rank windows.** The gate exists
+to ask whether independent retrievers agree on *where the answer lives*, and it
+compares `object_id`. Two retrievers can agree on a section while pointing at
+different passages within it. The docstring promises more than the code measures.
+
+**Sibling expansion consults only the primary.** R-025 admits sibling windows
+clearing the floor using the primary's scores alone, in precisely the band where
+the gate requires two retrievers to agree - and merges them into one evidence
+item under one citation spanning the concatenation.
+
+**A carried statement is findable and never served.** Rule 5's context reaches
+`search_text` and not `block_ids`, so the pack can contain an answer without the
+question it answers.
+
+**Why open rather than fixed:** the last two interact. Requiring corroboration on
+siblings would drop evidence that citation completeness currently depends on
+(96.2% holdout), and serving carried context would put uncitable text into a pack
+whose whole discipline is that everything shown can be cited. Either change alone
+moves a published number for reasons unrelated to quality.
+
+Recorded with the numbers they would move, so the next person changes them
+deliberately rather than discovering the interaction afterwards.

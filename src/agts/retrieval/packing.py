@@ -165,10 +165,17 @@ def build_pack(
         block_ids = list(
             dict.fromkeys([*retrieved.block_ids, *siblings.get(obj.object_id, ())])
         )
+        # `text or latex`, matching what the chunker made searchable.
+        # Rendering only `text` meant a latex-only block was ranked on its
+        # formula, cited in the span, and served as an empty line -- prose
+        # promising a formula, no formula, and a citation vouching for the
+        # block that held it. Reported by a reviewer, reproduced, then fixed.
         text = "\n".join(
-            corpus.blocks[b].text or ""
+            content
             for b in block_ids
-            if b in corpus.blocks and corpus.blocks[b].text
+            if b in corpus.blocks
+            for content in [corpus.blocks[b].text or corpus.blocks[b].latex or ""]
+            if content
         )
         item = EvidenceItem(
             object_id=obj.object_id,
@@ -191,9 +198,12 @@ def build_pack(
             )
         )
 
-    filled_roles = {item.role for item in items}
+    # Keyed on slot id, not role. Two required slots asking for the same role
+    # were both satisfied by one item, so a plan that asked twice received once
+    # and the pack still reported SUFFICIENT.
+    filled_slots = {item.slot_id for item in items}
     for slot in slots:
-        if slot.required and slot.role not in filled_roles:
+        if slot.required and slot.slot_id not in filled_slots:
             gaps.append(f"required slot {slot.slot_id} ({slot.role.value}) is unfilled")
 
     sufficiency = SufficiencyResult(

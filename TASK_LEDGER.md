@@ -108,7 +108,15 @@
 - [x] Evidence usability measured (R-037): **12% of maths formula blocks are
       unreadable**, 0% of science. Found by a reviewer, invisible to every gate
 
+- [x] Two agent reviewers run directly (R-039..R-042): bounds on every rate, two
+      config guards, a cited-but-not-served latex defect, and three findings
+      accepted and left open with the numbers they would move
+
 ## Next, unblocked
+
+- [ ] **R-042's three open findings**, which interact: window-level corroboration,
+      sibling expansion consulting only the primary, and carried context that is
+      findable but never served
 
 - [ ] **Calibrate the gate, not one of its inputs.** `calibrate_abstention`
       measures the primary retriever's top score while the decision also reads
