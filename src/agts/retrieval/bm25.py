@@ -29,6 +29,7 @@ from collections import Counter
 
 from agts.contracts.runtime import QueryPlan, RetrievedItem
 from agts.evaluation.corpus import Corpus
+from agts.retrieval.query import search_query
 
 _TOKEN = re.compile(r"[a-z0-9]+")
 
@@ -101,7 +102,7 @@ class BM25Representations:
         requires two retrievers to agree (R-045).
         """
         idf, frequencies, lengths, average_length = self._build(corpus)
-        query = _tokens(plan.query_text)
+        query = _tokens(search_query(plan))
         if not query:
             return {}
         default = max(idf.values(), default=1.0)
@@ -126,7 +127,7 @@ class BM25Representations:
 
     def retrieve(self, plan: QueryPlan, corpus: Corpus, k: int) -> list[RetrievedItem]:
         idf, frequencies, lengths, average_length = self._build(corpus)
-        query = _tokens(plan.query_text)
+        query = _tokens(search_query(plan))
         if not query:
             return []
 

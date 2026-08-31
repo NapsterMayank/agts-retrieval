@@ -10,6 +10,7 @@ from .chunking import REPRESENTATION_VERSION, represent, represent_all
 from .dense import DenseRetriever, HybridRetriever
 from .lexical import RepresentationKeyword
 from .provenance import build_manifest, build_trace, corpus_checksum, lineage_failures
+from .query import search_query
 from .rerank import RerankedRetriever
 
 __all__ = [
@@ -24,5 +25,6 @@ __all__ = [
     "corpus_checksum",
     "lineage_failures",
     "represent",
+    "search_query",
     "represent_all",
 ]

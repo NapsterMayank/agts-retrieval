@@ -16,8 +16,8 @@ whole thing over HTTP.
 | | visible 140 | holdout 64 |
 |---|---:|---:|
 | Unanswerable questions refused | 31/31 | **24/24** — supports ≥88% |
-| Answerable questions answered | 81/109 | **33/40** — supports ≥70% |
-| Citation completeness (§14 bar ≥95%) | 97.6% | **95.7%** |
+| Answerable questions answered | 90/109 | **34/40** — supports ≥73% |
+| Citation completeness (§14 bar ≥95%) | 95.2% | **97.1%** |
 | Citation ID resolution (§14 bar 100%) | 100% | **100%** |
 | Lineage failures (§14 bar 0) | 0 | **0** |
 

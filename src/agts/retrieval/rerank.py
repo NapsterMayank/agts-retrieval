@@ -18,6 +18,7 @@ from __future__ import annotations
 from agts.contracts.runtime import QueryPlan, RetrievedItem
 from agts.evaluation.corpus import Corpus
 from agts.platform.reranking import RerankPort
+from agts.retrieval.query import search_query
 
 #: How many candidates are handed to the reranker. Deeper costs money per query
 #: and cannot help beyond the retriever's own recall at that depth.
@@ -65,7 +66,7 @@ class RerankedRetriever:
                 obj = corpus.objects.get(item.object_id)
                 documents.append(obj.text if obj else "")
 
-        scores = self.reranker.rerank(plan.query_text, documents)
+        scores = self.reranker.rerank(search_query(plan), documents)
         reranked = [
             RetrievedItem(
                 object_id=item.object_id,

@@ -35,6 +35,10 @@ ARTIFACTS = ROOT / "artifacts"
 GOLD = ARTIFACTS / "gold" / "pilot-2-chapters-v1.json"
 CURRICULUM_VERSION = "2026-27"
 
+#: The pair the service runs with, chosen on the visible set (R-048).
+SHIPPED_FLOOR = 0.737
+SHIPPED_CEILING = 0.800
+
 CHAPTERS = [
     ChapterArtefact(directory=ARTIFACTS / "chemical-reactions-quarantine",
                     title="Chemical Reactions and Equations", publisher="NCERT",
@@ -96,9 +100,17 @@ def main() -> None:
         for c in gold_set.visible if c.answerable
     )
     ceiling = tops[len(tops) // 2]
-    print(f"constants from visible set: floor {calibration.threshold:.3f}, ceiling {ceiling:.3f}")
+    # What ships, not what calibration would suggest today. The two differ:
+    # calibration re-derives from the current score distribution every run, and
+    # a report that silently follows it is scoring a system nobody is running.
+    # The shipped pair was chosen on the visible set under a declared rule and
+    # is recorded in EVALUATION_LEDGER (R-048).
+    shipped_floor, shipped_ceiling = SHIPPED_FLOOR, SHIPPED_CEILING
+    print(f"shipped:     floor {shipped_floor:.3f}, ceiling {shipped_ceiling:.3f}")
+    print(f"calibration would suggest: floor {calibration.threshold:.3f}, ceiling {ceiling:.3f}"
+          f"{'  (same)' if abs(calibration.threshold - shipped_floor) < 1e-9 else ''}")
 
-    gate = SufficiencyGate(dense, lexical, threshold=calibration.threshold, high_confidence=ceiling)
+    gate = SufficiencyGate(dense, lexical, threshold=shipped_floor, high_confidence=shipped_ceiling)
 
     def decide(cases):
         return [

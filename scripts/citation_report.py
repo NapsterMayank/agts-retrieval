@@ -69,9 +69,10 @@ def main() -> None:
         dense.retrieve(plan_for_case(c, curriculum_version=CURRICULUM_VERSION), corpus, 20)[0].score
         for c in gold_set.visible if c.answerable
     )
-    gate = SufficiencyGate(
-        dense, lexical, threshold=calibration.threshold, high_confidence=tops[len(tops) // 2]
-    )
+    # The shipped pair, not what calibration suggests today (R-048). Measuring
+    # citations against a configuration nobody runs reports on a system that
+    # does not exist.
+    gate = SufficiencyGate(dense, lexical, threshold=0.737, high_confidence=0.800)
 
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"], capture_output=True, text=True

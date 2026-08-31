@@ -116,7 +116,17 @@
       matcher attached 35 of 43 and was wrong on two of three checked against the
       page images; the strict one attaches 4 and survives checking
 
+- [x] Query scoping (R-049): a short question now searches with the grade and
+      subject its full-sentence twin carried. Short-form acceptance 59% -> 76%,
+      refusals unchanged
+- [x] Runners score the shipped thresholds rather than re-deriving them (R-050) --
+      every earlier number described a configuration nobody ran
+
 ## Next, unblocked
+
+- [ ] Citation completeness is 95.2% visible against a 95% gate. Acceptance and
+      completeness now trade visibly; the next change that buys answers may take
+      it under
 
 - [ ] **39 formulas need a human to choose among Chandra candidates.** The review
       queue already pairs each with its crop; this is 20 minutes of somebody's

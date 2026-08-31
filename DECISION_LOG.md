@@ -1140,3 +1140,47 @@ run.
 **Still not established:** the rewordings are mine, so they share my assumptions
 about how a learner writes. This measures register sensitivity. It does not
 measure real learners.
+
+---
+
+### R-049 - A short question is thin, not wrong, so the plan's scope is restored
+**Status:** Active - 31 August 2026
+
+Acceptance was 82% for textbook phrasing and 56% for short. A full sentence
+carries its subject with the question; four words do not. Both retrievers now
+search `class {grade} {subject}, {query}`, taken from the plan.
+
+**Not query rewriting.** The learner's words survive intact and nothing is
+inferred - the scope was already on the plan, because a learner asking from a
+Class 10 science lesson is asking inside that scope whether or not they say so.
+A rewriter that changed words would need measuring for changing meaning; this
+cannot.
+
+Measured on the visible set alone: 90/109 answered against 81/109, refusals
+unchanged at 31/31, short-form acceptance 59% -> 76%. Holdout 34/40 against
+33/40, refusal 24/24.
+
+**And an existing test caught a regression the change introduced:** with scope
+prepended an empty question is no longer empty, so asking nothing would have
+returned whatever best matches `class 10 science`. Scope alone is not a question.
+
+---
+
+### R-050 - A report scores what ships, not what calibration suggests today
+**Status:** Active - 31 August 2026
+
+Both runners re-derived floor and ceiling from the current score distribution and
+scored *those*, while the service runs the pair chosen in R-048. After query
+scoping the two diverged - 0.745/0.807 derived against 0.737/0.800 shipped - and
+the gap is 83/109 against 90/109 on the visible set.
+
+**Every number reported before this fix described a configuration nobody was
+running.** The runners now score the shipped pair and print the derived one
+beside it, so a drift between them is visible rather than silently adopted.
+
+**Consequence for citation completeness:** measured on the shipped configuration
+it is 95.2% visible and 97.1% holdout, down from 98.4% and 98.6%, because
+answering more questions means more chances to answer one incompletely. It still
+clears the >= 95% gate and it is now close to it, which is the honest reading:
+acceptance and completeness trade against each other, and that trade is visible
+for the first time.

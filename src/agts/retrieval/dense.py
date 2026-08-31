@@ -24,6 +24,7 @@ from agts.contracts.runtime import QueryPlan, RetrievedItem
 from agts.evaluation.corpus import Corpus
 from agts.platform.embedding import EmbeddingPort, cosine
 from agts.retrieval.bm25 import BM25Representations
+from agts.retrieval.query import search_query
 
 #: RRF's damping constant. 60 is the value from the original paper and is not
 #: tuned here on purpose: a constant fitted to sixty cases is a constant fitted
@@ -53,7 +54,7 @@ class DenseRetriever:
         builder needs the siblings' scores to decide which of them clear the
         same bar, so they are exposed rather than recomputed from a guess.
         """
-        query_vector = self.embedder.embed_query(plan.query_text)
+        query_vector = self.embedder.embed_query(search_query(plan))
         return {
             rep.representation_id: (cosine(query_vector, rep.vector) + 1.0) / 2.0
             for rep, _ in corpus.authorised_representations(plan)
@@ -61,7 +62,7 @@ class DenseRetriever:
         }
 
     def retrieve(self, plan: QueryPlan, corpus: Corpus, k: int) -> list[RetrievedItem]:
-        query_vector = self.embedder.embed_query(plan.query_text)
+        query_vector = self.embedder.embed_query(search_query(plan))
         best: dict[str, RetrievedItem] = {}
         skipped = 0
 

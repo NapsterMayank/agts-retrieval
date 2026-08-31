@@ -1289,6 +1289,67 @@ written by the author of the originals shares their blind spots about what a
 learner would ask. It measures register sensitivity, which was the point; it does
 not measure whether real learners ask questions this repository has imagined.
 
+## Restoring the scope a short question leaves out - 31 August 2026
+
+The register measurement said acceptance was 82% for textbook phrasing and 56%
+for short. The diagnosis follows from what the two look like: *"What are
+endothermic reactions?"* carries its subject along with its question, and
+`endothermic reactions` does not. The short query is not worse, it is thinner.
+
+**The plan already knows what the four words left out.** A learner asking from a
+Class 10 science lesson is asking inside that scope whether or not they say so,
+and the scope is on the plan. Both retrievers now search
+`class 10 science, endothermic reactions`.
+
+This is **not query rewriting**. Nothing is reworded, dropped or guessed at - the
+learner's words survive intact with context restored in front of them. A rewriter
+would need measuring for changing the meaning; this cannot change a meaning that
+the plan had already scoped.
+
+| expansion | refuse | answer | short-form acceptance |
+|---|---|---|---|
+| none | 55/55 | 114/149 | 59% |
+| `science, ...` | 55/55 | 120/149 | 69% |
+| **`class 10 science, ...`** | **55/55** | **124/149** | **76%** |
+
+Chosen on the visible set alone under the declared rule - no leaks first, then
+most answers - which the full form wins at 90/109 against 81/109, with refusals
+unchanged at 31/31.
+
+### An existing test caught a real regression
+
+`test_an_empty_query_returns_nothing_rather_than_everything` failed immediately:
+with scope prepended, an empty question is no longer empty, so asking nothing
+would return whatever best matches `class 10 science`. Scope alone is not a
+question, and an empty query now stays empty.
+
+### The holdout, and a reporting defect found on the way
+
+| | before scoping | after |
+|---|---|---|
+| unanswerable refused | 24/24, supports >= 88% | **24/24, supports >= 88%** |
+| answerable answered | 33/40 (82%), supports >= 70% | **34/40 (85%), supports >= 73%** |
+
+Setting this up exposed something worse than the gain. **The runners were
+re-deriving floor and ceiling on every run and scoring those**, while the service
+runs the pair chosen in R-048. Today the two differ - calibration now suggests
+0.745/0.807 against the shipped 0.737/0.800 - and the difference is not small:
+83/109 against 90/109 on the visible set. Every number reported before this fix
+described a configuration nobody was running. Both runners now score what ships
+and print what calibration would suggest beside it.
+
+### Citation completeness moved, and is close to its gate
+
+| | before | after |
+|---|---|---|
+| completeness, visible | 98.4% | **95.2%** |
+| completeness, holdout | 98.6% | **97.1%** |
+
+Answering more questions means more chances to answer one incompletely, so the
+visible figure fell toward the >= 95% bar it still clears. Worth watching rather
+than celebrating: the next change that buys acceptance may take completeness
+under the gate, and the two now trade against each other visibly.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn
