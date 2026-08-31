@@ -30,3 +30,5 @@ artifacts/embeddings/
 # two exact filenames and the third variant walked straight past it.
 artifacts/gold/review-sheet.csv
 review*.csv
+# Verification packs embed the whole chapter, which is the point of them.
+artifacts/gold/verify-*.txt
