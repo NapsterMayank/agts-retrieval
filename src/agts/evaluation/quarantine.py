@@ -71,7 +71,7 @@ class ChapterArtefact:
 
         Absent for a quarantined artefact, which is the normal state. Present
         only once a human has filed one against this checksum -- see
-        `scripts/approve_source.py`.
+        `scripts/register_source.py`.
         """
         path = self.directory / "rights.json"
         if not path.exists():
@@ -100,7 +100,7 @@ class ChapterArtefact:
                 raise ValueError(
                     f"{self.directory.name}: manifest says APPROVED but no rights.json "
                     "is filed. Approval is a human act against a checksum (§5); "
-                    "run scripts/approve_source.py rather than editing the manifest."
+                    "run scripts/register_source.py rather than editing the manifest."
                 )
             if manifest.get("rights_checksum_sha256") != manifest["sha256"]:
                 raise ValueError(
@@ -162,7 +162,7 @@ def load_corpus(
             if licence is None:
                 raise ValueError(
                     f"{source.source_id} is QUARANTINED and no evaluation licence was "
-                    "given. File a rights record with scripts/approve_source.py, or "
+                    "given. File a rights record with scripts/register_source.py, or "
                     "pass an EvaluationLicence naming this source to measure against it."
                 )
         sources[source.source_id] = source

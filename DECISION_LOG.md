@@ -1549,12 +1549,18 @@ The rights position is that the pilot corpus is usable. The build guide's §5
 requirement does not change shape because of that: `RightsRecord` has no field
 for a verbal assurance, deliberately, and approval is per checksum.
 
-So there is now a path rather than an exception. `scripts/approve_source.py`
-files a rights record beside the artefact - owner, legal basis, evidence URI,
-named approver, and what the grant actually permits - records the checksum it
-was filed against, and only then moves the manifest to APPROVED. `load_corpus`
-requires an evaluation licence for quarantined sources, refuses one for
-approved sources, and a corpus of approved content needs no licence at all.
+**Correction, same day.** This entry first claimed the path did not exist and
+described a new `scripts/approve_source.py` written to provide it. The path did
+exist: `scripts/register_source.py` has been the mechanism since Q3 was raised,
+and it is the better one -- it checksums the *file* rather than trusting the
+manifest's own field, refuses a record whose `permits_model_processing` is false
+while the pipeline embeds, and writes the approval to the database the service
+reads. The duplicate was deleted. What survives is the reader-side check below.
+
+`load_corpus` requires an evaluation licence for quarantined sources, refuses
+one for approved sources, and a corpus of approved content needs no licence at
+all. `ChapterArtefact.source()` validates an APPROVED manifest instead of
+trusting it.
 
 Three ways to claim an approval without having one are refused and tested: no
 record filed, a record filed against different bytes, and no completed scan.
@@ -1562,11 +1568,11 @@ The checksum check is the one that matters in practice - re-parsing a chapter
 changes its bytes, and a rights record filed against the old parse approves a
 source that no longer exists.
 
-**Nothing is approved yet.** The script needs five facts a person has to supply,
-and the one that usually decides it is `--evidence-uri`: a link to the signed
-record. Until those exist the corpus stays quarantined and every number stays a
-measurement, which is the same position as before - but now the gap is one
-command wide rather than a refactor.
+**Nothing is approved yet**, and the blocker was never tooling. It is the
+signed record itself: `register_source.py --template` emits the shape, and a
+person with authority has to fill in the owner, the legal basis and a link to
+the signature. Until that exists the corpus stays quarantined and every number
+stays a measurement.
 
 ---
 
