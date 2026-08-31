@@ -756,3 +756,63 @@ Traces record the corpus checksum, commit, thresholds, primary retriever and
 every filter applied, including the evaluation licence. Rejected candidates carry
 a reason - 1,045 of them across 98 packs - because a trace of only the winners
 cannot answer why a passage was not used.
+
+---
+
+### R-034 - The service refuses to serve unapproved content, and the override authorises as well as boots
+**Status:** Active - 31 August 2026
+
+Everything measured so far is `QUARANTINED` under an evaluation licence (R-011),
+which is legitimate for measuring and not for serving. The service therefore
+**refuses to boot** against a corpus with unapproved sources rather than
+defaulting to permissive, and the override is a full phrase
+(`AGTS_ALLOW_QUARANTINED_CONTENT=yes-i-accept-unapproved-content`) so it cannot
+be set by a habitual `=true`.
+
+**A bug worth recording, because the first version had it.** The override
+originally only permitted *booting*. `Corpus.authorised` still admitted nothing,
+so the service started cleanly and then abstained on every question with "no
+candidate survived the authorisation filter" - an override that looks enabled and
+is not. It now attaches a named serving permission as well, and every response
+carries `unapproved_content: true`.
+
+Three further boundaries, each a deliberate refusal rather than an omission:
+
+- **The tenant comes from the bearer token**, never from the body, which forbids
+  the field outright. A caller that names its own tenant has no tenant boundary.
+- **Thresholds are configuration.** The service will not start without a
+  calibrated floor and ceiling, and never derives them from live traffic - a gate
+  that recalibrates itself loosens exactly when the corpus gets harder.
+- **Lineage is checked at serve time**, not only in reports. A pack whose
+  lineage does not resolve is withheld with a 500 rather than returned with a
+  note attached.
+
+---
+
+### R-035 - The gate is sensitive to phrasing, and the gold set could not show it
+**Status:** Active - 31 August 2026 - **found by running the service, not by scoring it**
+
+Two paraphrases through the live endpoint flipped both decisions:
+
+| query | outcome |
+|---|---|
+| *What is the discriminant of a quadratic equation?* | SUFFICIENT |
+| *What is the discriminant?* | ABSTAIN |
+| *How do you solve a quadratic equation by completing the square?* | ABSTAIN |
+| *How do you solve by completing the square?* | **SUFFICIENT** |
+
+The second is a false answer on the exact case the gate exists to refuse.
+
+**Cause:** every gold case is a full sentence naming its subject, because that is
+how questions get written while looking at a chapter. A shorter query carries
+less signal, so both quantities the two-tier gate reads - the dense top score and
+the top-3 overlap - move together.
+
+**Consequence for the published numbers:** 8/8 refused and 27/30 answered hold
+for the phrasings measured, which are not how learners type. The result is about
+the question as written, not about the concept. Not retracted, and scoped.
+
+**Decision:** the next gold-set work is paraphrases of existing cases rather than
+new concepts, written by someone other than the author of the originals, and the
+floor is re-derived afterwards. Adding more cases in the same register would grow
+the set without widening it.

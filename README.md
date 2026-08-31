@@ -6,11 +6,12 @@ Build Guide** (revised 22 August 2026).
 This repository is Track B. It does not modify, refactor or migrate Foxxy's
 `retrieval` module, which stays live and demoed.
 
-## Status — 30 August 2026
+## Status — 31 August 2026
 
 A grounded retrieval pipeline runs end to end over two real NCERT chapters:
 parse, compose, chunk, embed, rank, decide whether the question can be answered
-at all, assemble a cited evidence pack, and record what produced it.
+at all, assemble a cited evidence pack, record what produced it — and serve the
+whole thing over HTTP.
 
 | | visible 60 | holdout 38 |
 |---|---:|---:|
@@ -43,6 +44,7 @@ it. See `RELEASE_EVIDENCE.md`.
 | §11 traces, §14 lineage gate | `src/agts/retrieval/provenance.py` |
 | §7.1 persistence | `migrations/`, `src/agts/platform/repository.py` |
 | Provider ports (no provider name escapes them) | `src/agts/platform/` |
+| §8 serving surface | `src/agts/service/` |
 
 Not built, and why: **generation and the teaching loop** (§9) are scope-blocked
 on Q5, which also makes §14's citation *precision* row unmeasurable — it asks
@@ -52,7 +54,7 @@ whether a citation supports a sentence, and there are no sentences (R-026).
 
 ```
 pip install -e ".[dev]"
-python -m pytest -q                      # 131 pass, 7 skip without a database
+python -m pytest -q                      # 148 pass, 7 skip without a database
 python scripts/baseline.py               # the §6.5 detection suite on fixtures
 ```
 
@@ -74,6 +76,34 @@ AGTS_DATABASE_URL=postgresql://agts:agts_dev_password@localhost:5434/agts_dev \
     python scripts/import_corpus.py        # imports, reads back, re-scores
 ```
 
+## Serving
+
+```
+docker compose -f docker/compose.yml up -d
+AGTS_DATABASE_URL=postgresql://agts:agts_dev_password@localhost:5434/agts_dev \
+AGTS_EMBEDDING_CACHE=artifacts/embeddings/voyage-3.json \
+AGTS_ABSTAIN_FLOOR=0.737 AGTS_HIGH_CONFIDENCE=0.827 \
+AGTS_RELEASE_MANIFEST_ID=rm-pilot-2-chapters-0001 \
+AGTS_API_TOKENS=dev-token:tenant-dev VOYAGE_API_KEY=... \
+PYTHONPATH=src python scripts/serve.py
+```
+
+`GET /health` reports the manifest, corpus checksum and thresholds.
+`POST /v1/evidence` takes a question and a curriculum scope and returns cited
+evidence or a refusal with its reason. It **does not generate text** — that is
+the teaching loop, which does not exist (Q5).
+
+It will refuse to start against the corpus above, because no source is
+`APPROVED`. That is the intended behaviour; the override
+(`AGTS_ALLOW_QUARANTINED_CONTENT=yes-i-accept-unapproved-content`) exists for
+development and marks every response `unapproved_content: true`.
+
+**Known limit, found by running it (R-035):** the gate is sensitive to phrasing.
+*"How do you solve a quadratic equation by completing the square?"* is correctly
+refused; *"How do you solve by completing the square?"* is answered. The gold set
+is written in one register and the thresholds are fitted to it, so the 8/8
+refusal figure describes the questions as written rather than the concepts.
+
 ## The content is not committed
 
 `artifacts/*-quarantine/` holds the parsed chapters. The blocks **are** the
@@ -93,6 +123,7 @@ src/agts/evaluation/    the ruler: cases, corpus, retrievers, scorer, citations
 src/agts/parsing/       Docling and opendataloader adapters, dual-parse diff
 src/agts/retrieval/     chunking, BM25, dense, hybrid, rerank, sufficiency, packing
 src/agts/platform/      embedding and rerank ports, Postgres repository
+src/agts/service/       the HTTP surface: evidence with citations, or a refusal
 migrations/             core schema, and pgvector as a separate opt-in
 tests/                  contract invariants, the §6.5 suite, integration tests
 docs/                   authority order, gates, workstreams, open questions

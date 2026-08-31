@@ -111,8 +111,16 @@
       0 lineage failures over 98 packs, 1,045 rejected candidates each carrying
       a reason
 
+- [x] **Serving API** (R-034) — `GET /health`, `POST /v1/evidence`, tenant from
+      the token, thresholds from config, lineage checked at serve time, and a
+      refusal to boot against unapproved content. 17 tests
+
 ## Next, unblocked
 
+- [ ] **Paraphrase the gold set** (R-035). Two ad-hoc rewordings through the live
+      endpoint flipped both decisions, including a false answer on the case the
+      gate was built to refuse. Phrasing variance belongs inside the measurement
+- [ ] Re-derive the floor afterwards — it is fitted to one register
 - [ ] Fill the gold-set gaps the matrix named: four crossings sit at n=18-19,
       one or two cases short of gating
 - [ ] Two named adjudicators for the 48 release-critical cases (§6.4)

@@ -738,6 +738,58 @@ The manifest reports `approved by NOBODY (unsigned)` and will keep saying so
 until named humans sign it. An unsigned manifest still answers "which corpus";
 calling it approved because it exists is how a release gate becomes decorative.
 
+## The service runs, and live queries found a limit the gold set hid - 31 August 2026
+
+A Starlette service serves the corpus over HTTP: `GET /health` and
+`POST /v1/evidence`, returning an evidence pack with citations or a refusal that
+states its reason. Measured against the real corpus through a real socket:
+
+| query | outcome | latency |
+|---|---|---:|
+| *What is a decomposition reaction?* | SUFFICIENT, 5 items, cited to p8 | 63 ms |
+| *Why is respiration an exothermic reaction?* | SUFFICIENT, 5 items | 1,844 ms (cold embed) |
+| *What is the pH of lemon juice?* | ABSTAIN, below the floor | 45 ms |
+| no bearer token | 401 | - |
+| boot with unapproved sources | **refuses to start** | - |
+
+Cached questions answer in tens of milliseconds; a question never asked before
+costs one embedding round trip, which is most of the 1.5-1.8 s.
+
+### The finding: the gate is sensitive to phrasing, and the gold set hid it
+
+Two ad-hoc paraphrases, neither in the gold set, were enough to flip both
+decisions:
+
+| query | outcome |
+|---|---|
+| *What is the discriminant of a quadratic equation?* | SUFFICIENT |
+| *What is the discriminant?* | **ABSTAIN** |
+| *How do you solve a quadratic equation by completing the square?* | ABSTAIN |
+| *How do you solve by completing the square?* | **SUFFICIENT** |
+
+The second pair is the serious one. "Completing the square" is the case this gate
+was built to refuse - the chapter names the method and never teaches it (R-019,
+R-023) - and **dropping four words got it answered.**
+
+The cause is that every gold case is a full sentence naming its subject, because
+that is how someone writes questions while looking at a chapter. A shorter query
+carries less signal, so the dense score and the top-3 overlap both move, and the
+two-tier gate is placed on exactly those two numbers.
+
+**What this does to the numbers already published.** The holdout result - 8/8
+unanswerable refused, 27/30 answered - stands for the phrasings it was measured
+on, and those phrasings are not how learners type. It is not evidence that the
+gate refuses *the concept*; it is evidence that it refuses *the question as
+written*. Nothing here is retracted, and its scope is narrower than it looked.
+
+**What would fix it, in order:** paraphrases of every gold case, written by
+someone other than whoever wrote the original, so phrasing variance is inside the
+measurement rather than outside it. Then re-derive the floor, because it is
+currently fitted to a single register.
+
+This is the first defect found by running the thing rather than scoring it, which
+is the argument for having built the service before the gold set was finished.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn
