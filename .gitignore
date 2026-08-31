@@ -23,12 +23,16 @@ artifacts/*-quarantine/
 # scripts/embed_representations.py; the cache is keyed by text hash.
 artifacts/embeddings/
 
-# Review sheets quote chapter text as evidence, so they are quarantined content
-# in a spreadsheet. Regenerate with scripts/export_review_sheet.py; marked
-# copies come back from reviewers and stay out of git for the same reason.
-# Any review sheet, whatever it is called. The first version of this rule named
-# two exact filenames and the third variant walked straight past it.
-artifacts/gold/review-sheet.csv
+# Everything under artifacts/gold is quarantined content until proven otherwise.
+# Review sheets, verification packs and formula sheets all quote the chapter in
+# full -- that is the point of them, and it is why they cannot be committed.
+#
+# This is an allowlist because the deny-list version failed twice: it named
+# review-sheet.csv, and review-for-mayank.csv walked straight past it. A new
+# export is now ignored by default and has to be argued onto this list.
+artifacts/gold/*
+!artifacts/gold/.gitkeep
+# The gold set itself is questions and block ids, no chapter prose.
+!artifacts/gold/pilot-2-chapters-v1.json
+# Belt and braces: a review sheet copied anywhere else in the tree.
 review*.csv
-# Verification packs embed the whole chapter, which is the point of them.
-artifacts/gold/verify-*.txt
