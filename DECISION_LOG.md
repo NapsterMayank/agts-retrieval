@@ -1237,3 +1237,35 @@ retrievers choose the same window; overlapping chunk windows so adjacency become
 genuine block overlap (a re-measure of everything, including every stored
 vector); a third retriever so agreement can be two-of-three; and formula repair
 for the below-floor maths cases.
+
+---
+
+### R-053 - The repository was published publicly, with the chapter text in its history
+**Status:** Active - 31 August 2026 - **an operator decision, recorded rather than argued**
+
+Pushed to `github.com/NapsterMayank/agts-retrieval`, public, full history, 37
+commits.
+
+**What that published.** All code, all fourteen documents, every decision in this
+log, and the 204 gold cases. It also published, in history, five review sheets
+carrying roughly twenty-five verbatim NCERT passages each - `review-sheet.csv`,
+`review-for-mayank.csv`, `review-for-sumit.csv` and two simulated reviewer files.
+Those files were removed from the working tree on 31 August (R-034's gitignore
+work) but removal takes a file out of future commits, not out of history.
+
+**The advice given, and not taken.** A squashed push to a private repository was
+recommended: it drops the sheets from history, keeps every document and decision,
+and can be made public the moment a rights record exists. The operator chose the
+full public push after the exposure was measured and stated. That is their
+decision to make - they supplied the source material and carry the relationship
+with the rights holder.
+
+**What is still true.** No source is `APPROVED`, every manifest still reads
+`FORBIDDEN_PENDING_RIGHTS_RECORD`, and the service still refuses to boot without
+an explicit override. Publishing the repository changed none of that: it is a
+disclosure of working material, not an approval of content, and nothing in the
+pipeline treats it as one.
+
+**If it needs undoing:** GitHub retains blobs after a force-push, so the only
+reliable removal is deleting the repository. `gh repo edit --visibility private`
+limits further exposure but does not retract what has been fetched.
