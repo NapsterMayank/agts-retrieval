@@ -73,3 +73,21 @@ def unusable_formulas(blocks: Iterable[SourceBlock]) -> list[SourceBlock]:
         if block.block_type is BlockType.FORMULA
         and is_unusable(" ".join((block.text or "").split()))
     ]
+
+
+def readable_text(text: str | None, latex: str | None) -> str:
+    """What to show a reader, given both fields.
+
+    `text or latex` is the wrong precedence and shipped for a week: a block whose
+    extracted text has decayed to loose symbols still *has* text, so a correctly
+    recovered LaTeX beside it was never reached. The recovered quadratic formula
+    sat in the `latex` field while `2 4 , 2 b b ac a` went on being served.
+
+    Degraded text is kept in the block either way (R-008) -- this decides only
+    what is shown and searched, never what is stored.
+    """
+    if text and not is_unusable(" ".join(text.split())):
+        return text
+    if latex:
+        return latex
+    return text or ""

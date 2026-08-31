@@ -1001,3 +1001,46 @@ moves a published number for reasons unrelated to quality.
 
 Recorded with the numbers they would move, so the next person changes them
 deliberately rather than discovering the interaction afterwards.
+
+---
+
+### R-043 - The second parser's LaTeX is attached only when it cannot be a guess
+**Status:** Active - 31 August 2026
+
+R-008 required crop, raw text **and** LaTeX on every formula block. The `latex`
+field was never populated, while Chandra produced clean LaTeX for the same pages
+and was used only to count characters in a page diff. The 12% unreadable rate in
+R-037 was measured against a gap that a file on disk had already closed.
+
+**The first attempt attached 35 of 43 formulas and was wrong.** Three were
+checked against the page images: one correct, one matched to its own sign-flipped
+twin, one to a different formula on the same page. R-008 rejected Docling's
+enrichment because hallucinated LaTeX renders beautifully and is wrong; this was
+the same failure with a different tool, and 35-of-43 looked like success.
+
+Two causes, both avoidable. The symbol comparison **stripped operators with the
+markup**, making a formula and its sign-flipped twin identical. And it assumed a
+per-page join that R-008 had already recorded as **not one-to-one** - page 4 has
+two Docling formulas against zero Chandra display equations.
+
+**Decision:** operators count as symbols, and a match must beat its runner-up by
+0.50 as well as scoring 0.90. **4 of 43 attach; 39 go to human review.** A far
+worse yield, and the one that survives being checked. Both fields are kept on the
+block, so a wrong attachment stays detectable.
+
+---
+
+### R-044 - `text or latex` is the wrong precedence
+**Status:** Active - 31 August 2026
+
+A block whose text has decayed to loose symbols still *has* text, so `text or
+latex` would have hidden every recovered formula behind the mangled version of
+itself. `quality.readable_text` prefers LaTeX only when the text is unusable, and
+both fields are still stored either way (R-008).
+
+**Consequence:** the window a learner receives for "what is the quadratic
+formula" now carries the formula. **No score moved** - which is the finding, not
+a footnote. Nothing measured here would have caught the formula being wrong, and
+nothing measured here noticed it being fixed. Content quality sits outside every
+gate in this repository, and R-037's usability measure is the only thing that
+looks at it.

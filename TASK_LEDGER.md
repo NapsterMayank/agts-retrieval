@@ -112,7 +112,15 @@
       config guards, a cited-but-not-served latex defect, and three findings
       accepted and left open with the numbers they would move
 
+- [x] Chandra's LaTeX harvested onto formula blocks (R-043, R-044). The first
+      matcher attached 35 of 43 and was wrong on two of three checked against the
+      page images; the strict one attaches 4 and survives checking
+
 ## Next, unblocked
+
+- [ ] **39 formulas need a human to choose among Chandra candidates.** The review
+      queue already pairs each with its crop; this is 20 minutes of somebody's
+      time and recovers the remaining 4 unusable blocks
 
 - [ ] **R-042's three open findings**, which interact: window-level corroboration,
       sibling expansion consulting only the primary, and carried context that is

@@ -46,6 +46,7 @@ from collections.abc import Iterable, Sequence
 
 from agts.contracts.common import NON_CONTENT_BLOCKS, BlockType, Modality
 from agts.contracts.objects import LearningObject, SearchRepresentation, SourceBlock
+from agts.parsing.quality import readable_text
 
 
 #: Bump when the chunking function changes. Representation ids embed it, so two
@@ -87,7 +88,13 @@ def _is_exercise_statement(text: str) -> bool:
 
 
 def _text_of(block: SourceBlock) -> str:
-    return " ".join((block.text or block.latex or "").split())
+    """What a reader would take from this block.
+
+    Not `text or latex`: a block whose text has decayed to loose symbols still
+    has text, so that precedence hid every recovered formula behind the mangled
+    version of itself (R-043).
+    """
+    return " ".join(readable_text(block.text, block.latex).split())
 
 
 def _searchable(blocks: Iterable[SourceBlock]) -> list[SourceBlock]:

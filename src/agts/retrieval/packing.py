@@ -48,6 +48,7 @@ from agts.contracts.runtime import (
     SufficiencyResult,
 )
 from agts.evaluation.corpus import Corpus
+from agts.parsing.quality import readable_text
 from agts.retrieval.sufficiency import SufficiencyDecision
 
 
@@ -174,7 +175,7 @@ def build_pack(
             content
             for b in block_ids
             if b in corpus.blocks
-            for content in [corpus.blocks[b].text or corpus.blocks[b].latex or ""]
+            for content in [readable_text(corpus.blocks[b].text, corpus.blocks[b].latex)]
             if content
         )
         item = EvidenceItem(

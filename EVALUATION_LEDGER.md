@@ -1072,6 +1072,74 @@ It would have shown up the moment a formula recogniser started populating
 `latex` properly, which is to say: the fix for one defect would have activated
 another.
 
+## The LaTeX was there all along - 31 August 2026
+
+R-008 required that a formula block carry crop, raw text **and** LaTeX. The crop
+shipped. The raw text shipped. **The `latex` field has been empty on every block
+since the first parse** - while Chandra, the second parse strategy, ran on the
+same pages and produced this:
+
+| block | what we stored | what Chandra had |
+|---|---|---|
+| `texts-208` | `2 4 , 2 b b ac a  provided b 2 - 4 ac` | `\frac{-b \pm \sqrt{b^2 - 4ac}}{2a}, \text{ provided } b^2 - 4ac \geq 0` |
+| `texts-123` | `2 3 2 6 2 x x` | `3x^2 - 2\sqrt{6}x + 2 = 0` |
+
+Chandra was used to count characters for a page-level diff and nothing else. The
+12% unreadable rate measured in R-037, and the Mathpix request built on it, were
+both about a gap that a file on disk had already closed.
+
+### The first matcher was confident and wrong
+
+Matching each degraded block to the best Chandra candidate on its page attached
+35 of 43 formulas. **Three were checked against the page images. One was
+correct.**
+
+| block | attached | the page shows |
+|---|---|---|
+| `texts-208` | `\frac{-b \pm \sqrt{b^2-4ac}}{2a} ...` | **correct** |
+| `texts-153` | `-\frac{b}{2a} \mathbf{+} \frac{\sqrt{...}}{2a}` | a **minus**, not a plus |
+| `texts-159` | `b^2 - 4ac = (-4)^2 - ... = -8 < 0` | a **different formula** |
+
+R-008 rejected Docling's formula enrichment because *"hallucinated LaTeX renders
+beautifully and is wrong"*. This was the same failure with a different tool, and
+it very nearly shipped because 35-of-43 looked like success.
+
+Two causes, both mine. The comparison **stripped operators along with the
+markup**, so a formula and its sign-flipped twin were indistinguishable - that is
+`texts-153` exactly. And it assumed a per-page join that R-008 had already
+recorded as *not one-to-one*: page 4 has two Docling formulas and zero Chandra
+display equations, page 7 has six against three.
+
+### What was kept
+
+Operators now count as symbols, and a match must **also** beat its runner-up by
+0.50. Against the three verified cases the rule separates them cleanly:
+
+| block | confidence | margin | outcome |
+|---|---:|---:|---|
+| `texts-208` | 1.00 | 0.73 | attached |
+| `texts-153` | 1.00 | **0.00** | withheld - the twin ties it |
+| `texts-159` | 0.62 | 0.38 | withheld |
+
+**4 of 43 attached, 39 left for a human**, and 1 of the 5 unusable formulas
+recovered. That is a far worse yield than 35, and it is the yield that survives
+being checked.
+
+### And a precedence bug that would have wasted the whole exercise
+
+`text or latex` reads as sensible and is exactly wrong: a block whose text has
+decayed to loose symbols still *has* text, so the recovered LaTeX would never
+have been reached. `quality.readable_text` now prefers LaTeX only when the text
+is unusable, and the window a learner receives for "what is the quadratic
+formula" reads:
+
+    The roots of a quadratic equation ax 2 + bx + c = 0 are given by
+    \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}, \text{ provided } b^2 - 4ac \geq 0.
+
+No score moved. Every gate still passes at the same numbers - which is the point
+worth keeping: **nothing measured here would have caught the formula being wrong,
+and nothing measured here noticed it being fixed.**
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn
