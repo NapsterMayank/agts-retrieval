@@ -26,5 +26,7 @@ artifacts/embeddings/
 # Review sheets quote chapter text as evidence, so they are quarantined content
 # in a spreadsheet. Regenerate with scripts/export_review_sheet.py; marked
 # copies come back from reviewers and stay out of git for the same reason.
+# Any review sheet, whatever it is called. The first version of this rule named
+# two exact filenames and the third variant walked straight past it.
 artifacts/gold/review-sheet.csv
-reviewed-*.csv
+review*.csv
