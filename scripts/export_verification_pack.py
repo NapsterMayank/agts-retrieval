@@ -13,6 +13,7 @@ says will confabulate it, and an agent given the chapter will not have to.
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -93,12 +94,28 @@ def chapter_text(blocks: dict[str, dict]) -> str:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--scope", choices=["critical", "rest", "all"], default="critical",
+        help="critical: the 47 release-critical cases. rest: everything else, "
+             "which no reviewer has ever seen. all: both.",
+    )
+    args = parser.parse_args()
+
     gold_set = load_gold_set(GOLD)
     written = []
 
     for subject, (document, title) in CHAPTERS.items():
         blocks = blocks_for(document)
-        cases = [c for c in gold_set.cases if c.is_release_critical and c.subject == subject]
+        if args.scope == "critical":
+            selected = [c for c in gold_set.cases if c.is_release_critical]
+        elif args.scope == "rest":
+            selected = [c for c in gold_set.cases if not c.is_release_critical]
+        else:
+            selected = list(gold_set.cases)
+        cases = [c for c in selected if c.subject == subject]
+        if not cases:
+            continue
 
         lines = [
             f"VERIFICATION PACK — {title}",
@@ -129,7 +146,8 @@ def main() -> None:
             else:
                 lines.append("CLAIM: NOT ANSWERABLE. This chapter cannot answer this question.")
 
-        out = ARTIFACTS / "gold" / f"verify-{subject}.txt"
+        suffix = "" if args.scope == "critical" else f"-{args.scope}"
+        out = ARTIFACTS / "gold" / f"verify-{subject}{suffix}.txt"
         out.write_text("\n".join(lines), encoding="utf-8")
         written.append((out, len(cases), len("\n".join(lines))))
 
