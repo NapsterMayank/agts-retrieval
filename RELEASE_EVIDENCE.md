@@ -13,7 +13,7 @@ intention. Updated 30 August 2026.
 | Schema and migration versions | `migrations/001_core.sql` and `002_pgvector.sql`, applied and tested against Postgres 17 + pgvector 0.8.6 |
 | Source and release manifests | **Built** — `provenance.build_manifest` hashes the corpus itself; `rm-pilot-2-chapters-0001` covers 38 objects and 2 sources |
 | Model, embedding, reranker, parser and prompt versions | Recorded in every trace: `voyage-3`, `rerank-2`, Docling 2.122.0, `block-window-v2`, no prompt (nothing generates) |
-| Decision and contract traceability | `DECISION_LOG.md` (R-001…R-033), `CONTRACT_REGISTRY.md`, `docs/00-authority.md` |
+| Decision and contract traceability | `DECISION_LOG.md` (R-001…R-035), `CONTRACT_REGISTRY.md`, `docs/00-authority.md` |
 | Unedited test and benchmark results | `EVALUATION_LEDGER.md`, plus `artifacts/gold/*.json` written by the scripts themselves |
 | RLS / authorization matrix | Partial — the §5 filter exists in Python **and** in SQL, with a test asserting they agree. No row-level security policy in the database |
 | Hidden-holdout runner config | `scripts/holdout_validation.py`, 38 unseen cases. **The seal is not real** — the cases are agent-drafted and unadjudicated (Q2) |
