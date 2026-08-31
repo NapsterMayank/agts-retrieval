@@ -4,7 +4,7 @@
     AGTS_DATABASE_URL=postgresql://agts:agts_dev_password@localhost:5434/agts_dev \
     AGTS_EMBEDDING_CACHE=artifacts/embeddings/voyage-3.json \
     AGTS_ABSTAIN_FLOOR=0.737 \
-    AGTS_HIGH_CONFIDENCE=0.827 \
+    AGTS_HIGH_CONFIDENCE=0.800 \
     AGTS_RELEASE_MANIFEST_ID=rm-pilot-2-chapters-0001 \
     AGTS_API_TOKENS=dev-token:tenant-dev \
     VOYAGE_API_KEY=... \

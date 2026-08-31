@@ -13,7 +13,8 @@
     "status": "DRAFT. Measures the harness against real content; not release evidence, and not the 300-500 case set \u00a76.4 requires.",
     "holdout": "The 38 h-* cases were written AFTER the sufficiency gate's floor, ceiling and corroboration rule were fixed, and were not consulted while choosing any of them. They are a genuine validation set for those constants. They are still agent-drafted and unadjudicated, so they validate the mechanism, not the curriculum judgement.",
     "external_review": "31 August: an independent model reviewed all 48 release-critical claims against the chapter text. Science 24 right, 3 wrong; mathematics 21 of 21 right. Two keys were incomplete and are fixed (h-chem-17, h-chem-11). One (h-chem-16) was removed rather than argued: the chapter tells a student to bring a burning candle to the tubes and then asks which gas is present without answering, so whether it 'answers' the question is a judgement two careful readers can split on. A gold case that turns on an unresolved judgement is a bad test item whichever way it is resolved.",
-    "external_review_2": "31 August, second round over the 50 previously unreviewed cases plus a re-check of the 21 maths claims. Science 24/26 right, mathematics 22/24 right, and the maths re-check came back clean a second time under a different reader. Three keys fixed; one finding is a content defect rather than a key error."
+    "external_review_2": "31 August, second round over the 50 previously unreviewed cases plus a re-check of the 21 maths claims. Science 24/26 right, mathematics 22/24 right, and the maths re-check came back clean a second time under a different reader. Three keys fixed; one finding is a content defect rather than a key error.",
+    "paraphrases": "31 August: rewordings of existing cases in short, spoken and typo registers. Each inherits its parent's answer and gold blocks unchanged, so no new judgement is introduced; a paraphrase stays in its parent's set, and adjudication does not inherit because a human approved the parent's wording rather than this one."
   },
   "cases": [
     {
@@ -1475,6 +1476,1865 @@
       ],
       "holdout": true,
       "answerable": false
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-001-p1",
+      "query": "ph of lemon juice",
+      "paraphrase_of": "unans-001",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-001-p2",
+      "query": "how acidic is lemon juice",
+      "paraphrase_of": "unans-001",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-002-p1",
+      "query": "human eye focus distant objects",
+      "paraphrase_of": "unans-002",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-002-p2",
+      "query": "how does my eye focus on far away things",
+      "paraphrase_of": "unans-002",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-003-p1",
+      "query": "ohms law formula",
+      "paraphrase_of": "unans-003",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-003-p2",
+      "query": "whats ohms law",
+      "paraphrase_of": "unans-003",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-004-p1",
+      "query": "chlorophyll function",
+      "paraphrase_of": "unans-004",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-004-p2",
+      "query": "what does chlorophyll actually do",
+      "paraphrase_of": "unans-004",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-005-p1",
+      "query": "reactivity series top metals",
+      "paraphrase_of": "unans-005",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-005-p2",
+      "query": "which metals are most reactive and why",
+      "paraphrase_of": "unans-005",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-006-p1",
+      "query": "cardano cubic method",
+      "paraphrase_of": "unans-006",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-006-p2",
+      "query": "how do i solve a cubic equation",
+      "paraphrase_of": "unans-006",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-007-p1",
+      "query": "sum of n terms ap",
+      "paraphrase_of": "unans-007",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-007-p2",
+      "query": "how do you add up an arithmetic progression",
+      "paraphrase_of": "unans-007",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-008-p1",
+      "query": "pythagoras theorem proof",
+      "paraphrase_of": "unans-008",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-008-p2",
+      "query": "can you prove pythagoras theorem",
+      "paraphrase_of": "unans-008",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "worked_example",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-009-p1",
+      "query": "completing the square",
+      "paraphrase_of": "unans-009",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "worked_example",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-009-p2",
+      "query": "how do you do completing the square",
+      "paraphrase_of": "unans-009",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "worked_example",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-009-p3",
+      "query": "how to solve quadratic by completeing the sqaure",
+      "paraphrase_of": "unans-009",
+      "phrasing": "typo",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-010-p1",
+      "query": "distance formula",
+      "paraphrase_of": "unans-010",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "answerable": false,
+      "case_id": "unans-010-p2",
+      "query": "how do i find the distance between two points",
+      "paraphrase_of": "unans-010",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-01-p1",
+      "query": "area of a circle formula",
+      "paraphrase_of": "h-unans-01",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-01-p2",
+      "query": "how do you find the area of a circle",
+      "paraphrase_of": "h-unans-01",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-02-p1",
+      "query": "factorise cubic polynomial",
+      "paraphrase_of": "h-unans-02",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-02-p2",
+      "query": "how do i factorise something with x cubed",
+      "paraphrase_of": "h-unans-02",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-03-p1",
+      "query": "nth term gp",
+      "paraphrase_of": "h-unans-03",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-03-p2",
+      "query": "whats the nth term of a geometric progression",
+      "paraphrase_of": "h-unans-03",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-04-p1",
+      "query": "median grouped data",
+      "paraphrase_of": "h-unans-04",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-04-p2",
+      "query": "how do you find the median from a frequency table",
+      "paraphrase_of": "h-unans-04",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-05-p1",
+      "query": "atomic number sodium",
+      "paraphrase_of": "h-unans-05",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-05-p2",
+      "query": "whats the atomic number of sodium",
+      "paraphrase_of": "h-unans-05",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-06-p1",
+      "query": "nerve impulse travel",
+      "paraphrase_of": "h-unans-06",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-06-p2",
+      "query": "how does a nerve signal move",
+      "paraphrase_of": "h-unans-06",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-07-p1",
+      "query": "ac vs dc current",
+      "paraphrase_of": "h-unans-07",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-07-p2",
+      "query": "difference between ac and dc",
+      "paraphrase_of": "h-unans-07",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-08-p1",
+      "query": "enzymes digestion role",
+      "paraphrase_of": "h-unans-08",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "answerable": false,
+      "case_id": "h-unans-08-p2",
+      "query": "what do enzymes do when you digest food",
+      "paraphrase_of": "h-unans-08",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-65",
+        "chemical-reactions:docling:texts-67",
+        "chemical-reactions:docling:texts-68",
+        "chemical-reactions:docling:texts-74"
+      ],
+      "case_id": "chem-001-p1",
+      "query": "balanced chemical equation",
+      "paraphrase_of": "chem-001",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-65",
+        "chemical-reactions:docling:texts-67",
+        "chemical-reactions:docling:texts-68",
+        "chemical-reactions:docling:texts-74"
+      ],
+      "case_id": "chem-001-p2",
+      "query": "what does it mean when an equation is balanced",
+      "paraphrase_of": "chem-001",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-67",
+        "chemical-reactions:docling:texts-383"
+      ],
+      "case_id": "chem-002-p1",
+      "query": "why balance equations",
+      "paraphrase_of": "chem-002",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-149",
+        "chemical-reactions:docling:texts-162"
+      ],
+      "case_id": "chem-003-p1",
+      "query": "combination reaction",
+      "paraphrase_of": "chem-003",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-149",
+        "chemical-reactions:docling:texts-162"
+      ],
+      "case_id": "chem-003-p2",
+      "query": "what is a combinaton reaction",
+      "paraphrase_of": "chem-003",
+      "phrasing": "typo",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-195",
+        "chemical-reactions:docling:texts-385"
+      ],
+      "case_id": "chem-004-p1",
+      "query": "decomposition reaction",
+      "paraphrase_of": "chem-004",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-195",
+        "chemical-reactions:docling:texts-385"
+      ],
+      "case_id": "chem-004-p2",
+      "query": "whats a decomposition reaction",
+      "paraphrase_of": "chem-004",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "modality": "equation",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-147",
+        "chemical-reactions:docling:texts-148"
+      ],
+      "case_id": "chem-005-p1",
+      "query": "calcium oxide plus water",
+      "paraphrase_of": "chem-005",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-163",
+        "chemical-reactions:docling:texts-386"
+      ],
+      "case_id": "chem-006-p1",
+      "query": "reactions that give out heat",
+      "paraphrase_of": "chem-006",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-263",
+        "chemical-reactions:docling:texts-387"
+      ],
+      "case_id": "chem-007-p1",
+      "query": "endothermic reactions",
+      "paraphrase_of": "chem-007",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-263",
+        "chemical-reactions:docling:texts-387"
+      ],
+      "case_id": "chem-007-p2",
+      "query": "what are endothermic reactions",
+      "paraphrase_of": "chem-007",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-308",
+        "chemical-reactions:docling:texts-310",
+        "chemical-reactions:docling:texts-311"
+      ],
+      "case_id": "chem-008-p1",
+      "query": "why does copper sulphate go pale when you put an iron nail in",
+      "paraphrase_of": "chem-008",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-311",
+        "chemical-reactions:docling:texts-388"
+      ],
+      "case_id": "chem-009-p1",
+      "query": "displacement reaction",
+      "paraphrase_of": "chem-009",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-329",
+        "chemical-reactions:docling:texts-389"
+      ],
+      "case_id": "chem-010-p1",
+      "query": "double displacement reaction",
+      "paraphrase_of": "chem-010",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-329",
+        "chemical-reactions:docling:texts-389"
+      ],
+      "case_id": "chem-010-p2",
+      "query": "what is dubble displacement reaction",
+      "paraphrase_of": "chem-010",
+      "phrasing": "typo",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-321",
+        "chemical-reactions:docling:texts-390"
+      ],
+      "case_id": "chem-011-p1",
+      "query": "precipitation reaction",
+      "paraphrase_of": "chem-011",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-353",
+        "chemical-reactions:docling:texts-362",
+        "chemical-reactions:docling:texts-391"
+      ],
+      "case_id": "chem-012-p1",
+      "query": "oxidation reduction oxygen",
+      "paraphrase_of": "chem-012",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-353",
+        "chemical-reactions:docling:texts-362",
+        "chemical-reactions:docling:texts-391"
+      ],
+      "case_id": "chem-012-p2",
+      "query": "how do you tell if something is oxidised",
+      "paraphrase_of": "chem-012",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-366",
+        "chemical-reactions:docling:texts-367"
+      ],
+      "case_id": "chem-013-p1",
+      "query": "why do iron things go rusty",
+      "paraphrase_of": "chem-013",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-370"
+      ],
+      "case_id": "chem-014-p1",
+      "query": "rancidity prevention",
+      "paraphrase_of": "chem-014",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-251",
+        "chemical-reactions:docling:texts-254"
+      ],
+      "case_id": "chem-015-p1",
+      "query": "silver chloride sunlight grey",
+      "paraphrase_of": "chem-015",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "modality": "equation",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-70",
+        "chemical-reactions:docling:texts-72"
+      ],
+      "case_id": "chem-016-p1",
+      "query": "zinc dilute sulphuric acid gas",
+      "paraphrase_of": "chem-016",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-57",
+        "chemical-reactions:docling:texts-58"
+      ],
+      "case_id": "chem-017-p1",
+      "query": "reactants and products",
+      "paraphrase_of": "chem-017",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-109",
+        "chemical-reactions:docling:texts-110"
+      ],
+      "case_id": "chem-018-p1",
+      "query": "physical state symbols equation",
+      "paraphrase_of": "chem-018",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-168",
+        "chemical-reactions:docling:texts-169"
+      ],
+      "case_id": "chem-019-p1",
+      "query": "why is breathing an exothermic reaction",
+      "paraphrase_of": "chem-019",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-47",
+        "chemical-reactions:docling:texts-48",
+        "chemical-reactions:docling:texts-49",
+        "chemical-reactions:docling:texts-50",
+        "chemical-reactions:docling:texts-51"
+      ],
+      "case_id": "chem-021-p1",
+      "query": "signs a chemical reaction happened",
+      "paraphrase_of": "chem-021",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "misconception",
+      "teaching_action": "misconception_correction",
+      "learner_state": "misconception",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-353",
+        "chemical-reactions:docling:texts-363"
+      ],
+      "case_id": "chem-022-p1",
+      "query": "when magnesium burns is it oxidised or reduced",
+      "paraphrase_of": "chem-022",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-108"
+      ],
+      "case_id": "chem-023-p1",
+      "query": "hit and trial balancing",
+      "paraphrase_of": "chem-023",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "modality": "equation",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-196",
+        "chemical-reactions:docling:texts-197"
+      ],
+      "case_id": "chem-024-p1",
+      "query": "heating calcium carbonate",
+      "paraphrase_of": "chem-024",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-321",
+        "chemical-reactions:docling:texts-329"
+      ],
+      "case_id": "chem-025-p1",
+      "query": "sodium sulphate barium chloride precipitate",
+      "paraphrase_of": "chem-025",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-203"
+      ],
+      "case_id": "chem-026-p1",
+      "query": "lead nitrate brown fumes",
+      "paraphrase_of": "chem-026",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-21",
+        "quadratic-equations:docling:texts-204"
+      ],
+      "case_id": "maths-001-p1",
+      "query": "quadratic equation definition",
+      "paraphrase_of": "maths-001",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-21",
+        "quadratic-equations:docling:texts-204"
+      ],
+      "case_id": "maths-001-p2",
+      "query": "what even is a quadratic equation",
+      "paraphrase_of": "maths-001",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-22"
+      ],
+      "case_id": "maths-002-p1",
+      "query": "standard form quadratic",
+      "paraphrase_of": "maths-002",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-97",
+        "quadratic-equations:docling:texts-205"
+      ],
+      "case_id": "maths-003-p1",
+      "query": "root of a quadratic equation",
+      "paraphrase_of": "maths-003",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-98"
+      ],
+      "case_id": "maths-004-p1",
+      "query": "how many roots quadratic",
+      "paraphrase_of": "maths-004",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-98"
+      ],
+      "case_id": "maths-004-p2",
+      "query": "can a quadratic have three roots",
+      "paraphrase_of": "maths-004",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-162"
+      ],
+      "case_id": "maths-005-p1",
+      "query": "discriminant",
+      "paraphrase_of": "maths-005",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-162"
+      ],
+      "case_id": "maths-005-p2",
+      "query": "whats the discriminant again",
+      "paraphrase_of": "maths-005",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-164",
+        "quadratic-equations:docling:texts-211"
+      ],
+      "case_id": "maths-006-p1",
+      "query": "two distinct real roots condition",
+      "paraphrase_of": "maths-006",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-161",
+        "quadratic-equations:docling:texts-166"
+      ],
+      "case_id": "maths-007-p1",
+      "query": "no real roots condition",
+      "paraphrase_of": "maths-007",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-160",
+        "quadratic-equations:docling:texts-165"
+      ],
+      "case_id": "maths-008-p1",
+      "query": "equal roots condition",
+      "paraphrase_of": "maths-008",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-160",
+        "quadratic-equations:docling:texts-165"
+      ],
+      "case_id": "maths-008-p2",
+      "query": "when are the roots equl",
+      "paraphrase_of": "maths-008",
+      "phrasing": "typo",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "worked_example",
+      "modality": "equation",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-101",
+        "quadratic-equations:docling:texts-102",
+        "quadratic-equations:docling:texts-106"
+      ],
+      "case_id": "maths-009-p1",
+      "query": "factorise 2x2-5x+3",
+      "paraphrase_of": "maths-009",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "worked_example",
+      "modality": "equation",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-116",
+        "quadratic-equations:docling:texts-117",
+        "quadratic-equations:docling:texts-120"
+      ],
+      "case_id": "maths-010-p1",
+      "query": "roots of 6x2-x-2",
+      "paraphrase_of": "maths-010",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-101",
+        "quadratic-equations:docling:texts-102",
+        "quadratic-equations:docling:texts-112",
+        "quadratic-equations:docling:texts-206"
+      ],
+      "case_id": "maths-011-p1",
+      "query": "splitting the middle term",
+      "paraphrase_of": "maths-011",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "modality": "equation",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-207",
+        "quadratic-equations:docling:texts-208"
+      ],
+      "case_id": "maths-012-p1",
+      "query": "quadratic formula",
+      "paraphrase_of": "maths-012",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "modality": "equation",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-207",
+        "quadratic-equations:docling:texts-208"
+      ],
+      "case_id": "maths-012-p2",
+      "query": "whats the formula for solving quadratics",
+      "paraphrase_of": "maths-012",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "multi_hop",
+      "teaching_action": "worked_example",
+      "modality": "equation",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-169",
+        "quadratic-equations:docling:texts-170",
+        "quadratic-equations:docling:texts-171"
+      ],
+      "case_id": "maths-013-p1",
+      "query": "discriminant of 2x2-4x+3",
+      "paraphrase_of": "maths-013",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "enrichment",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-18"
+      ],
+      "case_id": "maths-014-p1",
+      "query": "who derived the quadratic formula",
+      "paraphrase_of": "maths-014",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "multi_hop",
+      "teaching_action": "worked_example",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-10",
+        "quadratic-equations:docling:texts-11"
+      ],
+      "case_id": "maths-015-p1",
+      "query": "prayer hall equation",
+      "paraphrase_of": "maths-015",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "multi_hop",
+      "teaching_action": "worked_example",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-132",
+        "quadratic-equations:docling:texts-137",
+        "quadratic-equations:docling:texts-138"
+      ],
+      "case_id": "maths-016-p1",
+      "query": "prayer hall length breadth",
+      "paraphrase_of": "maths-016",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "misconception",
+      "teaching_action": "misconception_correction",
+      "learner_state": "misconception",
+      "modality": "equation",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-80",
+        "quadratic-equations:docling:texts-83"
+      ],
+      "case_id": "maths-017-p1",
+      "query": "is x plus 2 cubed equals x cubed minus 4 a quadratic",
+      "paraphrase_of": "maths-017",
+      "phrasing": "spoken",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "multi_hop",
+      "teaching_action": "worked_example",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-186",
+        "quadratic-equations:docling:texts-187",
+        "quadratic-equations:docling:texts-188"
+      ],
+      "case_id": "maths-019-p1",
+      "query": "pole circular park possible",
+      "paraphrase_of": "maths-019",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "enrichment",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-12"
+      ],
+      "case_id": "maths-020-p1",
+      "query": "babylonians quadratic",
+      "paraphrase_of": "maths-020",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-98",
+        "quadratic-equations:docling:texts-205"
+      ],
+      "case_id": "maths-021-p1",
+      "query": "why only two roots",
+      "paraphrase_of": "maths-021",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-96",
+        "quadratic-equations:docling:texts-97"
+      ],
+      "case_id": "maths-022-p1",
+      "query": "what does satisfies the equation mean",
+      "paraphrase_of": "maths-022",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "modality": "equation",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-126",
+        "quadratic-equations:docling:texts-127"
+      ],
+      "case_id": "maths-023-p1",
+      "query": "repeated factor root twice",
+      "paraphrase_of": "maths-023",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "multi_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-137",
+        "quadratic-equations:docling:texts-138"
+      ],
+      "case_id": "maths-024-p1",
+      "query": "why reject negative root",
+      "paraphrase_of": "maths-024",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-32"
+      ],
+      "case_id": "h-chem-01-p1",
+      "query": "magnesium ribbon burns product",
+      "paraphrase_of": "h-chem-01",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "modality": "equation",
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-193",
+        "chemical-reactions:docling:texts-194"
+      ],
+      "case_id": "h-chem-05-p1",
+      "query": "heating ferrous sulphate",
+      "paraphrase_of": "h-chem-05",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-370"
+      ],
+      "case_id": "h-chem-09-p1",
+      "query": "antioxidants in food why",
+      "paraphrase_of": "h-chem-09",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-65",
+        "chemical-reactions:docling:texts-68"
+      ],
+      "case_id": "h-chem-11-p1",
+      "query": "skeletal chemical equation",
+      "paraphrase_of": "h-chem-11",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-67"
+      ],
+      "case_id": "h-chem-12-p1",
+      "query": "law of conservation of mass",
+      "paraphrase_of": "h-chem-12",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "science",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "chemical-reactions-and-equations"
+      ],
+      "holdout": true,
+      "gold_block_ids": [
+        "chemical-reactions:docling:texts-366",
+        "chemical-reactions:docling:texts-367"
+      ],
+      "case_id": "h-chem-15-p1",
+      "query": "corrosion cost",
+      "paraphrase_of": "h-chem-15",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "definition",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-22"
+      ],
+      "case_id": "h-maths-01-p1",
+      "query": "degree of quadratic polynomial",
+      "paraphrase_of": "h-maths-01",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "worked_example",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "modality": "equation",
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-106",
+        "quadratic-equations:docling:texts-107"
+      ],
+      "case_id": "h-maths-05-p1",
+      "query": "roots of 2x2-5x+3",
+      "paraphrase_of": "h-maths-05",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "modality": "equation",
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-165"
+      ],
+      "case_id": "h-maths-06-p1",
+      "query": "discriminant when roots equal",
+      "paraphrase_of": "h-maths-06",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "explain",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-160"
+      ],
+      "case_id": "h-maths-10-p1",
+      "query": "can quadratic have two equal roots",
+      "paraphrase_of": "h-maths-10",
+      "phrasing": "short",
+      "adjudicators": []
+    },
+    {
+      "grade": "10",
+      "subject": "mathematics",
+      "question_type": "single_hop",
+      "teaching_action": "worked_example",
+      "concept_ids": [
+        "quadratic-equations"
+      ],
+      "holdout": true,
+      "modality": "equation",
+      "gold_block_ids": [
+        "quadratic-equations:docling:texts-117",
+        "quadratic-equations:docling:texts-120"
+      ],
+      "case_id": "h-maths-12-p1",
+      "query": "roots of 6x2-x-2 factorisation",
+      "paraphrase_of": "h-maths-12",
+      "phrasing": "short",
+      "adjudicators": []
     }
   ]
 }

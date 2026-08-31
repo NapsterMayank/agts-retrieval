@@ -1206,6 +1206,89 @@ is the improvement.** The gate previously accepted on a weaker notion of
 agreement than it claimed; the number went down because the claim got true. What
 did not move is the only column where a mistake reaches a learner.
 
+## Paraphrases, and the floor re-derived on more than one register - 31 August 2026
+
+R-035 recorded that every gold case is a full sentence naming its subject,
+because that is how questions get written while looking at a chapter, and that
+dropping four words turned a correct refusal into an answer. The set is now 204
+cases: **107 rewordings of 77 parents**, in three registers - `short` (72,
+keyword-style), `spoken` (31, how a student asks aloud) and `typo` (4, real
+keyboard errors).
+
+A paraphrase **inherits its parent's answer and gold blocks unchanged**. Only the
+wording differs, so writing one invents no judgement - which is what makes it
+legitimate for the author of a case to reword it, where writing new cases would
+not be. A reworded holdout case stays in the holdout, and adjudication does not
+inherit: a human would have approved the parent's wording, not this one.
+
+### What the old floor did across registers
+
+Before changing anything, the shipped configuration was run over the wider set:
+
+| phrasing | refused | answered |
+|---|---|---|
+| textbook | 18/18 | 65/79 - **82%** |
+| short | 18/18 | 30/54 - **56%** |
+| spoken | 18/18 | 8/13 - **62%** |
+| typo | 1/1 | 2/3 |
+
+**Refusal is register-proof; acceptance is not.** 54 of 54 unanswerable questions
+were refused however they were phrased, while a learner who types
+`endothermic reactions` instead of a full sentence is refused about twice as
+often as one who writes like a textbook. That is the shape of the R-035 problem
+measured rather than inferred, and it is the better half of a bad situation: the
+failure mode is conservatism, not invention.
+
+### Re-deriving
+
+Calibration on the wider visible set (140 cases, up from 60) moved both numbers:
+floor 0.737 -> 0.715, ceiling 0.827 -> 0.800. Four combinations were then scored
+**on the visible set alone**, under a rule declared before looking - no leaks
+first, then most answers:
+
+| floor | ceiling | refuse | answer |
+|---:|---:|---|---|
+| 0.715 | 0.800 | 30/31 **leaks** | 82/109 |
+| 0.715 | 0.827 | 30/31 **leaks** | 76/109 |
+| **0.737** | **0.800** | **31/31 clean** | **81/109** |
+| 0.737 | 0.827 | 31/31 clean | 75/109 |
+
+**The re-derived floor was rejected and the old one kept.** Lowering it to the
+new midpoint buys one answer and leaks an unanswerable case. What did change is
+the ceiling: 0.800 rather than 0.827, worth six more answered questions at no
+cost in refusals, because the median answerable score is lower once short
+questions are in the set.
+
+### The holdout, touched once
+
+| | before paraphrases | after |
+|---|---|---|
+| cases | 29 answerable, 8 unanswerable | **40 answerable, 24 unanswerable** |
+| unanswerable refused | 8/8 - supports >= 69% | **24/24 - supports >= 88%** |
+| answerable answered | 23/29 (79%) - supports >= 63% | **33/40 (82%) - supports >= 70%** |
+
+Both numbers improved, and the refusal bound improved most: **the same claim now
+rests on 24 observations instead of 8**, across three registers rather than one.
+That is what the exercise was for. Acceptance is up three points on a harder set.
+
+### And the case that started it
+
+`unans-009` is now in the set four times. All four are refused:
+
+    refused  [textbook]  How do you solve a quadratic equation by completing the square?
+    refused  [short]     completing the square
+    refused  [spoken]    how do you do completing the square
+    refused  [typo]      how to solve quadratic by completeing the sqaure
+
+The short form is the one that was answered on 31 August morning. It is refused
+now - not because the floor moved, but because R-045 made agreement mean the two
+retrievers found the same *passage*.
+
+**What this does not establish.** The rewordings are mine, and a paraphrase set
+written by the author of the originals shares their blind spots about what a
+learner would ask. It measures register sensitivity, which was the point; it does
+not measure whether real learners ask questions this repository has imagined.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

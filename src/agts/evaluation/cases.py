@@ -58,6 +58,18 @@ class EvalCase(BaseModel):
     reference_answer: str | None = None
     answerable: bool = True
 
+    #: The case this one rewords. A paraphrase inherits its parent's answer and
+    #: gold blocks unchanged -- only the wording differs -- so it tests whether
+    #: the system answers the *concept* or merely the sentence. Adding a
+    #: paraphrase invents no new judgement, which is why one author may write
+    #: them for cases another author labelled (R-047).
+    paraphrase_of: str | None = None
+
+    #: How the question is asked. The gold set was written in one register --
+    #: full sentences naming their subject, the way questions get written while
+    #: looking at a chapter -- and learners do not type that way.
+    phrasing: str = "textbook"
+
     adjudicators: list[str] = Field(
         default_factory=list,
         description="Named human reviewers. Release-critical cases need two (§6.4).",

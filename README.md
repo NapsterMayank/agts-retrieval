@@ -13,16 +13,18 @@ parse, compose, chunk, embed, rank, decide whether the question can be answered
 at all, assemble a cited evidence pack, record what produced it — and serve the
 whole thing over HTTP.
 
-| | visible 60 | holdout 37 |
+| | visible 140 | holdout 64 |
 |---|---:|---:|
-| Unanswerable questions refused | 10/10 | **8/8** — supports ≥69% |
-| Answerable questions answered | 42/50 | **23/29** — supports ≥63% |
+| Unanswerable questions refused | 31/31 | **24/24** — supports ≥88% |
+| Answerable questions answered | 81/109 | **33/40** — supports ≥70% |
 | Citation completeness (§14 bar ≥95%) | 97.6% | **95.7%** |
 | Citation ID resolution (§14 bar 100%) | 100% | **100%** |
 | Lineage failures (§14 bar 0) | 0 | **0** |
 
-The bounds are exact one-sided Clopper-Pearson at 95% (R-039): eight clean
-refusals support “at least 69%”, not certainty.
+The bounds are exact one-sided Clopper-Pearson at 95% (R-039). The set covers
+four phrasings of the same questions — textbook, short, spoken and
+mistyped — because refusing a full sentence and answering its four-word
+version is not refusing the concept (R-047).
 
 An outside model reviewed all 48 release-critical claims against the chapter
 text and found **three wrong answer keys** and three code defects (R-036). All
@@ -90,7 +92,7 @@ AGTS_DATABASE_URL=postgresql://agts:agts_dev_password@localhost:5434/agts_dev \
 docker compose -f docker/compose.yml up -d
 AGTS_DATABASE_URL=postgresql://agts:agts_dev_password@localhost:5434/agts_dev \
 AGTS_EMBEDDING_CACHE=artifacts/embeddings/voyage-3.json \
-AGTS_ABSTAIN_FLOOR=0.737 AGTS_HIGH_CONFIDENCE=0.827 \
+AGTS_ABSTAIN_FLOOR=0.737 AGTS_HIGH_CONFIDENCE=0.800 \
 AGTS_RELEASE_MANIFEST_ID=rm-pilot-2-chapters-0001 \
 AGTS_API_TOKENS=dev-token:tenant-dev VOYAGE_API_KEY=... \
 PYTHONPATH=src python scripts/serve.py

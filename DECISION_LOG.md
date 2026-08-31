@@ -1087,3 +1087,56 @@ than more `block_ids`. The distinction is the whole point - these blocks are rea
 and on real pages, so the pack **serves and cites** them, while recall continues
 to score only the blocks the window is made of. Counting them as the window's own
 evidence would inflate every recall number in this repository.
+
+---
+
+### R-047 - A paraphrase inherits its label, so its author may be the author of the case
+**Status:** Active - 31 August 2026 - **closes R-035**
+
+Every gold case was a full sentence naming its subject. The set now carries 107
+rewordings of 77 parents in three registers, doubling it to 204 cases.
+
+**Why this is not more marking my own homework.** A paraphrase inherits its
+parent's answer and gold blocks unchanged; only the wording differs. Writing one
+introduces no new judgement about what a chapter teaches, which is exactly the
+judgement an author cannot check for themselves. Writing new *cases* would be a
+different act, and is not what happened here.
+
+Two rules the expansion follows: a reworded holdout case stays in the holdout, or
+thresholds would be fitted to a question whose twin is meant to be unseen; and
+adjudication does not inherit, because a human would have approved the parent's
+wording rather than this one.
+
+**Measured before changing anything:** refusal is register-proof (54/54 across
+all registers) and acceptance is not (82% textbook, 56% short, 62% spoken). The
+failure mode of a short question is conservatism rather than invention, which is
+the better half of a bad situation.
+
+---
+
+### R-048 - The re-derived floor was rejected; only the ceiling moved
+**Status:** Active - 31 August 2026
+
+Calibration on the wider visible set moved floor 0.737 -> 0.715 and ceiling
+0.827 -> 0.800. Four combinations were scored on the visible set alone under a
+rule declared before looking - no leaks first, then most answers.
+
+**The new floor leaks.** 0.715 buys one more answer and lets an unanswerable case
+through, so 0.737 stays. The ceiling moves to **0.800**, worth six more answered
+questions at no cost in refusals, because the median answerable score is lower
+once short questions are in the set.
+
+**Holdout, touched once, on 64 cases across three registers:**
+
+| | before | after |
+|---|---|---|
+| unanswerable refused | 8/8, supports >= 69% | **24/24, supports >= 88%** |
+| answerable answered | 23/29, supports >= 63% | **33/40, supports >= 70%** |
+
+The refusal claim now rests on 24 observations rather than 8, which is the point
+of the exercise. `AGTS_HIGH_CONFIDENCE` becomes 0.800 wherever the service is
+run.
+
+**Still not established:** the rewordings are mine, so they share my assumptions
+about how a learner writes. This measures register sensitivity. It does not
+measure real learners.

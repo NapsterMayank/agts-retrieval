@@ -153,10 +153,12 @@
       the token, thresholds from config, lineage checked at serve time, and a
       refusal to boot against unapproved content. 17 tests
 
-- [ ] **Paraphrase the gold set** (R-035). Two ad-hoc rewordings through the live
-      endpoint flipped both decisions, including a false answer on the case the
-      gate was built to refuse. Phrasing variance belongs inside the measurement
-- [ ] Re-derive the floor afterwards — it is fitted to one register
+- [x] Gold set paraphrased (R-047): 107 rewordings of 77 parents in short, spoken
+      and typo registers, 204 cases total. Refusal proved register-proof (54/54);
+      acceptance was not (82% textbook against 56% short)
+- [x] Floor re-derived (R-048). **The new floor leaks and was rejected**; the
+      ceiling moved 0.827 to 0.800. Holdout refusal now rests on 24 observations
+      rather than 8: 24/24, supporting >= 88%
 - [ ] Fill the gold-set gaps the matrix named: four crossings sit at n=18-19,
       one or two cases short of gating
 - [ ] **Adjudication in progress: Mayank and Sumit named** (31 August). Each
