@@ -142,6 +142,12 @@ scripts/                every number in the ledger is reproducible from one of t
 
 ## Where to start reading
 
+**`docs/04-how-to-continue.md`** — written for whoever picks this up next. What
+the system is, where it stands, the five rules this repository follows, what has
+already been measured and rejected, and what is blocked on whom.
+
+## The rest
+
 `EVALUATION_LEDGER.md` for what was measured and what it cost, `DECISION_LOG.md`
 for why each thing is the way it is — including the hypotheses that were wrong
 (R-022, R-027, R-030, R-032), which are recorded so they are not re-tried.

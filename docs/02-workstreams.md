@@ -23,6 +23,10 @@ Six directories exist now:
 | `src/agts/platform/` | Platform and security | embedding and rerank ports, Postgres repository, migrations |
 | `src/agts/service/` | Platform and security | the HTTP surface. Owns no retrieval logic: it builds a plan, calls the gate, and refuses (R-034) |
 
+Retrieval also owns `query.py`, which restores the grade and subject a short
+question leaves out (R-049), and `formula_match.py`, which attaches a second
+parser's LaTeX only when it cannot be a guess (R-043).
+
 `src/agts/teaching/` does not exist and will not until Q5 answers whether this
 repository builds §9 or consumes it.
 

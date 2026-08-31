@@ -1,5 +1,10 @@
 """Export the release-critical cases as a sheet a human can mark (section 13).
 
+Note the set grows: paraphrases of a holdout or unanswerable case inherit its
+release-critical status, so a sheet exported before the paraphrases (48 cases)
+is a subset of one exported after (95). Re-export rather than reusing an old
+sheet, or a reviewer will mark a set that no longer matches the gold file.
+
     PYTHONPATH=src python scripts/export_review_sheet.py
 
 Writes `artifacts/gold/review-sheet.csv`: one row per case, with the question,

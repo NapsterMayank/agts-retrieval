@@ -5,6 +5,10 @@ the client can make. **Q1 and Q3 block work that is otherwise ready to start.**
 
 Raised 24 August 2026. Nothing here is a disagreement with the approach.
 
+*Updated 31 August: Q4 carries evidence now, and Q6 has been added for two
+adjudicators. Q1, Q2, Q3 and Q5 are exactly as raised on 24 August, and all
+four remain unanswered.*
+
 ---
 
 ## Q1 — Name the pilot curriculum · BLOCKING
@@ -89,6 +93,26 @@ The gap is sibling expansion, which adds windows after ranking (R-025). Gating
 the first would gate something no learner experiences. **The ask is therefore for
 delivered recall**, and the same run also produced citation completeness at 97.2%
 / 96.3% against §14's existing ≥95% bar, so the two rows can be read together.
+
+---
+
+## Q6 — two named adjudicators · BLOCKS BELIEF, NOT WORK
+
+**Needed:** two people who know Class 10 Science and Mathematics, roughly two
+hours each.
+
+**Blocks:** believing any number this repository reports. The gold set was
+written by the agent that built the system, and two independent model reviews
+have already found **six wrong answer keys** in it. §6.4 requires two named
+humans on every release-critical case; there are now **95** and none is
+adjudicated.
+
+**Named 31 August:** Mayank and Sumit. `scripts/export_review_sheet.py` issues a
+spreadsheet, `scripts/review_cases.py` walks a reviewer through one case at a
+time, and `scripts/import_review_sheet.py` reads either back.
+
+**Both reviewers see every case.** Splitting by subject would give each case one
+reviewer, which is what the two-adjudicator rule exists to prevent.
 
 ---
 

@@ -14,6 +14,9 @@ row is also a question to the client — see `docs/03-open-questions.md`.
 
 | C-7 | §5 forbids retrieval from an unapproved source; the ruler cannot be validated without real content | Build guide, internally | `EvaluationLicence` permits **measuring** named quarantined sources and never serving them; every number produced under one carries the licence (R-011) | **Resolved, and the first real numbers exist because of it** |
 
+| C-8 | Acceptance versus refusal: every measured way to answer more questions also answers some that should be refused | Internally, against §14's zero-tolerance rows | **Refusal wins every time.** Five relaxations measured, five rejected (R-045, R-048, R-051, R-052). Acceptance sits at 85% on the holdout with refusal at 100% | **Resolved by rule:** a refusal costs a learner a question, a wrong answer costs them the thing the gate exists to prevent |
+| C-9 | A gold set written by the system's own author cannot validate that system | §6.4 and §13 versus what one agent can do alone | Two model reviews found six wrong keys; paraphrases inherit labels rather than inventing them (R-047); two humans named and not yet started | **Open — Q6** |
+
 ## Rule
 
 A conflict is resolved by authority order (`docs/00-authority.md`), and the

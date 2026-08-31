@@ -3,26 +3,29 @@
 Transcribed from client build guide §14. Automated model judges may assist
 evaluation but are never the sole release authority.
 
-Last measured 30 August 2026 over two quarantined chapters, 98 gold cases.
+Last measured 31 August 2026 over two quarantined chapters, **204 gold cases in
+four phrasings** (textbook, short, spoken, mistyped). Figures are for the
+**shipped** thresholds, floor 0.737 and ceiling 0.800, not for what calibration
+would derive today (R-050).
 "Measured" below means a number exists in `EVALUATION_LEDGER.md`; it does not
 mean the gate is satisfied for release, which additionally needs a real gold set,
 a sealed holdout and human sign-off.
 
 | Gate | Minimum bar | Enforced by | Last measured |
 |---|---:|---|---|
-| Approved-source and lineage resolution | 100% | `provenance.lineage_failures`, `ReleaseManifest`, `unapproved_source` counter — **also enforced at serve time**, where a pack that fails is withheld rather than annotated (R-034) | **0 failures / 98 packs** |
+| Approved-source and lineage resolution | 100% | `provenance.lineage_failures`, `ReleaseManifest`, `unapproved_source` counter — **also enforced at serve time**, where a pack that fails is withheld rather than annotated (R-034) | **0 failures / 204 packs** |
 | Retrieval from unapproved, retired, deleted or unauthorized source | 0 | `Corpus.authorised` + the same filter in SQL, `unapproved_source` + `retired_content` counters | **0** |
 | Cross-tenant retrieval or state access | 0 | `Corpus.authorised`, `cross_tenant` counter | **0** |
 | Recall@20 — single-hop | ≥95% | `ScoreReport.recall_at_candidates` | 94.0% visible — **below bar** |
 | Recall@20 — multi-hop, visual, multilingual | ≥90% each | `ScoreReport.failing_slices`, now pairwise (R-031) | reported per slice; several below bar |
 | Citation ID resolution | 100% | `EvidencePack` validator + `citations.score_citations` | **100%** |
 | Citation precision | ≥98% | **not measurable until generation exists** — the proxy is named `evidence_precision` and is not this row (R-026) | not claimed |
-| Citation completeness | ≥95% | `citations.score_citations` | **97.2% visible, 96.3% holdout** |
+| Citation completeness | ≥95% | `citations.score_citations` | **95.2% visible, 97.1% holdout** — the visible figure is close to the bar, and acceptance now trades against it visibly (R-050) |
 | Supported consequential claims | ≥95%, no unsupported safety- or assessment-critical claim | `VerificationResult` | not built (Phase 3) |
 | Graded-solution leakage | 0 | `DisclosurePolicy`, `LearningObject` validator and a CHECK constraint, `disclosure_violations` counter | **0** |
 | Mathematical tool-proof failure on tool-required cases | 0 accepted outputs | not yet built (Phase 3) | — |
-| Hidden-holdout regression | No slice below its gate | `score(..., include_holdout=True)`, 38 unseen cases | measured, **seal not real** — see Q2 |
-| Human academic review | Passed by named reviewers | `EvalCase.adjudicators` | **0 of 48 release-critical cases adjudicated** |
+| Hidden-holdout regression | No slice below its gate | `score(..., include_holdout=True)`, **64 unseen cases across four phrasings** | measured, **seal not real** — see Q2 |
+| Human academic review | Passed by named reviewers | `EvalCase.adjudicators` | **0 of 95 release-critical cases adjudicated.** Mayank and Sumit named 31 August; the set grew from 48 when paraphrases of holdout cases inherited that status |
 | Security/privacy/rollback evidence | Complete and reproducible | `provenance.build_trace` covers reproducibility; rollback and privacy are not built | partial |
 | Latency and cost | Within founder-approved pilot budgets | not yet built | — |
 

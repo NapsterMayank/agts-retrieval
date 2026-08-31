@@ -28,26 +28,32 @@ intention. Updated 30 August 2026.
 Measured over two quarantined chapters, 60 visible and 38 holdout cases. The
 holdout column is the one that leaves this repository (R-024).
 
-| | visible | holdout |
+| | visible 140 | holdout 64 |
 |---|---:|---:|
-| Unanswerable questions refused | 10/10 | **8/8** |
-| Answerable questions answered | 48/50 | **27/30** |
+| Unanswerable questions refused | 31/31 | **24/24** — supports ≥88% |
+| Answerable questions answered | 90/109 | **34/40** — supports ≥73% |
 | Citation ID resolution | 100% | 100% |
-| Citation completeness (§14 ≥95%) | 97.2% | **96.3%** |
-| Delivered recall | 100% | 96.3% |
+| Citation completeness (§14 ≥95%) | 95.2% | **97.1%** |
+| Delivered recall | 98.9% | 100% |
 | Lineage failures | 0 | 0 |
 | Zero-tolerance counter violations | 0 | 0 |
 
+Bounds are exact one-sided Clopper-Pearson at 95% (R-039), and the figures are
+for the **shipped** thresholds rather than what calibration would derive today
+(R-050). The set covers four phrasings of each question, because refusing a full
+sentence while answering its four-word version is not refusing the concept.
+
 **None of this is release evidence.** Every number was produced under an
 evaluation licence over `QUARANTINED` content (R-011), the thresholds were fitted
-on the visible set, and the gold set is 98 cases against §6.4's 300-500 with zero
-adjudicators.
+on the visible set, and the gold set is 204 cases against §6.4's 300-500 with
+**zero of its 95 release-critical cases adjudicated**.
 
-**And the refusal figures are narrower than they look.** Running the service
-showed the gate is sensitive to phrasing: dropping four words from *"How do you
-solve a quadratic equation by completing the square?"* turns a correct refusal
-into an answer (R-035). The table above describes the questions as written, not
-the concepts behind them, and the gold set is written in a single register.
+**The phrasing gap that qualified these figures is measured and partly closed.**
+Dropping four words from *"How do you solve a quadratic equation by completing
+the square?"* once turned a correct refusal into an answer (R-035). The set now
+carries four phrasings of each question and that case is refused in all four.
+Refusal proved register-proof at 55/55; acceptance did not — 82% for textbook
+phrasing against 56% for short, which R-049 raised to 76%.
 
 ## Human sign-offs required before `PILOT_READY`
 

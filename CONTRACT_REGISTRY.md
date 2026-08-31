@@ -26,7 +26,7 @@ instead of importing a contract breaks the §4 execution model.
 | `SourceBlock` | `contracts/objects.py` | must carry text, latex or an image; records its parse strategy |
 | `CurriculumIdentity` | `contracts/objects.py` | curriculum truth, defined before embeddings exist |
 | `LearningObject` | `contracts/objects.py` | solutions, answers and rubrics may not be `PUBLIC` |
-| `SearchRepresentation` | `contracts/objects.py` | non-empty search text; **vector optional** and paired with the model that produced it (R-016); `representation_version` names the chunking function; separate from the object |
+| `SearchRepresentation` | `contracts/objects.py` | non-empty search text; **vector optional** and paired with the model that produced it (R-016); `representation_version` names the chunking function; `context_block_ids` holds what the window is *findable by* but not *made of*, kept separate so it can be cited without inflating recall (R-046) |
 
 ## Supporting
 
@@ -34,9 +34,9 @@ instead of importing a contract breaks the §4 execution model.
 |---|---|---|
 | `DisclosurePolicy` | `contracts/runtime.py` | may lower the ceiling implied by assessment state, never raise it |
 | `FallbackPolicy` | `contracts/runtime.py` | at most one corrective retrieval; terminal state must be safe |
-| `EvalCase` / `GoldSet` | `evaluation/cases.py` | gold matches answerability; unique case ids; `slice_keys` crosses all nine axes pairwise (R-031) |
+| `EvalCase` / `GoldSet` | `evaluation/cases.py` | gold matches answerability; unique case ids; `slice_keys` crosses all nine axes pairwise (R-031); `paraphrase_of` and `phrasing` record a rewording and its register, which inherit their parent's label unchanged (R-047) |
 | `EvaluationLicence` | `evaluation/corpus.py` | names sources individually, unlocks `QUARANTINED` only, never `RETIRED` or `WITHDRAWN` (R-011) |
-| `SufficiencyDecision` | `retrieval/sufficiency.py` | carries the reasons for a refusal, not only the verdict (R-020) |
+| `SufficiencyDecision` | `retrieval/sufficiency.py` | carries the reasons for a refusal, not only the verdict (R-020); carries **both** retrievers' window scores, so the pack admits a sibling on two opinions rather than one (R-045) |
 
 ## The serving boundary
 
