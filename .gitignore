@@ -22,3 +22,9 @@ artifacts/*-quarantine/
 # Vectors of quarantined chapter text. Regenerate with
 # scripts/embed_representations.py; the cache is keyed by text hash.
 artifacts/embeddings/
+
+# Review sheets quote chapter text as evidence, so they are quarantined content
+# in a spreadsheet. Regenerate with scripts/export_review_sheet.py; marked
+# copies come back from reviewers and stay out of git for the same reason.
+artifacts/gold/review-sheet.csv
+reviewed-*.csv
