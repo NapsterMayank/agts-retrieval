@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from agts.contracts.common import BlockType
 from agts.contracts.objects import Region, SourceBlock
-from agts.parsing.quality import is_unusable, unusable_formulas
+from agts.parsing.quality import is_unusable, readable_text, unusable_formulas
 
 
 def formula(text: str, block_type=BlockType.FORMULA) -> SourceBlock:
@@ -54,3 +54,34 @@ def test_only_formula_blocks_are_judged() -> None:
     found = unusable_formulas(blocks)
     assert len(found) == 1
     assert found[0].block_type is BlockType.FORMULA
+
+
+def test_a_relation_with_nothing_after_it_does_not_excuse_loose_text() -> None:
+    """The recovered quadratic formula, and why the excuse had to be narrowed.
+
+    `is_unusable` lets a high proportion of single-character tokens pass when
+    the text carries a relation, because a chemical equation legitimately looks
+    like that. Searching for the symbol anywhere excused this: the block ends
+    `... b 2 - 4 ac >=`, where the relation is the final character and relates
+    nothing. It was ruled usable, so `readable_text` kept it and the correct
+    LaTeX beside it went unread -- R-037 returning through a different door.
+
+    A trailing relation is evidence the extraction stopped, not that it
+    survived. Three blocks in the chapter change under this rule and all three
+    carry verified LaTeX; no chemistry block changes at all.
+    """
+    degraded = "2 4 , 2 b b ac a − ± − provided b 2 - 4 ac ≥"
+    latex = r"rac{-b \pm \sqrt{b^2 - 4ac}}{2a}, 	ext{ provided } b^2 - 4ac \geq 0."
+
+    assert is_unusable(degraded)
+    assert readable_text(degraded, latex) == latex
+
+
+def test_a_relation_with_operands_on_both_sides_still_excuses_it() -> None:
+    """Otherwise every chemical equation in the corpus becomes a backlog item."""
+    assert not is_unusable("Mg + O 2 → MgO")
+    assert not is_unusable("Zn + H 2 SO 4 → ZnSO 4 + H 2")
+
+
+def test_text_is_kept_when_there_is_no_latex() -> None:
+    assert readable_text("Mg + O 2 -> MgO", None) == "Mg + O 2 -> MgO"

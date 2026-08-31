@@ -68,3 +68,71 @@ def test_readable_text_prefers_latex_only_when_the_text_has_decayed() -> None:
     assert readable_text("Zn + H2SO4 -> ZnSO4 + H2", r"\text{wrong}") == "Zn + H2SO4 -> ZnSO4 + H2"
     assert readable_text(None, r"\frac{1}{2}") == r"\frac{1}{2}"
     assert readable_text("plain prose here", None) == "plain prose here"
+
+
+# --------------------------------------------------------------------------
+# Granularity: the two parsers do not agree on what one formula is
+# --------------------------------------------------------------------------
+
+
+def test_a_formula_is_found_inside_a_multi_line_candidate() -> None:
+    """Docling emits one line; the second parser emits the whole derivation.
+
+    Verified against the quadratic chapter, block texts-42: the degraded text is
+    one line of a four-line `aligned` block, and the correct LaTeX is sitting
+    inside it. Comparing against the block as a whole matches, and then the
+    margin refuses it, because every other line of the same derivation contains
+    the same symbols. 39 of 43 formula blocks were withheld this way.
+    """
+    degraded = "= - x 2  + 45 x - 200"
+    block = (
+        r"\begin{aligned} \text{Therefore, their product} &= (x - 5)(40 - x) \ "
+        r"&= 40x - x^2 - 200 + 5x \ &= -x^2 + 45x - 200 \end{aligned}"
+    )
+
+    match = best_match("b", degraded, [block])
+    assert match is not None and match.confident
+    assert "-x^2 + 45x - 200" in match.latex
+    assert "aligned" not in match.latex, "the line, not the derivation it came from"
+
+
+def test_the_tightest_explanation_wins_over_the_block_containing_it() -> None:
+    """A line and the block it belongs to are not competing explanations.
+
+    They are the same answer at two granularities, so the margin must not treat
+    the container as a rival. It still has to treat a genuinely different
+    formula as one -- that is the next test.
+    """
+    degraded = "x 2 - 45 x + 324 = 0"
+    line = r"x^2 - 45x + 324 = 0"
+    container = r"\text{i.e., } x^2 - 45x + 324 = 0 \text{, so } x = 9 \text{ or } x = 36"
+
+    match = best_match("b", degraded, [container, line])
+    assert match.confident
+    assert match.latex == line
+
+
+def test_a_rival_that_is_not_a_container_still_withholds() -> None:
+    """The sign-flip protection has to survive segmentation.
+
+    Both candidates are single lines, neither contains the other, and they
+    differ only in a sign the degraded text lost. Segmenting must not turn this
+    into a confident match.
+    """
+    degraded = "2 4 - 2 2 b ac b a a   ."
+    plus = r"\begin{aligned} &= -\frac{b}{2a} + \frac{\sqrt{b^2 - 4ac}}{2a} \end{aligned}"
+    minus = r"\begin{aligned} &= -\frac{b}{2a} - \frac{\sqrt{b^2 - 4ac}}{2a} \end{aligned}"
+
+    match = best_match("b", degraded, [plus, minus])
+    assert not match.confident
+
+
+def test_prose_only_segments_are_not_candidates() -> None:
+    """A sentence is not a formula, however many of its letters coincide."""
+    degraded = "x 2 + 2 x = 3"
+    prose = r"\text{So, the area of the hall is thirty square metres}"
+    formula = r"x^2 + 2x = 3"
+
+    match = best_match("b", degraded, [prose, formula])
+    assert match.confident
+    assert match.latex == formula

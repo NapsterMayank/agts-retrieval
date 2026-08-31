@@ -37,7 +37,15 @@ def test_a_real_extracted_formula_becomes_readable() -> None:
 def test_the_decode_alone_can_rescue_a_block_the_quality_gate_rejected() -> None:
     # quadratic-equations:docling:texts-125, page 6. The equals sign was set in
     # Symbol, so the gate saw a wall of single characters and no relation at all.
-    raw = f"{LPAREN} {RPAREN} {LPAREN} {RPAREN} 3 2 3 2 0 x x {MINUS} {MINUS} {EQUALS}"
+    #
+    # The whole block, not the head of it. This fixture used to stop at the
+    # first equals sign, which left the relation with nothing on its right --
+    # and a later, stricter check refused it for that truncation rather than
+    # for anything the decode did or did not do. On disk the block continues.
+    raw = (
+        f"{LPAREN} {RPAREN} {LPAREN} {RPAREN} 3 2 3 2 0 x x {MINUS} {MINUS} {EQUALS} "
+        f"Now, 3 2 0 x {MINUS} {EQUALS} for 2 3 x {EQUALS} ."
+    )
     assert is_unusable(raw)
     assert not is_unusable(decode_symbol_font(raw))
 

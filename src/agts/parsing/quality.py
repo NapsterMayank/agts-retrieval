@@ -48,6 +48,31 @@ MIN_TOKENS = 4
 _RELATION = re.compile(r"[=<>≤≥→]|->|xrightarrow|rightarrow")
 
 
+#: Something a reader would take as an operand. A relation needs one on each
+#: side to be a statement rather than a leftover.
+_OPERAND = re.compile(r"[A-Za-z0-9]")
+
+
+def _has_balanced_relation(text: str) -> bool:
+    """Whether the text contains a relation with content on both sides.
+
+    The loose-token ratio alone calls a chemical equation unusable -- `Mg + O 2
+    -> MgO` is mostly single characters and perfectly readable -- so carrying a
+    relation excuses a high ratio. Searching for the symbol anywhere excuses too
+    much: the mangled quadratic formula ends `... b 2 - 4 ac >=`, where the
+    relation is the final character and there is no right-hand side at all. It
+    was ruled usable on the strength of a symbol that related nothing, which
+    left the recovered LaTeX beside it unread.
+
+    A trailing relation is evidence the extraction *stopped*, which is the
+    opposite of evidence that it survived.
+    """
+    for match in _RELATION.finditer(text):
+        if _OPERAND.search(text[: match.start()]) and _OPERAND.search(text[match.end() :]):
+            return True
+    return False
+
+
 def is_unusable(text: str | None) -> bool:
     """Whether a reader could reconstruct the mathematics from this text."""
     if not text:
@@ -56,7 +81,7 @@ def is_unusable(text: str | None) -> bool:
     if len(tokens) < MIN_TOKENS:
         return False
     loose = sum(1 for token in tokens if len(token) == 1) / len(tokens)
-    return loose > LOOSE_TOKEN_RATIO and not _RELATION.search(text)
+    return loose > LOOSE_TOKEN_RATIO and not _has_balanced_relation(text)
 
 
 def unusable_formulas(blocks: Iterable[SourceBlock]) -> list[SourceBlock]:

@@ -1567,3 +1567,86 @@ and the one that usually decides it is `--evidence-uri`: a link to the signed
 record. Until those exist the corpus stays quarantined and every number stays a
 measurement, which is the same position as before - but now the gap is one
 command wide rather than a refactor.
+
+---
+
+### R-065 - Formulas are matched by reading order, not by symbol content alone
+**Status:** Active - 31 August 2026
+
+`attach_chandra_latex` was attaching 4 of 43 formula blocks. The other 39 were
+not weak matches; 25 of them scored a **perfect 1.0** and were refused by the
+margin. Two causes, both about what "one formula" means.
+
+**Granularity.** Docling emits the single line a reader sees; the second parser
+emits the whole derivation as one `aligned` block. A line compared against the
+derivation containing it matches on content, and then every *other* line of the
+same derivation matches too, so the margin sees a tie. Candidates are now split
+into their lines, and prose-only lines are dropped -- a sentence is not a
+formula however many of its letters coincide.
+
+**Order.** Symbol overlap cannot separate `x^2 - 45x + 324 = 0` from
+`-x^2 + 45x - 324 = 0`: they are the same multiset. The margin is now measured
+on reading order, which tells them apart, while content still decides whether a
+candidate says what the block shows. Both conditions, as before.
+
+`MIN_ORDER_MARGIN = 0.20` sits inside the widest gap in the observed
+distribution -- margins run ..0.09, 0.13, 0.13, 0.14, then 0.22, 0.22, 0.25.. --
+and every value from 0.15 to 0.20 attaches exactly the same 22 blocks, so it is
+not fitted. The three matches verified wrong by eye lead their rivals by 0.077,
+0.042 and 0.037.
+
+22 of 43 attached, checked one by one against the chapter. Among them the
+quadratic formula from R-037, which reached a learner as `2 4 , 2 b b ac a` and
+now reads `\frac{-b \pm \sqrt{b^2-4ac}}{2a}`. Three blocks gain content where
+Docling split an equation mid-line; the completions match Exercise 4.1.
+
+---
+
+### R-066 - A trailing relation is not evidence the extraction survived
+**Status:** Active - 31 August 2026
+
+Attaching the LaTeX changed nothing a learner would see, and the reason was
+`is_unusable`. It excuses a high proportion of single-character tokens when the
+text carries a relation symbol, because a chemical equation legitimately looks
+like that. It searched for the symbol *anywhere*.
+
+The mangled quadratic formula ends `... b 2 - 4 ac >=`. The relation is the
+final character and relates nothing, so the block was ruled usable,
+`readable_text` kept the degraded text, and the correct LaTeX beside it went
+unread -- R-037 returning through a different door after being fixed once.
+
+A relation now counts only with an operand on both sides. A trailing relation is
+evidence the extraction *stopped*, which is the opposite of evidence that it
+survived. Three blocks change under this rule, all three carry verified LaTeX,
+and no chemistry block changes at all.
+
+**Rejected: making LaTeX outrank text unconditionally.** It fixes this case and
+breaks the one the existing tests already pinned -- good text beside a wrong
+attachment must keep the text. The defect was in the discriminator, not the
+precedence, and changing precedence would have hidden it.
+
+---
+
+### R-067 - The formula queue counts work someone can do
+**Status:** Active - 31 August 2026
+
+The review queue was built as "every formula block carrying no LaTeX", and read
+73 across two chapters. That is not the same question as "every formula a reader
+cannot trust".
+
+Thirty of the 73 are the chemistry chapter, where the extracted text says
+`Mg + O 2 -> MgO` -- correct, and missing LaTeX only because opendataloader
+labels no formulas anywhere and never could supply any. Zero chemistry blocks
+are unusable. A backlog that counts work nobody can do hides the items a person
+actually has to look at.
+
+Three dispositions now, in `scripts/triage_formula_queue.py`: ATTACHED,
+READABLE_NO_LATEX_SOURCE, and NEEDS_HUMAN. The queue file and the manifest count
+carry only the last.
+
+    73 pending  ->  22 attached, 48 readable without LaTeX, 3 needing a human
+
+The three are texts-153, texts-159 and texts-198 -- the same three the earlier
+audit named. Their problem is reading *order*, not encoding, so no candidate can
+be attached safely and a person has to read the crop. That is a queue somebody
+can finish in an afternoon, which the 73 never was.
