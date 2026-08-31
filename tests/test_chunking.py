@@ -187,3 +187,18 @@ def test_carried_context_is_never_a_formula() -> None:
     reps = represent(obj(blocks), blocks)
     if len(reps) > 1:
         assert "300 = 0" not in reps[1].search_text.split(reps[1].search_text[-50:])[0][:200]
+
+
+def test_a_caption_extracted_before_its_figure_still_travels_with_it() -> None:
+    """Reported by an outside review. The pairing used to depend on the figure
+    having been seen already, so a caption emitted first split the pair while
+    the docstring promised it could not."""
+    caption = block(0, "Fig. 1.4 Heating ferrous sulphate", block_type=BlockType.CAPTION,
+                    linked="doc:docling:texts-1")
+    figure = block(1, "figure body", block_type=BlockType.FIGURE)
+    tail = [block(i, "Body text. " * 40) for i in range(2, 6)]
+    blocks = [caption, figure, *tail]
+
+    reps = represent(obj(blocks), blocks)
+    home = {bid: rep.representation_id for rep in reps for bid in rep.block_ids}
+    assert home[caption.block_id] == home[figure.block_id]

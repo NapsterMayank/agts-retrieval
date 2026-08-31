@@ -461,17 +461,26 @@ and not consulted while choosing any of them. Constants derived from the visible
 | visible 60 (tuned on - upper bound) | 10/10 | 48/50 - 96% |
 | **holdout 38 (never consulted)** | **8/8** | **27/30 - 90%** |
 
-**Refusal generalises perfectly; acceptance loses six points.** That gap is the
-cost of fitting two constants to sixty cases, and it is the number to quote - not
-the 96%.
+**Refusal held on the holdout; acceptance lost six points.** An earlier version
+of this paragraph said "refusal generalises perfectly" and attributed the
+acceptance gap to "the cost of fitting two constants". An outside review flagged
+both, correctly. Eight unanswerable cases cannot demonstrate generalisation, and
+three misses do not identify their own cause - test composition, query wording,
+the retrievers and the chunker are all live candidates. What the run shows is
+that **this gate reproduced its intended decisions on 37 later cases written by
+the same author about the same two chapters.** The holdout figure is still the
+one to quote, and it is smaller evidence than the phrase implied.
 
 The three holdout misses are the two kinds already known: one below the floor by
 0.002 (`h-chem-06`, 0.735 against 0.737, which says the floor is brittle rather
 than wrong) and two corroboration failures. **No unanswerable case was answered
 in either set.**
 
-**Still true:** 98 cases against the 300-500 of section 6.4, agent-drafted, and
-adjudicated by nobody. This validates the mechanism, not the curriculum judgement.
+**Still true:** 97 cases against the 300-500 of section 6.4, agent-drafted, and
+adjudicated by no human. It **exercises one implementation of the mechanism on
+internally drafted cases** - it does not validate the curriculum judgement
+underneath them, and "validates the mechanism" was too strong a phrase for what
+was done.
 
 ## Citation gates, first measurement - 30 August 2026
 
@@ -562,10 +571,13 @@ sufficiency gate use BM25 as its primary retriever?
 | **dense (current)** | 10/10 | 48/50 | **8/8** | **27/30** |
 | bm25 | 10/10 | 45/50 | 6/8 | 26/30 |
 
-**No.** Dense keeps the gate accurate on unseen cases where BM25 lets two
-unanswerable questions through. Better pack recall did not translate into a
-better gate, which is a reminder that a retriever is chosen for the decision it
-supports and not for its headline number.
+**Dense was kept.** On this holdout BM25 let two unanswerable questions through
+where dense let none, so the better pack recall did not translate into a better
+gate. That is a point estimate over 8 unanswerable and 30 answerable cases from
+one author and two chapters, not a demonstration that dense is stably superior -
+an outside review made that distinction and it is a fair one. What survives it is
+the reason for the choice: a retriever is selected for the decision it supports,
+not for its headline number.
 
 ## Persistence, verified against a real server - 30 August 2026
 
@@ -789,6 +801,78 @@ currently fitted to a single register.
 
 This is the first defect found by running the thing rather than scoring it, which
 is the argument for having built the service before the gold set was finished.
+
+## An outside model reviewed the answer key, and found three errors - 31 August 2026
+
+The gold set and its answer keys were written by the same agent that built the
+system, which makes every number in this file self-marked. An independent model
+was given the full chapter text and all 48 release-critical claims, with
+instructions to hunt for errors rather than agree.
+
+**Science: 24 right, 3 wrong. Mathematics: 21 of 21 right.**
+
+All three science findings were checked against the chapter text before being
+accepted, and all three were correct:
+
+| case | the reviewer's objection | verified | action |
+|---|---|---|---|
+| `h-chem-17` *"What are the observations that a chemical reaction has occurred?"* | the key cited one observation where the chapter lists four | true - `texts-48`, `texts-49`, `texts-51` are change of state, colour and temperature | all four bullets added to the key |
+| `h-chem-11` *"What is a skeletal chemical equation?"* | the cited block says an equation must be balanced; it does not define the term | true - **`texts-65` defines it** and was not in the key at all | `texts-65` added |
+| `h-chem-16` *"How do you test which gas is collected in the electrolysis of water?"* | the chapter says to bring a burning candle but never gives the outcome | true - the chapter then *asks* the student which gas is present | **case removed** |
+
+`h-chem-16` was removed rather than argued either way. The chapter supplies the
+method and withholds the result, so whether it "answers" the question is a
+judgement two careful readers can split on, and a gold case that turns on an
+unresolved judgement is a bad test item whichever way it resolves.
+
+The reviewer also confirmed the case the whole abstention design rests on:
+**"completing the square" appears in the maths chapter only as historical
+attribution, never as a method.** That claim now has a second, independent
+reading behind it.
+
+### What it did to the numbers
+
+| | before | after |
+|---|---|---|
+| cases | 98 | 97 |
+| visible: refused / answered | 10/10 · 48/50 | 10/10 · **47/50** |
+| holdout: refused / answered | 8/8 · 27/30 | 8/8 · **26/29** |
+| citation completeness, holdout | 96.3% | 96.2% |
+| delivered recall, holdout | 96.3% | 96.2% |
+
+Acceptance fell by one case on each side. Two of those are the corrected keys
+doing exactly what a corrected key should - `chem-001` and `h-chem-13` now abstain
+because the gate's corroboration rule was also tightened in the same pass (below),
+and the numbers were not re-tuned to recover them.
+
+### And four defects in the code
+
+The same review read the implementation. Three were real and are fixed; one is
+acknowledged and open.
+
+**The anchor did not require the shared object to be the teaching object.** The
+rule asked whether *either* retriever ranked some `DEFINITION` or `CONCEPT`
+first, so an unrelated definition at rank 1 could bless a match the two
+retrievers disagreed about. It now requires the anchoring object to be one of
+the shared ones. This is why acceptance dropped a case: the looser rule had been
+passing matches it should not have.
+
+**A caption extracted before its figure split the pair.** The grouping only
+attached a caption to a target it had already seen, so reading order silently
+broke the invariant the function documents. Attachments now resolve regardless
+of order, and a pair is placed where the earlier of the two appears.
+
+**The gate accepted configurations that disabled its own conditions.**
+`min_corroboration=0` turned corroboration off, `depth=0` compared empty sets,
+and a ceiling below the floor made the high-confidence branch unreachable while
+looking configured. All three now raise.
+
+**Open, and correct:** `calibrate_abstention` calibrates only the primary
+retriever's top score, while the shipped decision also depends on BM25 overlap,
+object types and the ceiling. The calibration does not describe the gate that
+runs. The floor it produces is still measured rather than picked, but the
+function's name promises more than it delivers, and the fix is a calibration
+that scores the whole gate rather than one of its inputs.
 
 ## Holdout
 

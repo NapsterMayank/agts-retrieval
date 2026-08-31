@@ -125,17 +125,42 @@ def teaching_corpus():
     })
 
 
-def test_weak_agreement_is_enough_when_anchored_on_a_definition(plan) -> None:
-    """"What is a decomposition reaction?": one retriever ranks the definition
-    section first, the other the exercises, and they share only the summary.
-    Requiring two shared objects there refuses a textbook question."""
+def test_weak_agreement_is_enough_when_the_shared_object_is_a_definition(plan) -> None:
+    """"What is a decomposition reaction?": the retrievers order things
+    differently but both surface the definition section. Requiring two shared
+    objects there refuses a textbook question."""
     corpus = teaching_corpus()
     primary = [item("definition", 0.6), item("other", 0.55), item("prose", 0.5)]
-    corroborator = [item("other", 0.6), item("x", 0.55), item("y", 0.5)]
+    corroborator = [item("other", 0.6), item("definition", 0.55), item("y", 0.5)]
 
     decision = gate(Fixed("p", primary), Fixed("c", corroborator)).decide(plan, corpus)
     assert decision.answerable
     assert decision.anchored_on_teaching_object
+
+
+def test_a_definition_ranked_first_but_not_shared_does_not_anchor(plan) -> None:
+    """Reported by an outside review, and it was right: the earlier rule asked
+    only whether *either* retriever ranked some teaching object first, so an
+    unrelated definition at rank 1 could bless a match the two retrievers
+    disagreed about."""
+    corpus = teaching_corpus()
+    primary = [item("definition", 0.6), item("other", 0.55), item("z", 0.5)]
+    corroborator = [item("other", 0.6), item("x", 0.55), item("y", 0.5)]
+
+    decision = gate(Fixed("p", primary), Fixed("c", corroborator)).decide(plan, corpus)
+    assert not decision.anchored_on_teaching_object
+    assert decision.abstained
+
+
+def test_the_gate_refuses_a_configuration_that_disables_its_own_conditions() -> None:
+    """Each of these silently switches a condition off rather than failing."""
+    args = (Fixed("p", []), Fixed("c", []))
+    with pytest.raises(ValueError):
+        SufficiencyGate(*args, threshold=0.5, min_corroboration=0)
+    with pytest.raises(ValueError):
+        SufficiencyGate(*args, threshold=0.5, depth=0)
+    with pytest.raises(ValueError):
+        SufficiencyGate(*args, threshold=0.8, high_confidence=0.5)
 
 
 def test_weak_agreement_on_prose_alone_still_abstains(plan) -> None:

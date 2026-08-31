@@ -13,13 +13,18 @@ parse, compose, chunk, embed, rank, decide whether the question can be answered
 at all, assemble a cited evidence pack, record what produced it — and serve the
 whole thing over HTTP.
 
-| | visible 60 | holdout 38 |
+| | visible 60 | holdout 37 |
 |---|---:|---:|
 | Unanswerable questions refused | 10/10 | **8/8** |
-| Answerable questions answered | 48/50 | **27/30** |
-| Citation completeness (§14 bar ≥95%) | 97.2% | **96.3%** |
+| Answerable questions answered | 47/50 | **26/29** |
+| Citation completeness (§14 bar ≥95%) | 97.2% | **96.2%** |
 | Citation ID resolution (§14 bar 100%) | 100% | **100%** |
 | Lineage failures (§14 bar 0) | 0 | **0** |
+
+An outside model reviewed all 48 release-critical claims against the chapter
+text and found **three wrong answer keys** and three code defects (R-036). All
+were verified and fixed; the numbers above are after those fixes, and the
+thresholds were **not** re-tuned to recover the case each fix cost.
 
 The holdout cases were written after every threshold was fixed and were not
 consulted while choosing any of them, so **the holdout column is the one that

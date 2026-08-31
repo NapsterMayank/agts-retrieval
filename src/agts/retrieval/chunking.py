@@ -126,10 +126,32 @@ def _group(blocks: Sequence[SourceBlock]) -> list[list[SourceBlock]]:
         if block.linked_block_id and block.linked_block_id in by_id:
             attached_to[block.block_id] = block.linked_block_id
 
+    # Resolve each attachment to the block that *starts* its group, following
+    # chains, so a caption extracted before its figure still lands with it. The
+    # earlier version only looked at groups already built, which silently split
+    # the pair whenever the parser emitted the caption first -- the invariant
+    # this function documents, quietly broken by reading order.
+    def anchor_of(block_id: str, seen: set[str] | None = None) -> str | None:
+        seen = seen or {block_id}
+        target = attached_to.get(block_id)
+        if target is None or target in seen:
+            return None
+        seen.add(target)
+        return anchor_of(target, seen) or target
+
+    order = {block.block_id: index for index, block in enumerate(blocks)}
+    # A pair is placed where the *earlier* of the two appears, so reading order
+    # is preserved whichever way round the parser emitted them.
+    placement = {
+        block.block_id: min(order[block.block_id], order.get(anchor_of(block.block_id) or "", order[block.block_id]))
+        for block in blocks
+    }
+    blocks = sorted(blocks, key=lambda b: (placement[b.block_id], order[b.block_id]))
+
     groups: list[list[SourceBlock]] = []
     index_of: dict[str, int] = {}
     for block in blocks:
-        anchor = attached_to.get(block.block_id)
+        anchor = anchor_of(block.block_id)
         if anchor is not None and anchor in index_of:
             groups[index_of[anchor]].append(block)
             index_of[block.block_id] = index_of[anchor]

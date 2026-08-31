@@ -105,6 +105,20 @@ class SufficiencyGate:
         depth: int = CORROBORATION_DEPTH,
         teaching_types: frozenset = TEACHING_TYPES,
     ) -> None:
+        # Checked here because each of these silently disables a condition
+        # rather than failing: min_corroboration <= 0 turns the corroboration
+        # requirement off, depth <= 0 compares empty sets, and a ceiling below
+        # the floor makes the high-confidence branch unreachable while looking
+        # configured. All three were reported by an outside review.
+        if min_corroboration < 1:
+            raise ValueError("min_corroboration below 1 disables corroboration entirely")
+        if depth < 1:
+            raise ValueError("depth below 1 compares empty candidate sets")
+        if high_confidence is not None and high_confidence < threshold:
+            raise ValueError(
+                f"high_confidence {high_confidence} is below the floor {threshold}: "
+                "the band between them would be empty and the corroboration rule dead"
+            )
         self.primary = primary
         self.corroborator = corroborator
         self.threshold = threshold
@@ -135,10 +149,14 @@ class SufficiencyGate:
         # there refuses a textbook question. "Completing the square" has no
         # definition section to anchor on -- both retrievers land on the
         # introduction that names it in passing -- so it still abstains.
-        anchored = corroboration >= 1 and any(
-            corpus.objects[item.object_id].object_type in self.teaching_types
-            for item in (items[:1] + other[:1])
-            if item.object_id in corpus.objects
+        # The anchor has to be a *shared* object. An earlier version asked only
+        # whether either retriever ranked some teaching object first, which let
+        # an unrelated definition at rank 1 bless a match the two retrievers
+        # disagreed about -- reported by an outside review, and correct.
+        anchored = any(
+            object_id in corpus.objects
+            and corpus.objects[object_id].object_type in self.teaching_types
+            for object_id in shared
         )
 
         reasons: list[str] = []

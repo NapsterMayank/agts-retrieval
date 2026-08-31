@@ -816,3 +816,45 @@ the question as written, not about the concept. Not retracted, and scoped.
 new concepts, written by someone other than the author of the originals, and the
 floor is re-derived afterwards. Adding more cases in the same register would grow
 the set without widening it.
+
+---
+
+### R-036 - An outside review found three wrong answer keys and three code defects
+**Status:** Active - 31 August 2026
+
+The gold set was written by the agent that built the system, so an independent
+model was given the chapter text and every release-critical claim, instructed to
+find errors rather than agree. **Science 24 right, 3 wrong; mathematics 21 of 21
+right.** Each objection was checked against the chapter before being accepted,
+and all three held:
+
+- `h-chem-17` cited one of four observations. Fixed.
+- `h-chem-11` cited a block that says an equation must be balanced; the block
+  that actually **defines** a skeletal equation was missing. Fixed.
+- `h-chem-16` asks how to identify the electrolysis gases, and the chapter gives
+  the method while withholding the result. **Removed** rather than resolved: a
+  case that turns on a judgement two careful readers can split on is a bad test
+  item whichever way it goes.
+
+Three code defects, all real, all fixed:
+
+- **the anchor did not require the shared object to be the teaching object**, so
+  an unrelated definition at rank 1 could bless a disputed match;
+- **a caption extracted before its figure split the pair**, because grouping only
+  attached to a target already seen - the documented invariant broken by reading
+  order;
+- **configurations that disabled the gate's own conditions were accepted**
+  (`min_corroboration=0`, `depth=0`, ceiling below floor).
+
+One finding is accepted and open: `calibrate_abstention` calibrates the primary
+retriever's top score, not the gate that actually ships, which also reads BM25
+overlap and object types.
+
+**Consequence:** acceptance fell from 48/50 to 47/50 visible and 27/30 to 26/29
+holdout, and **the constants were not re-tuned to recover them**. Retuning after
+a correctness fix would convert a fixed defect back into a number.
+
+**The general lesson:** three of the four checks a reviewer was given found
+something. The one that found most was the one with the chapter text and the
+instruction to disagree - not the one asking for an opinion about the
+architecture.

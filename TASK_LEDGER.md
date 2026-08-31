@@ -101,7 +101,14 @@
 - [x] Reranking built, measured, and switched off: not one pairing moved pack
       recall (R-027). Gate keeps dense as primary, measured (R-028)
 
+- [x] External model review of all 48 release-critical claims (R-036): three
+      wrong answer keys and three code defects found, verified and fixed
+
 ## Next, unblocked
+
+- [ ] **Calibrate the gate, not one of its inputs.** `calibrate_abstention`
+      measures the primary retriever's top score while the decision also reads
+      BM25 overlap and object types (R-036, accepted and open)
 
 - [x] **Persistence verified against a real server** (R-029) - own container on
       5434, 7 integration tests passing, pgvector migration applied, 728 blocks

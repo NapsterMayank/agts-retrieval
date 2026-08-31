@@ -11,7 +11,8 @@
     "gold_labels": "block ids read off the parsed chapters by hand (rule 4: gold is blocks, not objects, so recomposition cannot invalidate it)",
     "unanswerable_design": "in-subject, out-of-chapter. Four are deliberately adjacent - chlorophyll, Pythagoras and completing the square are all *mentioned* in these chapters without being taught, so a retriever that matches on surface words will answer them confidently and wrongly.",
     "status": "DRAFT. Measures the harness against real content; not release evidence, and not the 300-500 case set \u00a76.4 requires.",
-    "holdout": "The 38 h-* cases were written AFTER the sufficiency gate's floor, ceiling and corroboration rule were fixed, and were not consulted while choosing any of them. They are a genuine validation set for those constants. They are still agent-drafted and unadjudicated, so they validate the mechanism, not the curriculum judgement."
+    "holdout": "The 38 h-* cases were written AFTER the sufficiency gate's floor, ceiling and corroboration rule were fixed, and were not consulted while choosing any of them. They are a genuine validation set for those constants. They are still agent-drafted and unadjudicated, so they validate the mechanism, not the curriculum judgement.",
+    "external_review": "31 August: an independent model reviewed all 48 release-critical claims against the chapter text. Science 24 right, 3 wrong; mathematics 21 of 21 right. Two keys were incomplete and are fixed (h-chem-17, h-chem-11). One (h-chem-16) was removed rather than argued: the chapter tells a student to bring a burning candle to the tubes and then asks which gas is present without answering, so whether it 'answers' the question is a judgement two careful readers can split on. A gold case that turns on an unresolved judgement is a bad test item whichever way it is resolved."
   },
   "cases": [
     {
@@ -1065,8 +1066,10 @@
       ],
       "holdout": true,
       "gold_block_ids": [
+        "chemical-reactions:docling:texts-65",
         "chemical-reactions:docling:texts-68"
-      ]
+      ],
+      "_review": "external review: texts-65 defines a skeletal equation and was missing from the key."
     },
     {
       "case_id": "h-chem-12",
@@ -1133,21 +1136,6 @@
       ]
     },
     {
-      "case_id": "h-chem-16",
-      "query": "How do you test which gas is collected in the electrolysis of water?",
-      "grade": "10",
-      "subject": "science",
-      "question_type": "single_hop",
-      "teaching_action": "explain",
-      "concept_ids": [
-        "chemical-reactions-and-equations"
-      ],
-      "holdout": true,
-      "gold_block_ids": [
-        "chemical-reactions:docling:texts-239"
-      ]
-    },
-    {
       "case_id": "h-chem-17",
       "query": "What are the observations that a chemical reaction has occurred?",
       "grade": "10",
@@ -1160,8 +1148,12 @@
       "holdout": true,
       "gold_block_ids": [
         "chemical-reactions:docling:texts-47",
-        "chemical-reactions:docling:texts-50"
-      ]
+        "chemical-reactions:docling:texts-48",
+        "chemical-reactions:docling:texts-49",
+        "chemical-reactions:docling:texts-50",
+        "chemical-reactions:docling:texts-51"
+      ],
+      "_review": "external review: the key cited one observation of four. All four bullets added."
     },
     {
       "case_id": "h-chem-18",
