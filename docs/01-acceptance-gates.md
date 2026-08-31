@@ -11,6 +11,13 @@ would derive today (R-050).
 mean the gate is satisfied for release, which additionally needs a real gold set,
 a sealed holdout and human sign-off.
 
+> **These numbers predate the Symbol-font decode of 31 August (R-054).** That
+> change corrected 27 blocks and altered 12 window texts, so the embeddings
+> behind every figure below are stale. Re-run `embed_representations.py`,
+> `holdout_validation.py` and `citation_report.py` before quoting any of them.
+> The thresholds do not move afterwards, whatever the re-measurement shows
+> (R-036).
+
 | Gate | Minimum bar | Enforced by | Last measured |
 |---|---:|---|---|
 | Approved-source and lineage resolution | 100% | `provenance.lineage_failures`, `ReleaseManifest`, `unapproved_source` counter — **also enforced at serve time**, where a pack that fails is withheld rather than annotated (R-034) | **0 failures / 204 packs** |

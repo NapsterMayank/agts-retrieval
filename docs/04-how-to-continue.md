@@ -29,17 +29,38 @@ composed, chunked, embedded, persisted in Postgres, and served over HTTP.
 Bounds are exact one-sided Clopper-Pearson at 95% (R-039). **Quote the holdout
 column**, and quote the bound rather than the fraction.
 
+**But do not quote them yet.** The Symbol-font decode of 31 August (R-054)
+changed 12 window texts, so the embeddings behind this table are stale. Re-embed
+and re-run both reports first — it is the top of the task list below, and it
+needs `VOYAGE_API_KEY`.
+
 **Nothing here is releasable.** No source has a rights record, so the service
 refuses to boot without an explicit override; no human has adjudicated a single
 case; the gold set is 204 cases against §6.4's 300-500; and every number was
 produced under an evaluation licence over quarantined content.
 
-## Start here: the next three tasks, in order
+## Start here: the next four tasks, in order
 
-**1. Re-export the review sheets and get them adjudicated.** This is the only
-task that changes what any number here is worth. The set grew from 48 to **95
-release-critical cases** when paraphrases inherited that status, so a sheet
-exported before 31 August is a subset — re-export rather than reusing one:
+**0. Re-embed and re-measure.** Twelve window texts changed in the decode, so
+every number above describes the corpus as it was before. One API call, then two
+reports:
+
+```
+PYTHONPATH=src python scripts/embed_representations.py
+PYTHONPATH=src python scripts/holdout_validation.py
+PYTHONPATH=src python scripts/citation_report.py
+```
+
+Do not re-tune the thresholds afterwards (R-036). Watch citation completeness in
+particular: it sits at 95.2% against a 95% bar, and four newly readable blocks
+are four more chances to cite incompletely.
+
+**1. Get the answer key adjudicated.** This is the task that changes what every
+number here is *worth*, as opposed to what it is. The sheet is already exported
+at `artifacts/gold/review-sheet.csv` — **95 release-critical cases**, 50 science
+and 45 mathematics, 40 with an answer key and 55 claimed unanswerable. It grew
+from 48 when paraphrases inherited release-critical status, so re-export rather
+than reuse anything older:
 
 ```
 PYTHONPATH=src python scripts/export_review_sheet.py     # a spreadsheet, 95 rows
@@ -47,15 +68,20 @@ PYTHONPATH=src python scripts/review_cases.py --reviewer "Name"   # or one at a 
 PYTHONPATH=src python scripts/import_review_sheet.py a.csv b.csv --apply
 ```
 
-Mayank and Sumit are named (Q6). **Both review every case** — splitting by
-subject gives each case one reviewer, which is what the two-adjudicator rule
-exists to prevent.
+Mayank and Sumit are named (Q6), neither has started. **Both review every case**
+— splitting by subject gives each case one reviewer, which is exactly what the
+two-adjudicator rule exists to prevent.
 
 **2. Attach LaTeX for the last three formulas.** texts-153, texts-159 and
 texts-198. Each is scrambled in reading *order*, not encoding, so no automatic
 rule can fix them and the strict matcher (R-043) correctly refuses to guess --
 it is a person with the crops in
 `artifacts/quadratic-equations-quarantine/assets/`, and about ten minutes.
+
+`scripts/export_formula_sheet.py` writes the sheet: the broken text beside the
+second parser's LaTeX from that page and its neighbours, ranked by symbol
+overlap. It also shows why the matcher refuses — texts-153's top two candidates
+score 1.00 and are each other's sign flip. The right answer ranks third.
 
 Do not trust an older doc saying *39 formulas*: that counted formulas lacking a
 LaTeX field, when most of those read perfectly well without one (R-054).
@@ -147,11 +173,13 @@ docker compose -f docker/compose.yml up -d
 Then, with `AGTS_DATABASE_URL` and `VOYAGE_API_KEY` set:
 
 ```
+python scripts/decode_symbol_font.py      # once per parse; see R-054
 python scripts/embed_representations.py   # once; cached by content hash
 python scripts/holdout_validation.py      # the number that gets quoted
 python scripts/citation_report.py         # §14 citation and lineage rows
 python scripts/import_corpus.py           # write to Postgres and re-score from it
 python scripts/serve.py                   # the HTTP surface
+python scripts/export_formula_sheet.py    # the three formulas a person must choose
 ```
 
 Every number in `EVALUATION_LEDGER.md` comes from one of those. If a claim has no

@@ -129,9 +129,10 @@
 *Ordered. The first two change what the numbers are worth; the rest change the
 numbers, which is a lesser thing until the first two are done.*
 
-- [ ] **1. Re-export the review sheets and adjudicate.** 95 release-critical
-      cases, up from 48 once paraphrases inherited the status — a sheet exported
-      before 31 August is a subset. Mayank and Sumit named, neither started (Q6)
+- [x] Review sheets re-exported at 95 release-critical cases (50 science,
+      45 mathematics; 40 with an answer key, 55 claimed unanswerable)
+- [ ] **1. Get the 95-case sheet adjudicated.** Mayank and Sumit named, neither
+      started. Both review all 95, not half each (Q6)
 - [x] Symbol-font decode (R-054): 27 blocks corrected, 4 made readable, and the
       formula backlog re-counted honestly -- it was 39 by the wrong measure
 - [ ] **2. Attach LaTeX for the last 3 formulas** -- texts-153, texts-159,

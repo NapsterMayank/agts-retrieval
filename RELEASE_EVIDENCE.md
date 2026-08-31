@@ -28,6 +28,13 @@ intention. Updated 30 August 2026.
 Measured over two quarantined chapters, 60 visible and 38 holdout cases. The
 holdout column is the one that leaves this repository (R-024).
 
+> **These numbers predate the Symbol-font decode of 31 August (R-054).** That
+> change corrected 27 blocks and altered 12 window texts, so the embeddings
+> behind every figure below are stale. Re-run `embed_representations.py`,
+> `holdout_validation.py` and `citation_report.py` before quoting any of them.
+> The thresholds do not move afterwards, whatever the re-measurement shows
+> (R-036).
+
 | | visible 140 | holdout 64 |
 |---|---:|---:|
 | Unanswerable questions refused | 31/31 | **24/24** — supports ≥88% |

@@ -1316,3 +1316,25 @@ recovered is worse than leaving it visibly broken.
 
 **Cost.** Twelve window texts changed, so their embeddings and every number
 derived from them must be rebuilt before anything here is quoted again.
+
+---
+
+### R-055 - Quarantined output is ignored by allowlist, not by name
+**Status:** Active - 31 August 2026
+
+`artifacts/gold` holds review sheets, verification packs and now formula sheets.
+All of them quote the chapter in full, which is the point of them and the reason
+none may be committed.
+
+The rule protecting that was a deny-list naming individual files, and **it
+failed twice**: it named `review-sheet.csv`, and `review-for-mayank.csv` walked
+straight past it. A deny-list has to anticipate every future filename, and the
+cost of missing one is publishing textbook text to a repository that is now
+public (R-053).
+
+Inverted. `artifacts/gold/*` is ignored, and a file has to be argued onto the
+allowlist to be tracked. Only `pilot-2-chapters-v1.json` is - it holds questions
+and block ids, no chapter prose. A new export is ignored by default, which is
+the correct default for a directory whose purpose is quoting the source.
+
+The formula sheet added the same day would have been the third leak.
