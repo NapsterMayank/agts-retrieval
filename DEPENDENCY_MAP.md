@@ -72,6 +72,9 @@ teaching loop on the right remains scope-blocked on Q5.
 Python 3.12, pydantic 2.12, pytest. Postgres 17 with pgvector, reached through
 psycopg2. HTTP to Voyage for embeddings and reranking, through `requests`, behind
 ports in `platform/` — **no provider name appears outside that package** (§7.3).
+The serving surface is Starlette and uvicorn: the installed FastAPI is
+incompatible with the installed Starlette, and pinning a shared environment to
+suit one service is a worse trade than writing two route functions (R-034).
 
 Every provider call is cached to disk by content hash, so a scored run reaches no
 network and costs nothing to repeat. The 145 unit tests need neither: 7 of them

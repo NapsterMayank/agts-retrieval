@@ -10,7 +10,7 @@ a sealed holdout and human sign-off.
 
 | Gate | Minimum bar | Enforced by | Last measured |
 |---|---:|---|---|
-| Approved-source and lineage resolution | 100% | `provenance.lineage_failures`, `ReleaseManifest`, `unapproved_source` counter | **0 failures / 98 packs** |
+| Approved-source and lineage resolution | 100% | `provenance.lineage_failures`, `ReleaseManifest`, `unapproved_source` counter — **also enforced at serve time**, where a pack that fails is withheld rather than annotated (R-034) | **0 failures / 98 packs** |
 | Retrieval from unapproved, retired, deleted or unauthorized source | 0 | `Corpus.authorised` + the same filter in SQL, `unapproved_source` + `retired_content` counters | **0** |
 | Cross-tenant retrieval or state access | 0 | `Corpus.authorised`, `cross_tenant` counter | **0** |
 | Recall@20 — single-hop | ≥95% | `ScoreReport.recall_at_candidates` | 94.0% visible — **below bar** |

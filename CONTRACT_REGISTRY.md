@@ -38,6 +38,15 @@ instead of importing a contract breaks the §4 execution model.
 | `EvaluationLicence` | `evaluation/corpus.py` | names sources individually, unlocks `QUARANTINED` only, never `RETIRED` or `WITHDRAWN` (R-011) |
 | `SufficiencyDecision` | `retrieval/sufficiency.py` | carries the reasons for a refusal, not only the verdict (R-020) |
 
+## The serving boundary
+
+`service/app.py` defines `EvidenceRequest`, which is the only shape a caller
+controls. It **forbids extra fields**, and the field it most conspicuously lacks
+is a tenant: that comes from the bearer token, because a request that names its
+own tenant has no tenant boundary (R-034). Everything the service returns is
+derived from `EvidencePack`, so the pack contract remains the single description
+of what a teaching loop may see.
+
 ## Persisted shape
 
 `migrations/001_core.sql` stores these contracts and adds nothing of its own: a

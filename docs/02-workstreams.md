@@ -12,7 +12,7 @@ versioned contracts, never copied implementations.
 | Platform and security | `src/agts/platform/`, migrations, jobs, adapters, observability | Curriculum decisions |
 | Evaluation and assurance | `src/agts/evaluation/`, `tests/`, `EVALUATION_LEDGER.md` | Sole model-as-judge release authority |
 
-Five directories exist now:
+Six directories exist now:
 
 | Path | Workstream | State |
 |---|---|---|
@@ -21,6 +21,7 @@ Five directories exist now:
 | `src/agts/parsing/` | Content and curriculum | two strategies, dual-parse diff |
 | `src/agts/retrieval/` | Retrieval and verification | chunking, BM25, dense, hybrid, rerank, sufficiency, packing, provenance |
 | `src/agts/platform/` | Platform and security | embedding and rerank ports, Postgres repository, migrations |
+| `src/agts/service/` | Platform and security | the HTTP surface. Owns no retrieval logic: it builds a plan, calls the gate, and refuses (R-034) |
 
 `src/agts/teaching/` does not exist and will not until Q5 answers whether this
 repository builds §9 or consumes it.

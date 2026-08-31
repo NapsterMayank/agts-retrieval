@@ -20,7 +20,7 @@ intention. Updated 30 August 2026.
 | Load, failure and recovery evidence | Not built |
 | Dashboards, alerts, synthetic checks | Not built |
 | Known risks and exceptions | `CONFLICT_REGISTER.md`, `docs/03-open-questions.md` |
-| Rollout, rollback and ownership | Not built |
+| Rollout, rollback and ownership | Not built. A serving surface exists (`scripts/serve.py`) and **refuses to start against unapproved content**, which is the opposite of a rollout plan and the right default until there is one |
 | Required reviewer sign-offs | **None obtained** |
 
 ## What the numbers currently say
@@ -42,6 +42,12 @@ holdout column is the one that leaves this repository (R-024).
 evaluation licence over `QUARANTINED` content (R-011), the thresholds were fitted
 on the visible set, and the gold set is 98 cases against §6.4's 300-500 with zero
 adjudicators.
+
+**And the refusal figures are narrower than they look.** Running the service
+showed the gate is sensitive to phrasing: dropping four words from *"How do you
+solve a quadratic equation by completing the square?"* turns a correct refusal
+into an answer (R-035). The table above describes the questions as written, not
+the concepts behind them, and the gold set is written in a single register.
 
 ## Human sign-offs required before `PILOT_READY`
 
