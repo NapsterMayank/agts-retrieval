@@ -36,6 +36,7 @@ was ever worth having.
 
 from __future__ import annotations
 
+import logging
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -76,8 +77,17 @@ from agts.retrieval import BM25Representations, DenseRetriever
 from agts.retrieval.chunking import REPRESENTATION_VERSION
 from agts.retrieval.packing import build_pack
 from agts.retrieval.provenance import build_manifest, build_trace, lineage_failures
-from agts.retrieval.sufficiency import SufficiencyGate
+from agts.retrieval.sufficiency import (
+    SHIPPED_CEILING,
+    SHIPPED_FLOOR,
+    SHIPPED_UNDER_MODEL,
+    SufficiencyGate,
+)
 from agts.service.config import ConfigurationError, ServiceConfig
+
+#: Boot-time diagnostics. The service is otherwise silent by design.
+LOG = logging.getLogger("agts.service")
+
 
 
 @dataclass
@@ -194,6 +204,22 @@ def build_state(config: ServiceConfig) -> ServiceState:
 
         inner = VoyageEmbedding(config.embedding_api_key)
     embedder = CachedEmbedding(inner, Path(config.embedding_cache), model=DEFAULT_EMBEDDING_MODEL)
+
+    # The pair is configuration so an operator can hold a deployment on the
+    # thresholds it was validated under while a new pair is being derived. That
+    # is the legitimate case, and it is indistinguishable at boot from the
+    # illegitimate one: a stale pair copied forward past a model change. A floor
+    # is a property of one model's score distribution, so a mismatch is not a
+    # tuning preference -- it is the service running a gate nobody measured.
+    if (config.abstain_floor, config.high_confidence) != (SHIPPED_FLOOR, SHIPPED_CEILING):
+        LOG.warning(
+            "gate thresholds differ from the shipped pair: running "
+            "floor=%.6f ceiling=%.6f against shipped floor=%.6f ceiling=%.6f, "
+            "derived under %s. If this is not a deliberate hold, re-derive "
+            "before serving (R-060).",
+            config.abstain_floor, config.high_confidence,
+            SHIPPED_FLOOR, SHIPPED_CEILING, SHIPPED_UNDER_MODEL,
+        )
 
     gate = SufficiencyGate(
         DenseRetriever(embedder),

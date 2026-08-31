@@ -213,8 +213,13 @@ class SufficiencyGate:
         if not items:
             reasons.append("no candidate survived the authorisation filter")
         if items and top_score < self.threshold:
+            # Six decimals, matching the manifest: at three, a score of 0.743920
+            # against a floor of 0.744 renders as "0.744 below the calibrated
+            # floor 0.744", which reads as a bug in the gate rather than as a
+            # near miss. The trace has to be legible to whoever is asked why a
+            # learner got nothing (11).
             reasons.append(
-                f"top score {top_score:.3f} below the calibrated floor {self.threshold:.3f}"
+                f"top score {top_score:.6f} below the calibrated floor {self.threshold:.6f}"
             )
         if (
             items
