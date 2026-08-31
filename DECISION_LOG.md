@@ -1269,3 +1269,50 @@ pipeline treats it as one.
 **If it needs undoing:** GitHub retains blobs after a force-push, so the only
 reliable removal is deleting the repository. `gh repo edit --visibility private`
 limits further exposure but does not retract what has been fetched.
+
+---
+
+### R-054 - Reading a documented font encoding is a decode, not a guess
+**Status:** Active - 31 August 2026
+
+Eleven distinct characters in the parsed chapters sat in the Unicode private-use
+area: U+F028, U+F029, U+F02B, U+F02D, U+F03D, U+F061, U+F0B1, U+F0B3, U+F0B9,
+U+F0D0, U+F0D7. All eleven are `0xF000 + position` in **Adobe's Symbol
+encoding** - a PDF that sets operators in Symbol stores them by font position,
+and an extractor that cannot resolve the font passes the position straight
+through. A minus sign arrived as U+F02D. Nothing was damaged; it was written in
+an encoding nothing downstream read, so the retriever scored noise and the
+quality gate saw formulas containing no relation symbol at all.
+
+**Why this is allowed where R-008 and R-043 forbade the neighbouring thing.**
+R-008 forbids *inventing* a formula's content and R-043 rejected a matcher that
+*inferred* which formula a page's LaTeX belonged to. Symbol encoding is a fixed
+published table: U+F02D means the glyph at Symbol position 0x2D and cannot mean
+anything else. There is no candidate set and nothing to choose between.
+
+**Corroborated anyway, before adoption.** For each of the eleven, Chandra's
+LaTeX for every page where that codepoint occurs was checked for the
+corresponding glyph. **Ten of eleven were confirmed on every such page.** The
+eleventh, U+F0D7 (dot operator, two occurrences on page 8), has no counterpart
+because Chandra wrote that multiplication implicitly - it rests on the published
+table alone, and `symbol_font.py` says so.
+
+An unmapped private-use character is **left as itself**, and the script warns.
+A new font position must be looked up and corroborated, never approximated.
+
+**Result: 27 blocks decoded, 4 moved from unreadable to readable.**
+
+**And a correction to a number this repository had been repeating.** The docs
+said *39 formulas need a human*. That counted formulas **lacking LaTeX**, which
+is not the same as formulas that cannot be read: `x 2 - 45 x + 324 = 0` has no
+LaTeX and is perfectly legible. Measured against the quality gate rather than
+the LaTeX field, the real figure was 4, and after this decode it is **3** -
+texts-153, texts-159 and texts-198, all of which are scrambled in reading
+*order* rather than in encoding, and so genuinely need a person with the crops.
+
+A test pins that limit open: `test_the_decode_does_not_pretend_to_fix_a_scrambled_formula`
+asserts texts-159 stays unusable after decoding. Making a broken thing *look*
+recovered is worse than leaving it visibly broken.
+
+**Cost.** Twelve window texts changed, so their embeddings and every number
+derived from them must be rebuilt before anything here is quoted again.

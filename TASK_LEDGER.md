@@ -132,13 +132,19 @@ numbers, which is a lesser thing until the first two are done.*
 - [ ] **1. Re-export the review sheets and adjudicate.** 95 release-critical
       cases, up from 48 once paraphrases inherited the status — a sheet exported
       before 31 August is a subset. Mayank and Sumit named, neither started (Q6)
-- [ ] **2. Attach the remaining 39 formulas** from Chandra candidates, by hand.
-      Four are unreadable and two cause below-floor refusals
+- [x] Symbol-font decode (R-054): 27 blocks corrected, 4 made readable, and the
+      formula backlog re-counted honestly -- it was 39 by the wrong measure
+- [ ] **2. Attach LaTeX for the last 3 formulas** -- texts-153, texts-159,
+      texts-198. Scrambled in reading order, so a person with the page crops.
+      Roughly ten minutes, not the day the old "39" implied
+- [ ] **Re-embed 12 changed window texts** and re-run the holdout, citation and
+      completeness reports. Needs VOYAGE_API_KEY. Every number on file predates
+      the decode
 - [ ] 3. Citation completeness is 95.2% visible against a 95% gate. Acceptance and
       completeness now trade visibly; the next change that buys answers may take
       it under
 
-- [ ] **39 formulas need a human to choose among Chandra candidates.** The review
+- [ ] **3 formulas need a human to choose among Chandra candidates.** The review
       queue already pairs each with its crop; this is 20 minutes of somebody's
       time and recovers the remaining 4 unusable blocks
 

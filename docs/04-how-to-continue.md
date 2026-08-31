@@ -51,11 +51,14 @@ Mayank and Sumit are named (Q6). **Both review every case** — splitting by
 subject gives each case one reviewer, which is what the two-adjudicator rule
 exists to prevent.
 
-**2. Attach the remaining formula LaTeX.** 39 formulas have Chandra candidates
-waiting on a human to choose among them; four are unreadable today and two of
-those cause below-floor refusals. The strict matcher (R-043) attaches only what
-cannot be a guess, so the rest is a person with the crops in
-`artifacts/quadratic-equations-quarantine/assets/`.
+**2. Attach LaTeX for the last three formulas.** texts-153, texts-159 and
+texts-198. Each is scrambled in reading *order*, not encoding, so no automatic
+rule can fix them and the strict matcher (R-043) correctly refuses to guess --
+it is a person with the crops in
+`artifacts/quadratic-equations-quarantine/assets/`, and about ten minutes.
+
+Do not trust an older doc saying *39 formulas*: that counted formulas lacking a
+LaTeX field, when most of those read perfectly well without one (R-054).
 
 **3. Then, and only then, chase acceptance.** It sits at 85% on the holdout and
 five ways to raise it have already been measured and rejected. The untried ones
@@ -117,8 +120,8 @@ disagreeing on the *window*. None of these is free:
    Re-measures everything, including every stored vector.
 3. **A third retriever**, so agreement can be two-of-three rather than
    two-of-two.
-4. **Formula repair** — 39 formulas await a human choosing among candidates;
-   fixes two of the four below-floor cases.
+4. **Formula repair** — 3 formulas await a human choosing among candidates
+   (R-054 re-counted this; it was never really 39).
 
 ## What is blocked, and on whom
 
@@ -137,7 +140,7 @@ disagreeing on the *window*. None of these is free:
 
 ```
 pip install -e ".[dev]"
-python -m pytest -q                  # 190 pass, 7 skip without a database
+python -m pytest -q                  # 208 pass, 7 skip without a database
 docker compose -f docker/compose.yml up -d
 ```
 

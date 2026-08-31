@@ -1435,7 +1435,7 @@ fatal. Two-of-three would tolerate one dissenter without loosening what agreemen
 means.
 
 **Formula repair.** Two of the four below-floor cases are maths questions whose
-evidence is degraded formula text (R-037). 39 formulas are waiting on a human to
+evidence is degraded formula text (R-037). 3 formulas are waiting on a human to
 pick among Chandra candidates.
 
 ### And the thing worth saying plainly
@@ -1445,6 +1445,44 @@ tutor a refusal costs a question and a wrong answer costs the thing the gate
 exists to prevent, so the honest operating point is high refusal with acceptance
 as high as that allows. Today that is 24/24 and 34/40. Every measured attempt to
 raise the second lowered the first.
+
+## Symbol-font decode, and a number that had been wrong - 31 August 2026
+
+Eleven private-use codepoints across both chapters turned out to be Adobe Symbol
+font positions passed through by the extractor (R-054). Decoding them touched
+**27 blocks** and moved **4 from unreadable to readable**: texts-122, texts-125,
+texts-127, texts-208.
+
+Every mapping was corroborated against Chandra before adoption - for each
+codepoint, Chandra's LaTeX on every page where it occurs was checked for the
+corresponding glyph. Ten of eleven confirmed on every page; U+F0D7 (dot
+operator) had no counterpart because Chandra wrote that product implicitly.
+
+### The formula backlog was overstated by a factor of thirteen
+
+| counted by | figure |
+|---|---|
+| formulas lacking a LaTeX field | 39 |
+| formulas the quality gate calls unreadable, before the decode | 4 |
+| **formulas the quality gate calls unreadable, after the decode** | **3** |
+
+The 39 was never wrong, it was *the wrong question*. `x 2 - 45 x + 324 = 0`
+carries no LaTeX and needs none. What needs a human is a formula whose reading
+**order** is scrambled, and there are three: texts-153, texts-159, texts-198.
+
+**Not counted as broken, and worth saying so:** the quality gate also fires on
+empty picture blocks and on letterspaced headings like `Q U E S T I O N S`.
+Neither is damaged. `is_unusable` answers "should latex be preferred over text",
+not "is this block sound", and reading it as the latter is what produced the 39.
+
+### Re-measurement pending
+
+Twelve window texts changed, so the embedding cache -- which is read-only by
+design and refused to proceed -- must be rebuilt before the holdout, citation
+and completeness numbers above can be quoted. **Every number in this file
+predates the decode.** Per R-036 the thresholds do not move afterwards: this is
+a correctness fix and whatever it costs, it costs.
+
 
 ## Holdout
 
