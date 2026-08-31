@@ -13,7 +13,7 @@
 | Generation credentials (VLM, teaching model) | Us / client | §9.2, and the model pre-screen of the gold set | **Present but rejected.** `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` and `GEMINI_API_KEY` all exist in Foxxy's env and all three return 401. Only `VOYAGE_API_KEY` works |
 | Postgres with vector support | Us | §7.4, §8.2 | **Provisioned** — own container, `docker/compose.yml` port 5434, pgvector 0.8.6 (R-029) |
 | **GPU for parsing** | Us / client | §7.3 at any real corpus size | **Not provisioned — now a requirement, see below** |
-| **Mathpix API key** | Client | formula extraction (R-008) | Not provisioned, blocks the deciding test |
+| **Mathpix API key** | Client | formula extraction (R-008, R-037) | Not provisioned. **The need is now measured, not assumed:** 12% of the maths chapter's formula blocks (5 of 43) are unusable to a reader, against 0% in the science chapter |
 
 ### GPU is a requirement, not an optimisation
 

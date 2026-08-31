@@ -858,3 +858,52 @@ a correctness fix would convert a fixed defect back into a number.
 something. The one that found most was the one with the chapter text and the
 instruction to disagree - not the one asking for an opinion about the
 architecture.
+
+---
+
+### R-037 - A gate that finds the right block cannot tell whether the block says anything
+**Status:** Active - 31 August 2026 - **found by an outside reviewer, invisible to every existing gate**
+
+Asked to check "the maths chapter answers *what is the quadratic formula*", an
+outside reviewer agreed with the claim and objected anyway: the extracted
+evidence reads `2 4 , 2 b b ac a    provided b 2 - 4 ac`, and no student can
+reconstruct the quadratic formula from that.
+
+Recall passed. Pack recall passed. Delivered recall passed. Citation completeness
+passed. Lineage passed. **Every measurement in this repository asks whether the
+right block was found; none asks whether the block says anything.**
+
+**Decision:** `parsing/quality.py` measures usability as a reader's test - a
+formula is unusable when almost every token is a single character *and* no
+relation survives, because an equation without `=`, `<`, `>` or an arrow states
+nothing whatever symbols remain. Both conditions must hold, since chemical
+equations survive extraction far better than algebra and their arrows are why.
+
+**Measured:** 0 of 30 formula blocks unusable in the science chapter, **5 of 43
+(12%) in the maths chapter.**
+
+**Consequence:** R-008 predicted this and left it open for a week because nothing
+measured it. The case for a formula recogniser is no longer an assumption, and
+`maths-012` is the demonstration to attach to any request for a Mathpix key.
+
+The blocks are not dropped. The crop is still there, the citation still resolves,
+and a reviewer can still see what was meant - what this produces is a work list
+and an honest denominator.
+
+---
+
+### R-038 - The same key defect appeared twice, so it was systematic
+**Status:** Active - 31 August 2026
+
+`h-chem-17` and `chem-021` ask nearly the same question and both cited a subset
+of the four observations the chapter lists. The first round caught one; the
+second round caught the other only because the previously unreviewed half of the
+set was finally sent out.
+
+**Two things follow.** A defect found once in a set drafted by one author should
+be searched for across the whole set rather than fixed where it was seen. And
+scoping a review to the release-critical cases left 50 cases - more than half -
+checked by nobody, while the report of that review read like coverage.
+
+**Decision:** `export_verification_pack.py --scope rest|all`, and no review is
+described as complete while any case in the set is unreviewed.

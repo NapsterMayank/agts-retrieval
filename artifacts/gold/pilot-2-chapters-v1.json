@@ -12,7 +12,8 @@
     "unanswerable_design": "in-subject, out-of-chapter. Four are deliberately adjacent - chlorophyll, Pythagoras and completing the square are all *mentioned* in these chapters without being taught, so a retriever that matches on surface words will answer them confidently and wrongly.",
     "status": "DRAFT. Measures the harness against real content; not release evidence, and not the 300-500 case set \u00a76.4 requires.",
     "holdout": "The 38 h-* cases were written AFTER the sufficiency gate's floor, ceiling and corroboration rule were fixed, and were not consulted while choosing any of them. They are a genuine validation set for those constants. They are still agent-drafted and unadjudicated, so they validate the mechanism, not the curriculum judgement.",
-    "external_review": "31 August: an independent model reviewed all 48 release-critical claims against the chapter text. Science 24 right, 3 wrong; mathematics 21 of 21 right. Two keys were incomplete and are fixed (h-chem-17, h-chem-11). One (h-chem-16) was removed rather than argued: the chapter tells a student to bring a burning candle to the tubes and then asks which gas is present without answering, so whether it 'answers' the question is a judgement two careful readers can split on. A gold case that turns on an unresolved judgement is a bad test item whichever way it is resolved."
+    "external_review": "31 August: an independent model reviewed all 48 release-critical claims against the chapter text. Science 24 right, 3 wrong; mathematics 21 of 21 right. Two keys were incomplete and are fixed (h-chem-17, h-chem-11). One (h-chem-16) was removed rather than argued: the chapter tells a student to bring a burning candle to the tubes and then asks which gas is present without answering, so whether it 'answers' the question is a judgement two careful readers can split on. A gold case that turns on an unresolved judgement is a bad test item whichever way it is resolved.",
+    "external_review_2": "31 August, second round over the 50 previously unreviewed cases plus a re-check of the 21 maths claims. Science 24/26 right, mathematics 22/24 right, and the maths re-check came back clean a second time under a different reader. Three keys fixed; one finding is a content defect rather than a key error."
   },
   "cases": [
     {
@@ -26,9 +27,12 @@
         "chemical-reactions-and-equations"
       ],
       "gold_block_ids": [
+        "chemical-reactions:docling:texts-65",
         "chemical-reactions:docling:texts-67",
-        "chemical-reactions:docling:texts-68"
-      ]
+        "chemical-reactions:docling:texts-68",
+        "chemical-reactions:docling:texts-74"
+      ],
+      "_review": "second review: texts-65 and texts-74 state what a balanced equation IS; the key had only the conservation-of-mass reasoning"
     },
     {
       "case_id": "chem-002",
@@ -330,9 +334,12 @@
       ],
       "gold_block_ids": [
         "chemical-reactions:docling:texts-47",
+        "chemical-reactions:docling:texts-48",
+        "chemical-reactions:docling:texts-49",
         "chemical-reactions:docling:texts-50",
         "chemical-reactions:docling:texts-51"
-      ]
+      ],
+      "_review": "second review: the same missing-bullets defect as h-chem-17, in a second case"
     },
     {
       "case_id": "chem-022",
@@ -571,9 +578,12 @@
         "quadratic-equations"
       ],
       "gold_block_ids": [
+        "quadratic-equations:docling:texts-101",
+        "quadratic-equations:docling:texts-102",
         "quadratic-equations:docling:texts-112",
         "quadratic-equations:docling:texts-206"
-      ]
+      ],
+      "_review": "second review: the key cited the conclusion, not the worked demonstration of splitting the middle term"
     },
     {
       "case_id": "maths-012",
@@ -589,7 +599,8 @@
       "gold_block_ids": [
         "quadratic-equations:docling:texts-207",
         "quadratic-equations:docling:texts-208"
-      ]
+      ],
+      "_review": "second review, NOT a key error: the chapter does answer this and the key cites the right blocks. The extracted formula reads '2 4 , 2 b b ac a' -- a learner could not reconstruct the quadratic formula from it. The case stays answerable; the evidence is unusable, which is a parsing defect (R-008) demonstrated rather than assumed."
     },
     {
       "case_id": "maths-013",

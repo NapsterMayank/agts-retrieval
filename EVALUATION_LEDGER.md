@@ -874,6 +874,77 @@ runs. The floor it produces is still measured rather than picked, but the
 function's name promises more than it delivers, and the fix is a calibration
 that scores the whole gate rather than one of its inputs.
 
+## Second review round: the other half of the set, and a defect no gate could see - 31 August 2026
+
+The first review covered the 47 release-critical cases and left 50 checked by
+nobody, which was a gap in how the review was scoped rather than a property of
+those cases. Those 50 went out, along with a re-check of the 21 maths claims
+that had come back clean.
+
+| pack | result |
+|---|---|
+| science, previously unreviewed (26) | 24 right, **2 wrong** |
+| mathematics, previously unreviewed (24) | 22 right, **2 flagged** |
+| mathematics, re-check of the clean 21 | **clean again, under a second reader** |
+
+The re-check matters as much as the findings. A clean sweep from one reader is
+weak evidence; the same 21 claims surviving a second, independent reading is not.
+"Completing the square is only historical attribution" has now been confirmed
+twice by readers who were told to disagree.
+
+### Three more incomplete keys, same defect as the first round
+
+- `chem-001` *"What is a balanced chemical equation?"* cited the
+  conservation-of-mass reasoning. `texts-65` and `texts-74` state what a balanced
+  equation **is**, and neither was in the key.
+- `chem-021` *"What observations tell us a reaction has taken place?"* cited two
+  of the four bullets. This is the same defect as `h-chem-17` in the first round,
+  in a second case - which says the error was systematic rather than a slip.
+- `maths-011` *"How is a quadratic equation solved by splitting the middle
+  term?"* cited the conclusion and the summary, not `texts-101`/`texts-102`,
+  where the chapter actually demonstrates the split.
+
+### And one finding that is not a key error at all
+
+`maths-012` *"What is the quadratic formula?"* The chapter answers it. The key
+cites the right blocks. The retrieval finds them. The citation resolves. The gate
+answers. And the evidence a learner would be shown reads:
+
+    2 4 , 2 b b ac a    provided b 2 - 4 ac
+
+**Every gate in this repository measures whether the right block was found. None
+of them asks whether the block says anything.** That hole was invisible to
+recall, to pack recall, to delivered recall, to citation completeness and to the
+lineage gate - all of which pass on this case.
+
+`agts/parsing/quality.py` now measures it, as a reader's test rather than a
+parser's: a formula is unusable when almost every token is a single character
+**and** no relation survives, because an equation with no `=`, `<`, `>` or arrow
+states nothing whatever symbols remain.
+
+| chapter | formula blocks | unusable |
+|---|---:|---:|
+| Science, chapter 1 | 30 | **0 (0%)** |
+| Mathematics, chapter 4 | 43 | **5 (12%)** |
+
+R-008 predicted exactly this - *"chemical equations degrade into recoverable
+text; fractions, roots, integrals and matrices do not"* - and left it as an
+open question for a week because nothing measured it. It is now measured, and
+the case for a formula recogniser on maths is no longer an assumption: **one in
+eight formula blocks in the maths chapter cannot be read by a student.**
+
+### After the corrections
+
+| | visible | holdout |
+|---|---|---|
+| unanswerable refused | 10/10 | 8/8 |
+| answerable answered | 47/50 | 26/29 |
+
+Unchanged by this round: the three keys that were wrong were all in cases that
+already passed, so correcting them moved no number. That is worth stating
+plainly - **a corrected answer key that changes no score is still a corrected
+answer key**, and the previous numbers were right for partly wrong reasons.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

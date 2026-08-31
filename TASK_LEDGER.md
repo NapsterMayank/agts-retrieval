@@ -103,6 +103,10 @@
 
 - [x] External model review of all 48 release-critical claims (R-036): three
       wrong answer keys and three code defects found, verified and fixed
+- [x] Second round over the 50 cases nobody had reviewed (R-038): three more
+      incomplete keys, and the maths claims came back clean under a second reader
+- [x] Evidence usability measured (R-037): **12% of maths formula blocks are
+      unreadable**, 0% of science. Found by a reviewer, invisible to every gate
 
 ## Next, unblocked
 
