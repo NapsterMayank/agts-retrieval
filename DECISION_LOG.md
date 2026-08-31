@@ -1338,3 +1338,232 @@ and block ids, no chapter prose. A new export is ignored by default, which is
 the correct default for a directory whose purpose is quoting the source.
 
 The formula sheet added the same day would have been the third leak.
+
+---
+
+### R-056 - The hybrid score is a magnitude, not a rank statistic
+**Status:** Active - 31 August 2026
+
+The first real-content run scored `representation-hybrid` at 0.355 abstention
+accuracy against 0.903 for the dense retriever it contains. The fusion was not
+at fault: RRF is the right way to merge two rankings that share no scale, and
+swapping it for a weighted score sum would be tuning a hyperparameter on the
+gold set.
+
+The fault was reporting the fused rank statistic as the item's **score**. RRF at
+corroboration depth has nine reachable values, so 61 of 109 answerable cases
+tied at exactly 1.0 - "both retrievers ranked it first" - and the calibrated
+threshold landed at 0.980, inside the tie mass. Every abstention decision was
+being made on rank-1-versus-rank-2 noise.
+
+Ordering still comes from RRF. Scoring now comes from the dense retriever, which
+measures similarity rather than agreement: an item carries the dense score of
+the window being returned. A window dense cannot score - no vector, or another
+model - keeps the score of whichever run ranked it, because a missing embedding
+is an index defect and must not read as a weak match.
+
+Hybrid rose to 0.871 and is still beaten by plain dense on both recall and
+abstention. The fix made it defensible, not useful, and whether it ships at all
+is open.
+
+---
+
+### R-057 - The gate ceiling is the highest unanswerable score, strictly above
+**Status:** Active - 31 August 2026
+
+§8.4 says corroboration is uninformative above the highest score any
+*unanswerable* query reached: nothing above it has ever been an out-of-corpus
+match, so interrogating agreement there can only refuse answerable questions.
+
+The baseline run did not implement that. It used the **median answerable top
+score**, which is a property of the wrong distribution entirely and happened to
+sit higher. The gap was 0.036 wide, and corroboration ran inside it with nothing
+to catch: 13 answerable cases refused, no unanswerable one caught. 82/109 became
+95/109 with unanswerable refusal unchanged at 31/31.
+
+**Strictly above, and the strictness is not pedantry.** The gate reads a score
+*equal* to the ceiling as high confidence, so passing the highest unanswerable
+score itself hands the exemption to the one case that defined it - 31/31 became
+30/31. The ceiling is `nextafter(highest_unanswerable, inf)`, and the boundary
+is now pinned by a test rather than left to be rediscovered.
+
+Not taken: dropping corroboration from 2 of 3 to 1 of 3 buys 4 more answerable
+cases and costs 2 unanswerable ones. That is a product judgement about which
+error hurts a learner more, not a metrics one.
+
+---
+
+### R-058 - voyage-4-large replaces voyage-3, and the model name has one home
+**Status:** Active - 31 August 2026
+
+Five embedding models measured over the visible set of `pilot-2-chapters-v1`,
+each with its own calibration, because a floor derived under one model says
+nothing about another:
+
+| model | recall@20 | recall@pack | margin | gate answerable | gate unanswerable |
+|---|---|---|---|---|---|
+| voyage-3 | 0.899 | 0.899 | -0.051 | 95/109 | 31/31 |
+| voyage-3.5 | **0.972** | 0.954 | -0.110 | 89/109 | 31/31 |
+| voyage-4-lite | 0.927 | 0.927 | -0.168 | 101/109 | 31/31 |
+| voyage-4 | 0.954 | 0.954 | -0.093 | 104/109 | 30/31 |
+| **voyage-4-large** | 0.954 | 0.954 | **-0.041** | **107/109** | **31/31** |
+
+**voyage-3.5 is the reason this is decided on the gate and not on recall.** It
+retrieves more of the right evidence than anything else tested and produces the
+second-worst gate outcome of the five, because its answerable and unanswerable
+scores overlap by 0.110. Recall the calibration cannot separate is not accuracy:
+the system's job is to answer or refuse, and a score distribution that will not
+separate makes that decision badly however good the ranking underneath it is.
+
+voyage-4-large also packs tighter - 36.4 blocks per pack against 39.1 - so it is
+not trading context volume for recall.
+
+**The model name was eight string literals** across six scripts and the service,
+while R-016 makes the model part of every representation's identity. It is now
+`DEFAULT_EMBEDDING_MODEL`, and cache files are named after it, so switching
+models leaves the old vectors on disk instead of mixing two models in one file.
+
+**Still not separable.** Every model has a negative margin. The sufficiency gate
+remains the abstention mechanism and no threshold alone would work (R-019).
+
+---
+
+### R-059 - The shipped pair is checked against its model, not commented
+**Status:** Active - 31 August 2026
+
+`SHIPPED_FLOOR = 0.737` and `SHIPPED_CEILING = 0.800` were carried as literals
+in two scripts, each with a comment explaining that they are the shipped pair
+rather than what calibration suggests today. The comments were correct and
+insufficient: R-058 moved the embedding model, and a floor is a property of one
+model's score distribution.
+
+Nothing would have failed. `holdout_validation` would have scored voyage-3's
+thresholds against voyage-4-large's scores and printed a number, and
+`citation_report` would have described a configuration nobody runs. Both look
+exactly like results.
+
+The pair now lives beside the gate as one definition with `SHIPPED_UNDER_MODEL`,
+and both scripts refuse to run when the cache holds another model's vectors. The
+holdout is the reason this is an error and not a warning: a consultation spent
+on a stale threshold is spent regardless of what it measured.
+
+---
+
+### R-060 - The shipped pair re-derived under voyage-4-large
+**Status:** Active - 31 August 2026
+
+R-058 moved the embedding model, which invalidated the pair R-059 had just
+guarded. Re-derived on the **visible set only**, by a rule stated before the
+numbers were looked at: the floor is the calibrated midpoint, the ceiling is the
+highest unanswerable top score rounded **up** to three decimals.
+
+Rounding up rather than to nearest, because the gate reads a score equal to the
+ceiling as high confidence (R-057), so rounding down hands the exemption to the
+one case that defined it. Three decimals rather than the exact float, because
+the provider does not return bit-identical vectors across runs and the fourth
+decimal is noise - a pair quoted to sixteen digits claims a precision the
+measurement does not have.
+
+    floor 0.737 -> 0.744        ceiling 0.800 -> 0.765
+
+The rounded pair reproduces the exact pair's decisions case for case on the
+visible set: 107/109 answerable, 31/31 unanswerable, identical to the exact
+floats and to 0.744/0.766 and 0.745/0.765. The constants are not knife-edge,
+which is worth knowing given the vector drift recorded in EVALUATION_LEDGER.
+
+The ceiling clears the highest unanswerable score by 0.000282. That is roughly
+three times the drift observed across a cache rebuild, which is margin but not
+much of it. A rebuild that pushes an unanswerable score past it costs one
+refusal, and the pair should be re-derived rather than assumed after any
+re-embed.
+
+---
+
+### R-061 - The cache is primed with the query a retriever actually embeds
+**Status:** Active - 31 August 2026
+
+`embed_representations` primed the vector cache with `case.query`. Every
+retriever embeds `search_query(plan)` - the learner's words carrying the scope
+their sentence would have had, "class 10 science, ..." - which is a different
+string and a different cache key. The priming script had never populated a
+single query key any retriever would look up.
+
+Nothing failed, for the wrong reason: the read-only scripts found their keys
+because earlier live runs had written them as a side effect. The cache looked
+primed while being primed with strings nothing asks for.
+
+R-058 exposed it. A new model meant a new cache file with no incidental history,
+and `citation_report` stopped on the first query it needed. A defect that
+survives only while a side effect happens to cover it is a defect that will
+surface at the worst time - here, immediately after a model swap, which is
+exactly when a report is least trusted and most needed.
+
+The script now primes `search_query(plan_for_case(case))` for every case.
+
+---
+
+### R-062 - Dense ships alone; hybrid stays a comparator
+**Status:** Active - 31 August 2026
+
+With hybrid's score fixed (R-056) and the model moved (R-058), the two are close
+enough to state plainly: dense 0.954 pack recall against hybrid's 0.936, and
+36.4 blocks per pack against 40.9. Hybrid is behind on both, and it costs a
+second retrieval per query to get there.
+
+It stays in the benchmark because a fusion that loses to its own dense half is
+worth being able to re-check after any model change - the ordering it produces
+is not wrong, it just adds nothing here. It is not wired into the service and
+`app.py` has always run `DenseRetriever` behind the gate, so nothing changes
+operationally. What changes is that this is now a recorded decision rather than
+an accident of which retriever someone imported.
+
+---
+
+### R-063 - Corroboration stays at 2 of 3
+**Status:** Active - 31 August 2026
+
+Measured, at the shipped floor and ceiling, on the visible set:
+
+| min_corroboration | answerable | unanswerable refused |
+|---|---|---|
+| **2 of 3** | 95/109 -> **107/109** after R-057 | **31/31** |
+| 1 of 3 | +4 answerable | 29/31 |
+
+Relaxing to 1 of 3 buys four answerable questions and lets two unanswerable ones
+through. For a learner that trade is bad in the direction it looks good: a
+refusal is a visible gap the learner can route around by asking differently, and
+a confident answer assembled from a chapter that only *mentions* the concept is
+a wrong answer wearing citations. The gate exists because "completing the
+square" is genuinely present in the maths chapter and genuinely never taught
+there (R-019); 1 of 3 is exactly the setting that stops catching it.
+
+Held at 2. Revisit if the false-abstain rate becomes the pilot's complaint - the
+holdout says 95% answerable, so it is currently not.
+
+---
+
+### R-064 - Leaving QUARANTINED is a filed record, not a flag
+**Status:** Active - 31 August 2026
+
+The rights position is that the pilot corpus is usable. The build guide's §5
+requirement does not change shape because of that: `RightsRecord` has no field
+for a verbal assurance, deliberately, and approval is per checksum.
+
+So there is now a path rather than an exception. `scripts/approve_source.py`
+files a rights record beside the artefact - owner, legal basis, evidence URI,
+named approver, and what the grant actually permits - records the checksum it
+was filed against, and only then moves the manifest to APPROVED. `load_corpus`
+requires an evaluation licence for quarantined sources, refuses one for
+approved sources, and a corpus of approved content needs no licence at all.
+
+Three ways to claim an approval without having one are refused and tested: no
+record filed, a record filed against different bytes, and no completed scan.
+The checksum check is the one that matters in practice - re-parsing a chapter
+changes its bytes, and a rights record filed against the old parse approves a
+source that no longer exists.
+
+**Nothing is approved yet.** The script needs five facts a person has to supply,
+and the one that usually decides it is `--evidence-uri`: a link to the signed
+record. Until those exist the corpus stays quarantined and every number stays a
+measurement, which is the same position as before - but now the gap is one
+command wide rather than a refactor.

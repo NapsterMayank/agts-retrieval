@@ -1,17 +1,17 @@
 {
   "gold_set": "pilot-2-chapters-v1",
-  "floor": 0.7454002222089494,
-  "ceiling": 0.8067932206854677,
+  "floor": 0.7441051674576515,
+  "ceiling": 0.7647179637702762,
   "visible": {
     "abstained": 31,
     "unanswerable": 31,
-    "answered": 90,
+    "answered": 107,
     "answerable": 109
   },
   "holdout": {
     "abstained": 24,
     "unanswerable": 24,
-    "answered": 34,
+    "answered": 38,
     "answerable": 40
   }
 }

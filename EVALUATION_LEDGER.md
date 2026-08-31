@@ -1492,3 +1492,122 @@ set exists — see Q1 and Q2.
 
 `score()` refuses to touch holdout cases unless `include_holdout=True` is passed
 explicitly, so a tuning run cannot contaminate the seal by accident.
+
+
+## Real-content baseline, 31 August 2026 (voyage-4-large)
+
+Visible set of `pilot-2-chapters-v1`, two quarantined NCERT chapters under an
+evaluation licence. **A measurement, not release evidence** - the rights records
+are still outstanding (Q3).
+
+| retriever | recall@20 | recall@pack | blocks/pack | invariant violations |
+|---|---|---|---|---|
+| keyword-baseline | 1.000 | 0.954 | 137.1 | 0 |
+| representation-keyword | 0.936 | 0.881 | 41.3 | 0 |
+| representation-bm25 | 0.844 | 0.789 | 39.6 | 0 |
+| **representation-dense** | **0.954** | **0.954** | **36.4** | 0 |
+| representation-hybrid | 0.954 | 0.936 | 40.9 | 0 |
+| broken-random-ranking | 0.872 | 0.477 | 99.9 | 0 |
+| broken-wrong-grade | 0.991 | 0.899 | 136.1 | 903 |
+| broken-answer-only | 0.991 | 0.899 | 136.1 | 903 |
+| broken-cross-tenant | 0.991 | 0.899 | 136.1 | 903 |
+
+The ruler still works: all four broken retrievers are detected, and
+`representation-bm25` is detected too - alone it is below the bar.
+
+`keyword-baseline` still posts the highest candidate recall and does it by
+shipping 137 blocks per pack against dense's 36. Recall bought with context
+volume is not comparable to recall that fits in a pack.
+
+**Sufficiency gate (§8.4), calibrated on the visible set:**
+floor 0.744, ceiling 0.765 = `nextafter(highest unanswerable top score)`,
+corroboration 2 of top 3.
+
+- unanswerable correctly refused: **31/31**
+- answerable correctly answered: **107/109**
+
+Remaining false abstains are two, both below the floor rather than failures of
+corroboration.
+
+### What this replaces
+
+The previous run of this file used voyage-3, a gate ceiling set to the median
+answerable top score, and a hybrid retriever scoring on rank agreement. It read
+89.9% pack recall and 82/109 answerable. The three changes are R-056, R-057 and
+R-058; none of them touched the gold set.
+
+### Reproducibility caveat
+
+Re-populating the vector cache moved the dense floor at the fifth decimal
+(0.7454002 -> 0.7454795) and flipped two visible cases across it. The provider
+does not return bit-identical vectors for identical text across runs, so these
+numbers are stable to about three decimals and not beyond. A cache rebuild is a
+re-measurement, not a no-op.
+
+### Pending
+
+- **The shipped pair is stale.** `SHIPPED_FLOOR = 0.737` / `SHIPPED_CEILING =
+  0.800` were derived under voyage-3. Both `holdout_validation` and
+  `citation_report` now refuse to run rather than quote them against
+  voyage-4-large scores (R-059). Re-deriving them is a decision, and validating
+  the new pair costs a holdout consultation.
+- **The holdout has not been re-run since R-056 through R-058.** Its last
+  reading, under voyage-3 and the shipped pair, was 24/24 unanswerable and 34/40
+  answerable (85%); four of those six false abstains are the corroboration class
+  R-057 addresses.
+
+### Reranking does not earn its cost (Q4, answered)
+
+`rerank-2` over the same corpus, judged on pack recall:
+
+| configuration | recall@20 | pack | pack (holdout) |
+|---|---|---|---|
+| dense | 0.899 | 0.899 | 0.775 |
+| dense + rerank-2 | 0.899 | **0.899** | **0.775** |
+| bm25 | 0.844 | 0.789 | 0.725 |
+| bm25 + rerank-2 | 0.844 | 0.844 | 0.725 |
+| hybrid | 0.899 | 0.881 | 0.775 |
+| hybrid + rerank-2 | 0.899 | 0.899 | 0.775 |
+
+Measured under voyage-3, before R-058.
+
+Reranking adds **nothing** on top of dense - identical pack recall, identical
+holdout. It recovers 5.5 points for bm25 and 1.8 for hybrid, which is to say it
+buys back damage a weaker retriever caused and never exceeds the retriever that
+never caused it. A per-query API call, its latency and its failure mode, for
+zero. Not adopted.
+
+Worth re-testing only if the bottleneck moves: `recall@20 == recall@pack` means
+packing is lossless and candidate retrieval is the whole constraint, which is
+where a reranker cannot help by construction.
+
+### Holdout, 31 August 2026 (voyage-4-large, shipped pair 0.744 / 0.765)
+
+Consulted once, after the pair was fixed and recorded (R-060). Never used to
+choose anything.
+
+| set | unanswerable refused | answerable answered |
+|---|---|---|
+| visible (tuned on - upper bound) | 31/31 (100%) | 107/109 (98%) |
+| **holdout (the honest number)** | **24/24 (100%)** | **38/40 (95%)** |
+
+Lower bounds at 95% confidence: holdout unanswerable >= 88%, answerable >= 85%.
+
+**The generalisation gap is three points**, 98% visible against 95% holdout.
+Small, and the direction is the expected one. The gate is not fitted to the set
+it was tuned on.
+
+Previous reading, under voyage-3 with the median ceiling: 24/24 and 34/40 (85%).
+The ten-point gain on answerable cases comes from R-057 and R-058 together and
+was predicted by neither alone.
+
+**Citation and completeness on the same configuration:** resolution 100% on both
+sets, delivered recall 100% visible / 97.4% holdout, completeness 96.9% / 96.1%,
+§14 rows PASS.
+
+Note that `citation_report` reads the holdout as well, so the sealed set was
+consulted twice on 31 August 2026 - once for citations, once for the gate. Both
+readings are recorded here; neither informed a threshold.
+
+**Still a measurement, not release evidence.** The content is quarantined and
+the rights records are outstanding (Q3).

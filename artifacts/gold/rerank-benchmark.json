@@ -1,58 +1,58 @@
 [
   {
     "retriever": "dense (control)",
-    "recall_at_20": 0.94,
-    "recall_at_pack": 0.94,
-    "recall_at_pack_holdout": 0.7666666666666667,
-    "blocks_per_pack": 39.58,
+    "recall_at_20": 0.8990825688073395,
+    "recall_at_pack": 0.8990825688073395,
+    "recall_at_pack_holdout": 0.775,
+    "blocks_per_pack": 39.14678899082569,
     "violations": 0
   },
   {
     "retriever": "dense + identity rerank",
-    "recall_at_20": 0.94,
-    "recall_at_pack": 0.94,
-    "recall_at_pack_holdout": 0.7666666666666667,
-    "blocks_per_pack": 39.58,
+    "recall_at_20": 0.8990825688073395,
+    "recall_at_pack": 0.8990825688073395,
+    "recall_at_pack_holdout": 0.775,
+    "blocks_per_pack": 39.14678899082569,
     "violations": 0
   },
   {
     "retriever": "dense + rerank-2",
-    "recall_at_20": 0.94,
-    "recall_at_pack": 0.94,
-    "recall_at_pack_holdout": 0.7666666666666667,
-    "blocks_per_pack": 37.52,
+    "recall_at_20": 0.8990825688073395,
+    "recall_at_pack": 0.8990825688073395,
+    "recall_at_pack_holdout": 0.775,
+    "blocks_per_pack": 38.71559633027523,
     "violations": 0
   },
   {
     "retriever": "bm25 (control)",
-    "recall_at_20": 0.92,
-    "recall_at_pack": 0.92,
-    "recall_at_pack_holdout": 0.8333333333333334,
-    "blocks_per_pack": 39.16,
+    "recall_at_20": 0.8440366972477065,
+    "recall_at_pack": 0.7889908256880734,
+    "recall_at_pack_holdout": 0.725,
+    "blocks_per_pack": 39.60550458715596,
     "violations": 0
   },
   {
     "retriever": "bm25 + rerank-2",
-    "recall_at_20": 0.92,
-    "recall_at_pack": 0.92,
-    "recall_at_pack_holdout": 0.8333333333333334,
-    "blocks_per_pack": 39.44,
+    "recall_at_20": 0.8440366972477065,
+    "recall_at_pack": 0.8440366972477065,
+    "recall_at_pack_holdout": 0.725,
+    "blocks_per_pack": 39.92660550458716,
     "violations": 0
   },
   {
     "retriever": "hybrid (control)",
-    "recall_at_20": 0.94,
-    "recall_at_pack": 0.94,
-    "recall_at_pack_holdout": 0.7666666666666667,
-    "blocks_per_pack": 39.82,
+    "recall_at_20": 0.8990825688073395,
+    "recall_at_pack": 0.8807339449541285,
+    "recall_at_pack_holdout": 0.775,
+    "blocks_per_pack": 40.08256880733945,
     "violations": 0
   },
   {
     "retriever": "hybrid + rerank-2",
-    "recall_at_20": 0.94,
-    "recall_at_pack": 0.94,
-    "recall_at_pack_holdout": 0.7666666666666667,
-    "blocks_per_pack": 38.2,
+    "recall_at_20": 0.8990825688073395,
+    "recall_at_pack": 0.8990825688073395,
+    "recall_at_pack_holdout": 0.775,
+    "blocks_per_pack": 39.53211009174312,
     "violations": 0
   }
 ]
