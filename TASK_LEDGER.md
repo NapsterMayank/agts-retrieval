@@ -43,7 +43,10 @@
 ## Blocked
 
 - [ ] **Q1** Pilot curriculum named → §6.1 spine, §6.4 gold set, §7.1 registration
-- [ ] **Q3** Signed rights records per source → all parsing
+- [ ] **Q3** Signed rights records per source → serving anything at all.
+      **The mechanism is now built**: `scripts/register_source.py` takes a signed
+      record, verifies it against the file's checksum, and approves the source.
+      What is missing is the signature, not the tooling
 - [ ] **Q2** Holdout seal timing confirmed → whether §14's holdout gate binds at 72h
 - [ ] **Q5** Scope: does this repository build §9, or consume it?
 

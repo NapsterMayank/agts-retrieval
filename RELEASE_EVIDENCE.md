@@ -55,14 +55,27 @@ No agent may self-approve any of these (§3). The release manifest reports
 `approved by NOBODY (unsigned)` and will keep doing so until this table is
 filled in by people.
 
-| Sign-off | Named reviewer | Date |
-|---|---|---|
-| Source rights and lineage | — | — |
-| Curriculum concept map and content | — | — |
-| Release-critical gold set, two adjudicators | — | — |
-| Hindi / Hinglish and diagram review | — | — |
-| Privacy, security, assessment boundary | — | — |
-| Founder review of the packet and pilot criteria | — | — |
+| Sign-off | Named reviewer | Date | How it is recorded | What it unblocks |
+|---|---|---|---|---|
+| Source rights and lineage | — | — | `scripts/register_source.py --rights r.json --file x.pdf --apply` | **Serving anything at all.** The API refuses to boot without it |
+| Curriculum concept map and content | — | — | the section map in `scripts/compose_*.py`, reviewed | composition being correct rather than merely consistent |
+| Release-critical gold set, two adjudicators | — | — | `EvalCase.adjudicators`, two names on each of the 48 | believing any gate number |
+| Hindi / Hinglish and diagram review | — | — | not built — no non-English content exists yet | the language and visual slices |
+| Privacy, security, assessment boundary | — | — | not built | Phase 4 |
+| Founder review of the packet and pilot criteria | — | — | `ReleaseManifest.approved_by` | `PILOT_READY` |
+
+### What a rights record must contain (section 5)
+
+Owner, legal basis, four permissions (storage, transformation, display, **model
+processing**), attribution, territories, term, a **named human**, a date, and a
+link to the signed document. There is deliberately no field for a verbal
+assurance. `scripts/register_source.py --template` prints the shape.
+
+Registration refuses four ways, each of which is how an approval becomes
+meaningless: a checksum that does not match the file (section 5 approves bytes,
+not titles), a missing malware scan (section 7.1, and approval means a parser may
+read it), a record forbidding model processing while the pipeline embeds through
+a third party, and an expired term.
 
 Outcome is `PILOT_READY`, `CONDITIONALLY_BLOCKED` with named corrections, or
 `REJECTED`. There is no silent waiver.
