@@ -202,3 +202,26 @@ def test_a_caption_extracted_before_its_figure_still_travels_with_it() -> None:
     reps = represent(obj(blocks), blocks)
     home = {bid: rep.representation_id for rep in reps for bid in rep.block_ids}
     assert home[caption.block_id] == home[figure.block_id]
+
+
+def test_the_index_takes_words_and_the_pack_takes_the_formula() -> None:
+    """Searching and displaying are different questions (R-069).
+
+    A block with degraded text and recovered LaTeX must be *indexed* on the
+    text, because a query is a sentence somebody typed and `\frac{-b}{2a}` is
+    not words. It must be *shown* as the LaTeX, because the degraded text is
+    what R-037 was about. Measured: indexing the LaTeX cost a case of candidate
+    recall, and appending it to the text did not recover it.
+    """
+    from agts.parsing.quality import readable_text
+    from agts.retrieval.chunking import _text_of
+
+    degraded = block(
+        1,
+        "2 4 , 2 b b ac a − ± − provided b 2 - 4 ac ≥",
+        block_type=BlockType.FORMULA,
+    ).model_copy(update={"latex": '\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}'})
+
+    assert "frac" not in _text_of(degraded), "the index must not carry LaTeX markup"
+    assert "provided" in _text_of(degraded)
+    assert readable_text(degraded.text, degraded.latex) == degraded.latex

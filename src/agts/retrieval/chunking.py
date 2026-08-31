@@ -46,7 +46,6 @@ from collections.abc import Iterable, Sequence
 
 from agts.contracts.common import NON_CONTENT_BLOCKS, BlockType, Modality
 from agts.contracts.objects import LearningObject, SearchRepresentation, SourceBlock
-from agts.parsing.quality import readable_text
 
 
 #: Bump when the chunking function changes. Representation ids embed it, so two
@@ -93,8 +92,17 @@ def _text_of(block: SourceBlock) -> str:
     Not `text or latex`: a block whose text has decayed to loose symbols still
     has text, so that precedence hid every recovered formula behind the mangled
     version of itself (R-043).
+
+    **Searching is not displaying** (R-069). `readable_text` picks the rendering
+    a reader should see, which is the right question for a pack and the wrong
+    one for an index. Attaching correct LaTeX to two blocks moved candidate
+    recall 95.4% -> 94.5%, and appending the LaTeX to the text rather than
+    replacing it did not recover it: a query is a sentence a learner typed, and
+    `rac{-b}{2a}` is not words. The index takes the extracted text; the pack
+    takes `readable_text` and shows the formula. Both fields are stored (R-008),
+    so neither path loses anything.
     """
-    return " ".join(readable_text(block.text, block.latex).split())
+    return " ".join((block.text or block.latex or "").split())
 
 
 def _searchable(blocks: Iterable[SourceBlock]) -> list[SourceBlock]:

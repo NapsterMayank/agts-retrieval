@@ -1656,3 +1656,71 @@ The three are texts-153, texts-159 and texts-198 -- the same three the earlier
 audit named. Their problem is reading *order*, not encoding, so no candidate can
 be attached safely and a person has to read the crop. That is a queue somebody
 can finish in an afternoon, which the 73 never was.
+
+---
+
+### R-068 - Codex screens the gold set and the last formulas
+**Status:** Active - 1 September 2026
+
+`model_adjudicate.py` already argued against itself: the cases and their answer
+keys were written by Claude, so a Claude screen shares the blind spots that
+produced them. Codex is a different vendor on a different corpus that never saw
+the reasoning behind these cases, which is what independent was supposed to mean.
+Added as `--judge codex`, writing to its own file so neither screen overwrites
+the other -- the disagreements are the only thing two judges buy.
+
+**95 release-critical cases screened. 94 agree, 1 disagrees**, and the one is
+worth the run: `h-chem-03`, "Why can we not change the formula of a compound
+while balancing an equation?", where the answer key quotes text that *states*
+the rule without explaining it. The gate had already refused that case on the
+holdout with "named but not taught". Two systems reached the same doubt by
+different routes.
+
+**The label has not been changed.** Relabelling a case because a model disliked
+it, on the set that validates everything else, is how a holdout stops meaning
+anything. It goes to the humans as a flagged case.
+
+For the three formulas, Codex proposed LaTeX from the degraded text and the
+rejected candidates with no sight of the page, and was compared against the crops
+read separately:
+
+- **texts-153** agreed on the sign, which was the open question -- the crop shows
+  a minus and Codex reasoned to a minus from the surrounding text. It rendered
+  the same mathematics over a common denominator where the page shows two
+  fractions; the page's form was taken.
+- **texts-198** agreed exactly.
+- **texts-159** disagreed. Its crop is clipped at the top and Codex proposed only
+  the pair of roots where the crop shows `-b/2a +/- 0, i.e., x = ...`. Left in
+  the queue. A formula two readings disagree about is the case the queue exists
+  for.
+
+Both readers are models and `attach_reviewed_formulas.py` records that rather
+than implying a person signed. `countersigned_by` is null on both.
+
+    3 needing a human  ->  1
+
+---
+
+### R-069 - The index takes the words, the pack takes the formula
+**Status:** Active - 1 September 2026
+
+Attaching correct LaTeX to two blocks moved candidate recall **95.4% -> 94.5%**.
+The recovered formula was better in every sense except the one being measured.
+
+`_text_of` built the search representation with `readable_text`, which picks the
+rendering a *reader* should see. That is the right question for a pack and the
+wrong one for an index. A query is a sentence somebody typed, and
+`\frac{-b}{2a}` is not words: choosing the LaTeX threw away the sentence the
+formula sits in.
+
+Appending the LaTeX to the text rather than replacing it was tried and did not
+recover the case either -- the markup dilutes the vector. Indexing the extracted
+text restored 95.4% exactly.
+
+So the two paths split. The index takes `block.text`; the pack still takes
+`readable_text` and shows the recovered formula, so R-037 stands. Both fields are
+stored either way (R-008), which is what makes the split free.
+
+The evidence is one case in 109 and is recorded as such. What justifies the
+change is not the size of the number but that the two paths were answering
+different questions with the same function.
