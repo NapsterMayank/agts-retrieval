@@ -945,6 +945,62 @@ already passed, so correcting them moved no number. That is worth stating
 plainly - **a corrected answer key that changes no score is still a corrected
 answer key**, and the previous numbers were right for partly wrong reasons.
 
+## Two agent reviewers, run directly: one real finding each, and seven rejected - 31 August 2026
+
+`codex` and `opencode` were run against the repository, told to be adversarial
+and not to summarise. The ratio matters as much as the findings.
+
+### codex - on the calibration defect
+
+Two things, both correct.
+
+**On the fix it was asked to propose for `calibrate_abstention`:** a grid search
+over floor and ceiling, selecting the configuration with zero visible false
+answers and maximum acceptance, is *"aggressive multiple-comparisons overfitting
+masquerading as calibration"* at ten visible unanswerable cases. It wrote the
+code and then said what was wrong with its own code, which is the right shape of
+an answer. Not adopted as-is; the open item stands.
+
+**On the headline number:** report a bound and a denominator, not `8/8`.
+
+Adopted. `evaluation/confidence.py` computes exact one-sided Clopper-Pearson
+bounds, and every rate the runners print now carries one:
+
+| | observed | supports at 95% |
+|---|---|---|
+| holdout unanswerable refused | 8/8 | **at least 69%** |
+| holdout answerable answered | 26/29 | at least 75% |
+| visible unanswerable refused | 10/10 | at least 74% |
+| both sets combined | 18/18 | at least 85% |
+
+**A system that wrongly answered three learners in ten would produce 8/8 on
+eight cases about one run in twenty.** The fraction read as certainty and never
+was. Nothing about the system changed here - only what this file may claim about
+it.
+
+### opencode - eight claims, one and a half real
+
+It produced eight failure modes and closed with *"I need to re-verify a few of
+these against the actual code before claiming them"*, which was the right
+instinct. Three were checkable:
+
+| claim | verdict |
+|---|---|
+| empty candidates are treated as high-confidence answerable | **wrong** - the empty case is the first reason recorded, and it abstains |
+| a ceiling equal to the floor empties the band and skips corroboration | **correct** |
+| a slotless plan produces a SUFFICIENT pack with a fabricated role | **half** - `QueryPlan` forbids it, `model_copy` bypasses the validation |
+
+Both real ones are guarded now.
+
+### What the round says about review
+
+Eleven claims, four real defects, seven rejected after checking them against the
+code - including one that would have had me "fix" behaviour that was already
+correct. A reviewer worth running is one whose findings get verified, which is
+the standard R-036 already set when all three of that round's findings were
+checked before being accepted. The instinct to check applies to reviewers as
+much as to my own conclusions.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

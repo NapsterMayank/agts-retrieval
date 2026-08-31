@@ -130,9 +130,18 @@ def build_pack(
         )
 
     slots = list(plan.evidence_slots)
+    if not slots:
+        # QueryPlan requires at least one slot, but model_copy bypasses
+        # validation, so a slotless plan can reach here. Without this the items
+        # are tagged EXPLANATION by default and the pack reports SUFFICIENT --
+        # evidence presented as answering a requirement nobody expressed.
+        gaps_before = ["the plan carries no evidence slots, so nothing here is a considered answer"]
+    else:
+        gaps_before = []
+
     items: list[EvidenceItem] = []
     citations: list[Citation] = []
-    gaps: list[str] = []
+    gaps: list[str] = list(gaps_before)
 
     ranked = decision.items[:k_pack]
     siblings = _sibling_blocks(decision, corpus, {i.object_id for i in ranked})

@@ -907,3 +907,44 @@ checked by nobody, while the report of that review read like coverage.
 
 **Decision:** `export_verification_pack.py --scope rest|all`, and no review is
 described as complete while any case in the set is unreviewed.
+
+---
+
+### R-039 - Every rate carries its denominator and a lower bound
+**Status:** Active - 31 August 2026 - **asked for by `codex`**
+
+Asked what single measurement would most change confidence in the 8/8 refusal
+figure, codex answered: report a bound and a denominator rather than a bare
+fraction.
+
+**Measured:** 8/8 supports a true refusal rate of **at least 69%** at 95%
+confidence, exact one-sided Clopper-Pearson. A system that wrongly answered three
+learners in ten produces 8/8 on eight cases about one run in twenty. 18/18 across
+both sets supports at least 85%.
+
+**Decision:** `evaluation/confidence.py`, and every rate a runner prints carries
+its bound. Clopper-Pearson rather than a normal approximation, because at n=8 the
+approximation produces intervals extending past 1.0.
+
+Nothing about the system changed. What changed is what this repository may claim,
+and it is markedly less than the fractions implied.
+
+---
+
+### R-040 - A ceiling equal to the floor silently disables corroboration
+**Status:** Active - 31 August 2026 - **found by `opencode`**
+
+The constructor guard added in R-036 refused a ceiling *below* the floor. Equal
+was still accepted and is the worse case: the band between floor and ceiling is
+empty, so every score at or above the floor takes the high-confidence branch and
+corroboration never runs. The gate reads as fully configured with one of its two
+conditions switched off.
+
+It now raises. Separately, a slotless plan - which `QueryPlan` forbids and
+`model_copy` bypasses - records a gap rather than producing a `SUFFICIENT` pack
+of items tagged with a role nobody asked for.
+
+**On the reviewer:** eight claims, three checkable, one and a half survived. Its
+strongest contribution was closing with the observation that it should verify its
+own claims first. Findings are checked here before being accepted, and this round
+is why that rule exists.

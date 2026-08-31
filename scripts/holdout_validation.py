@@ -21,6 +21,7 @@ from statistics import median
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
 from agts.evaluation.cases import load_gold_set
+from agts.evaluation.confidence import rate
 from agts.evaluation.corpus import EvaluationLicence
 from agts.evaluation.planning import plan_for_case
 from agts.evaluation.quarantine import ChapterArtefact, load_corpus
@@ -50,8 +51,8 @@ def report(name, decisions):
     abstained = sum(1 for _, d in held if d.abstained)
     answered = sum(1 for _, d in askable if d.answerable)
     print(f"\n{name}")
-    print(f"  unanswerable correctly abstained: {abstained}/{len(held)}")
-    print(f"  answerable correctly answered   : {answered}/{len(askable)}")
+    print(f"  unanswerable correctly abstained: {rate(abstained, len(held))}")
+    print(f"  answerable correctly answered   : {rate(answered, len(askable))}")
     for case, decision in decisions:
         if decision.answerable != case.answerable:
             kind = "false ANSWER " if decision.abstained is False else "false abstain"

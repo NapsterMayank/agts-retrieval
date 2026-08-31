@@ -185,3 +185,12 @@ def test_the_anchor_still_requires_some_agreement(plan) -> None:
     corroborator = [item("x", 0.6), item("y", 0.55), item("z", 0.5)]
 
     assert gate(Fixed("p", primary), Fixed("c", corroborator)).decide(plan, corpus).abstained
+
+
+def test_a_ceiling_equal_to_the_floor_is_refused() -> None:
+    """Reported by a second outside reviewer. An equal ceiling empties the band,
+    so every score above the floor skips corroboration -- a gate that looks
+    configured with one condition silently off."""
+    args = (Fixed("p", []), Fixed("c", []))
+    with pytest.raises(ValueError):
+        SufficiencyGate(*args, threshold=0.7, high_confidence=0.7)

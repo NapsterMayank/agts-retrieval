@@ -114,9 +114,14 @@ class SufficiencyGate:
             raise ValueError("min_corroboration below 1 disables corroboration entirely")
         if depth < 1:
             raise ValueError("depth below 1 compares empty candidate sets")
-        if high_confidence is not None and high_confidence < threshold:
+        if high_confidence is not None and high_confidence <= threshold:
+            # Equal is the trap, not just below. With a ceiling equal to the
+            # floor the band is empty, so every score at or above the floor
+            # takes the high-confidence branch and corroboration never runs --
+            # a gate that looks fully configured and has one condition switched
+            # off. Reported by a second outside reviewer.
             raise ValueError(
-                f"high_confidence {high_confidence} is below the floor {threshold}: "
+                f"high_confidence {high_confidence} is not above the floor {threshold}: "
                 "the band between them would be empty and the corroboration rule dead"
             )
         self.primary = primary

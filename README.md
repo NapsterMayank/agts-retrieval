@@ -15,11 +15,14 @@ whole thing over HTTP.
 
 | | visible 60 | holdout 37 |
 |---|---:|---:|
-| Unanswerable questions refused | 10/10 | **8/8** |
-| Answerable questions answered | 47/50 | **26/29** |
+| Unanswerable questions refused | 10/10 | **8/8** — supports ≥69% |
+| Answerable questions answered | 47/50 | **26/29** — supports ≥75% |
 | Citation completeness (§14 bar ≥95%) | 97.2% | **96.2%** |
 | Citation ID resolution (§14 bar 100%) | 100% | **100%** |
 | Lineage failures (§14 bar 0) | 0 | **0** |
+
+The bounds are exact one-sided Clopper-Pearson at 95% (R-039): eight clean
+refusals support “at least 69%”, not certainty.
 
 An outside model reviewed all 48 release-critical claims against the chapter
 text and found **three wrong answer keys** and three code defects (R-036). All
