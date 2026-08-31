@@ -126,7 +126,7 @@
 - [ ] Re-derive the floor afterwards — it is fitted to one register
 - [ ] Fill the gold-set gaps the matrix named: four crossings sit at n=18-19,
       one or two cases short of gating
-- [ ] Two named adjudicators for the 48 release-critical cases (§6.4)
+- [ ] Two named adjudicators for the 48 release-critical cases (§6.4). **Both review routes are built** — a spreadsheet and an interactive walkthrough, with resume and a two-reviewer import. What is missing is the reviewers
 - [ ] Real slice axes wired to §11.2's pairwise matrix rather than the six ad-hoc
       axes now in `EvalCase.slice_keys`
 - [ ] Citation precision and completeness scorers (§14, still unenforced)
