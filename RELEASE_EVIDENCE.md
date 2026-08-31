@@ -59,7 +59,7 @@ filled in by people.
 |---|---|---|---|---|
 | Source rights and lineage | — | — | `scripts/register_source.py --rights r.json --file x.pdf --apply` | **Serving anything at all.** The API refuses to boot without it |
 | Curriculum concept map and content | — | — | the section map in `scripts/compose_*.py`, reviewed | composition being correct rather than merely consistent |
-| Release-critical gold set, two adjudicators | — | — | two routes, same output: `scripts/export_review_sheet.py` (a spreadsheet) or `scripts/review_cases.py` (one case at a time). `scripts/import_review_sheet.py` stamps the names | believing any gate number |
+| Release-critical gold set, two adjudicators | **assigned: Mayank, Sumit** — not yet reviewed | — | two routes, same output: `scripts/export_review_sheet.py` (a spreadsheet) or `scripts/review_cases.py` (one case at a time). `scripts/import_review_sheet.py` stamps the names | believing any gate number |
 | Hindi / Hinglish and diagram review | — | — | not built — no non-English content exists yet | the language and visual slices |
 | Privacy, security, assessment boundary | — | — | not built | Phase 4 |
 | Founder review of the packet and pilot criteria | — | — | `ReleaseManifest.approved_by` | `PILOT_READY` |

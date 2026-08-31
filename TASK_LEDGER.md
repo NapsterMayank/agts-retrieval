@@ -126,7 +126,11 @@
 - [ ] Re-derive the floor afterwards — it is fitted to one register
 - [ ] Fill the gold-set gaps the matrix named: four crossings sit at n=18-19,
       one or two cases short of gating
-- [ ] Two named adjudicators for the 48 release-critical cases (§6.4). **Both review routes are built** — a spreadsheet and an interactive walkthrough, with resume and a two-reviewer import. What is missing is the reviewers
+- [ ] **Adjudication in progress: Mayank and Sumit named** (31 August). Each
+      reviews **all 48** cases — splitting them would give every case one
+      reviewer, which is what §6.4 exists to prevent. Sheets issued as
+      `review-for-mayank.csv` and `review-for-sumit.csv`; import both with
+      `scripts/import_review_sheet.py ... --apply`
 - [ ] Real slice axes wired to §11.2's pairwise matrix rather than the six ad-hoc
       axes now in `EvalCase.slice_keys`
 - [ ] Citation precision and completeness scorers (§14, still unenforced)
