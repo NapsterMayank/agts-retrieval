@@ -1769,3 +1769,40 @@ comparison stops being one.
 Holdout unchanged at 24/24 and 38/40: this improves what the retriever finds,
 not what the gate decides. Delivered recall is 100% visible and 97.4% holdout,
 completeness 96.1% and 97.4%, all above their gates.
+
+---
+
+### R-071 - Corrected blocks reach the database
+**Status:** Active - 1 September 2026
+
+Every table in `save_corpus` updated on conflict except the one that mattered.
+`blocks` took `ON CONFLICT (block_id) DO NOTHING`, so a block already in the
+database was never corrected again.
+
+A block's text is the thing a learner reads, and it is the most-corrected object
+in the corpus: the Symbol-font decode (R-054), the matched LaTeX (R-065), the
+crop-verified LaTeX (R-068). All of it landed in the artefacts and stopped at the
+database. **The service was serving the first version ever imported.** Asked
+about the nature of roots, it returned `The roots are 2 2 1 1 , , , , . i.e., ,
+i.e., 2 2 6 6 3 3 b b a a` with the Symbol-font characters still undecoded -- a
+row that had been corrected on disk twice.
+
+Nothing failed. The import printed its counts and `import_corpus` printed "round
+trip is behaviourally identical", because that check compares **retrieval
+scores**, which run off `search_representations` -- and those did update. A stale
+block is invisible to a comparison made through the representations built on top
+of it.
+
+Two changes. Blocks now update their parse-derived fields on conflict, and the
+round-trip check compares the text and LaTeX of all 728 blocks rather than only
+what retrieval scores. The second is the more important one: the defect was
+silent for months because the check was measuring one layer above where it
+lived.
+
+Correcting a block under an APPROVED source changes content a rights record was
+filed against. That is what per-checksum approval is for (section 5) -- the
+checksum moves and the approval has to be re-filed. Keeping the old text is not
+the safer failure; it is the one nobody sees.
+
+Found by re-running the serving path after a retrieval change rather than
+assuming it still held. It had not held for a long time.

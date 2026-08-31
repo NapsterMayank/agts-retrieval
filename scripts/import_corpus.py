@@ -91,6 +91,28 @@ def main() -> None:
         if not same:
             raise SystemExit(f"{name}: retrieval differs between files and database")
 
+    # Retrieval scores run off representations, so they agree even when the
+    # blocks behind them do not. `blocks` took ON CONFLICT DO NOTHING: every
+    # corrected block -- a Symbol-font decode, a recovered formula -- stopped at
+    # the database while this check printed "identical", and the service served
+    # the first version ever imported. Compare the text a learner would read.
+    drifted = []
+    for block_id, block in from_files.blocks.items():
+        stored = from_db.blocks.get(block_id)
+        if stored is None:
+            drifted.append(f"{block_id}: missing from the database")
+        elif (stored.text, stored.latex) != (block.text, block.latex):
+            drifted.append(f"{block_id}: text or latex differs from the artefact")
+    if drifted:
+        print(f"\n{len(drifted)} blocks differ between files and database:")
+        for line in drifted[:10]:
+            print(f"    {line}")
+        raise SystemExit(
+            "the database is serving different text from the artefacts. A block "
+            "correction has not landed."
+        )
+    print(f"  blocks  {len(from_files.blocks)} compared on text and latex | identical: True")
+
     print("\nround trip is behaviourally identical")
 
 

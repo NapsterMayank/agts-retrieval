@@ -246,3 +246,34 @@ def test_the_vector_width_is_pinned_where_pgvector_is_installed(connection) -> N
     with pytest.raises(psycopg2.Error):
         save_corpus(connection, corpus)
     connection.rollback()
+
+
+def test_a_corrected_block_reaches_the_database(connection) -> None:
+    """Re-importing after a parse fix must change what the service serves.
+
+    `blocks` was the one table that took `ON CONFLICT DO NOTHING` while sources,
+    objects and representations all updated. Every correction to a block --
+    decoding a Symbol-font character, attaching a recovered formula -- landed in
+    the artefacts and stopped at the database, which went on serving the first
+    version ever imported. Nothing failed: the import printed its counts and the
+    round-trip check compared retrieval scores, which run off representations
+    and cannot see a stale block.
+
+    A learner was reading `2 4 , 2 b b ac a` from a row that had been corrected
+    on disk twice.
+    """
+    from agts.platform.repository import load_corpus, save_corpus
+
+    original = build_corpus()
+    save_corpus(connection, original)
+
+    corrected = original.blocks["pytest-b1"].model_copy(
+        update={"text": "decoded text", "latex": r"\frac{-b}{2a}"}
+    )
+    from dataclasses import replace
+
+    save_corpus(connection, replace(original, blocks={"pytest-b1": corrected}))
+
+    restored = load_corpus(connection).blocks["pytest-b1"]
+    assert restored.text == "decoded text"
+    assert restored.latex == r"\frac{-b}{2a}"

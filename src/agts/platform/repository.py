@@ -129,7 +129,21 @@ def save_corpus(connection, corpus: Corpus) -> dict[str, int]:
                     region_height, text, latex, image_uri, parse_strategy,
                     parser_version, parser_confidence, linked_block_id)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                ON CONFLICT (block_id) DO NOTHING
+                ON CONFLICT (block_id) DO UPDATE SET
+                    block_type = EXCLUDED.block_type,
+                    raw_label = EXCLUDED.raw_label,
+                    page = EXCLUDED.page,
+                    region_x = EXCLUDED.region_x,
+                    region_y = EXCLUDED.region_y,
+                    region_width = EXCLUDED.region_width,
+                    region_height = EXCLUDED.region_height,
+                    text = EXCLUDED.text,
+                    latex = EXCLUDED.latex,
+                    image_uri = EXCLUDED.image_uri,
+                    parse_strategy = EXCLUDED.parse_strategy,
+                    parser_version = EXCLUDED.parser_version,
+                    parser_confidence = EXCLUDED.parser_confidence,
+                    linked_block_id = EXCLUDED.linked_block_id
                 """,
                 (
                     block.block_id, block.source_id, block.document_id, block.order_index,
