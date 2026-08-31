@@ -81,6 +81,12 @@
 
 ## Blocked on a credential
 
+- [ ] **A working LLM key** for `scripts/model_adjudicate.py`, the second-model
+      pre-screen that would shorten human review. Anthropic, OpenAI and Gemini
+      keys are all present in Foxxy's env and all three return 401; only Voyage
+      works. Any one of the three would do
+
+
 - [ ] **Mathpix has no API key anywhere in this repo or Foxxy's env.** Still
       worth doing for the maths formula crops, but its value is now unproven
       rather than assumed — the failures blamed on formula text were not caused
