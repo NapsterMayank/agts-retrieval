@@ -143,8 +143,6 @@
       the token, thresholds from config, lineage checked at serve time, and a
       refusal to boot against unapproved content. 17 tests
 
-## Next, unblocked
-
 - [ ] **Paraphrase the gold set** (R-035). Two ad-hoc rewordings through the live
       endpoint flipped both decisions, including a false answer on the case the
       gate was built to refuse. Phrasing variance belongs inside the measurement
@@ -156,9 +154,8 @@
       reviewer, which is what §6.4 exists to prevent. Sheets issued as
       `review-for-mayank.csv` and `review-for-sumit.csv`; import both with
       `scripts/import_review_sheet.py ... --apply`
-- [ ] Real slice axes wired to §11.2's pairwise matrix rather than the six ad-hoc
-      axes now in `EvalCase.slice_keys`
-- [ ] Citation precision and completeness scorers (§14, still unenforced)
+- [ ] Citation **precision** (§14, ≥98%) — unmeasurable until generation exists
+      (R-026). Completeness is built and passing; precision is not claimed
 
 *(Dual-parse harness, formula crop retention and the provider-independent
 embedding adapter were listed here and are done — R-008, R-013, R-016.)*
