@@ -32,6 +32,39 @@ from agts.retrieval.query import search_query
 RRF_K = 60
 
 
+#: How many windows of one object may stand for it. Two, not more: five windows
+#: of one section are still not five pieces of evidence (R-018), and the whole
+#: point of window-level retrieval was that it packs 43 blocks where object-level
+#: packs 143.
+WINDOWS_PER_OBJECT = 2
+
+#: And the second one only when it is this close to the best. Keeping one window
+#: per object discarded the gold window of five answerable cases while retrieving
+#: the right object every time -- for "discriminant" the window holding the
+#: answer scored 0.7846 against 0.7917 for a sibling, a gap of 0.007 deciding
+#: which paragraph of the right section a learner saw.
+#:
+#: 0.02 is roughly three times that gap, and 0.05 admits exactly the same windows
+#: on this corpus, so the value is not doing fine-grained work. What it rules out
+#: is a genuinely worse window riding in on a good one.
+WINDOW_MARGIN = 0.02
+
+
+def windows_for_object(scored: list[tuple[float, object]]) -> list[tuple[float, object]]:
+    """The windows allowed to represent one object, best first.
+
+    A near-tie between two windows of the same section is not a decision about
+    which paragraph answers the question; it is the absence of one. Where the
+    scores separate, the best window stands alone.
+    """
+    if not scored:
+        return []
+    ordered = sorted(scored, key=lambda pair: -pair[0])
+    best = ordered[0][0]
+    kept = [pair for pair in ordered[:WINDOWS_PER_OBJECT] if pair[0] >= best - WINDOW_MARGIN]
+    return kept
+
+
 class DenseRetriever:
     """Cosine similarity over pre-embedded representations.
 
@@ -63,7 +96,7 @@ class DenseRetriever:
 
     def retrieve(self, plan: QueryPlan, corpus: Corpus, k: int) -> list[RetrievedItem]:
         query_vector = self.embedder.embed_query(search_query(plan))
-        best: dict[str, RetrievedItem] = {}
+        by_object: dict[str, list[tuple[float, object]]] = {}
         skipped = 0
 
         for rep, obj in corpus.authorised_representations(plan):
@@ -73,17 +106,21 @@ class DenseRetriever:
             # Cosine sits in [-1, 1]; map to [0, 1] so it is comparable with the
             # normalised BM25 score and can be thresholded the same way.
             score = (cosine(query_vector, rep.vector) + 1.0) / 2.0
-            current = best.get(obj.object_id)
-            if current is None or score > current.score:
-                best[obj.object_id] = RetrievedItem(
-                    object_id=obj.object_id,
-                    block_ids=tuple(rep.block_ids),
-                    score=score,
-                    representation_id=rep.representation_id,
-                )
+            by_object.setdefault(obj.object_id, []).append((score, rep))
+
+        items = [
+            RetrievedItem(
+                object_id=object_id,
+                block_ids=tuple(rep.block_ids),
+                score=score,
+                representation_id=rep.representation_id,
+            )
+            for object_id, scored in by_object.items()
+            for score, rep in windows_for_object(scored)
+        ]
 
         self.skipped = skipped
-        return sorted(best.values(), key=lambda i: (-i.score, i.object_id))[:k]
+        return sorted(items, key=lambda i: (-i.score, i.object_id))[:k]
 
 
 class HybridRetriever:
@@ -123,7 +160,19 @@ class HybridRetriever:
         fused: dict[str, float] = {}
         source: dict[str, RetrievedItem] = {}
         for run in runs:
-            for rank, item in enumerate(run, start=1):
+            # Rank objects, not items. Dense may return two windows of one
+            # object (R-070), and RRF scores by position: leaving both in
+            # pushes every later object down a rank it did not earn, which cost
+            # this retriever four points of pack recall the day window budgets
+            # went in.
+            seen: set[str] = set()
+            deduped = []
+            for item in run:
+                if item.object_id in seen:
+                    continue
+                seen.add(item.object_id)
+                deduped.append(item)
+            for rank, item in enumerate(deduped, start=1):
                 fused[item.object_id] = fused.get(item.object_id, 0.0) + 1.0 / (self.rrf_k + rank)
                 # Keep the lineage of whichever run ranked it highest, so the
                 # blocks reported are the ones some retriever actually chose.

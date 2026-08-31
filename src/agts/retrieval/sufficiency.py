@@ -78,6 +78,17 @@ SHIPPED_UNDER_MODEL = "voyage-4-large"
 TEACHING_TYPES = frozenset({ObjectType.DEFINITION, ObjectType.CONCEPT})
 
 
+def _top_objects(items: list[RetrievedItem], depth: int) -> dict[str, RetrievedItem]:
+    """The best item for each of the first `depth` distinct objects."""
+    out: dict[str, RetrievedItem] = {}
+    for item in items:
+        if item.object_id not in out:
+            out[item.object_id] = item
+        if len(out) == depth:
+            break
+    return out
+
+
 def _same_passage(mine: RetrievedItem, theirs: RetrievedItem) -> bool:
     """Whether two retrievers landed on the same passage, not just the same section.
 
@@ -181,8 +192,15 @@ class SufficiencyGate:
         # counted "we both like this section" as "we both found the answer" --
         # they could be pointing at different paragraphs. A shared object counts
         # only when the two windows are the same, or overlap in blocks.
-        mine = {i.object_id: i for i in items[: self.depth]}
-        theirs = {i.object_id: i for i in other[: self.depth]}
+        # The top `depth` *objects*, not the top `depth` items. Dense retrieval
+        # may now return two windows of one object when their scores tie
+        # (R-070), and slicing items directly let one section fill two of the
+        # three corroboration slots -- which cost two answerable cases the
+        # moment window budgets went in. The question this asks is whether both
+        # retrievers agree on where the answer lives, and that is a question
+        # about sections.
+        mine = _top_objects(items, self.depth)
+        theirs = _top_objects(other, self.depth)
         shared = {
             object_id
             for object_id in mine.keys() & theirs.keys()

@@ -1724,3 +1724,48 @@ stored either way (R-008), which is what makes the split free.
 The evidence is one case in 109 and is recorded as such. What justifies the
 change is not the size of the number but that the two paths were answering
 different questions with the same function.
+
+---
+
+### R-070 - A near-tie between two windows is not a decision
+**Status:** Active - 1 September 2026
+
+Mathematics sat at 0.904 candidate recall against a 0.95 floor, equations at
+0.900 and multi-hop at 0.909 -- 22 failing gating slices restating three axes.
+It was not a ranking failure. **Every one of the five missing cases retrieved
+the right object and the wrong window inside it.**
+
+`DenseRetriever` kept one window per object. For the query "discriminant" the
+window holding the gold block scored 0.7846 and ranked *third of twenty-four*;
+it was discarded because a sibling window of the same section scored 0.7917. A
+gap of 0.007 decided which paragraph of the right section a learner saw.
+
+So an object may now be represented by up to two windows, and the second only
+within `WINDOW_MARGIN = 0.02` of the best -- about three times the gap that
+caused this, and a margin of 0.05 admits exactly the same windows on this
+corpus, so the constant is not doing fine-grained work. Where scores separate,
+the best window still stands alone. R-018's property holds: 37.4 blocks per pack
+against 36.4 before, and 137 at object level.
+
+    candidate recall 95.4% -> 99.1%    pack recall 95.4% -> 99.1%
+    failing gating slices for dense    22 -> 0
+
+**Two things broke on the way in, both because they assumed one item per
+object.**
+
+The sufficiency gate sliced the top three *items* for corroboration, so one
+section could fill two of the three slots and the third retriever's agreement
+had nowhere to land. Answerable cases fell 107 to 105 before it was fixed to
+take the top three distinct *objects* -- which is what the gate was always
+asking, since it wants to know whether both retrievers agree on where the answer
+lives.
+
+Reciprocal rank fusion scores by position, so duplicate objects in the dense run
+pushed every later object down a rank it had not earned. Hybrid lost four points
+of pack recall until the runs were deduplicated by object before fusing. Hybrid
+does not ship (R-062), and silently degrading a comparator is still how a
+comparison stops being one.
+
+Holdout unchanged at 24/24 and 38/40: this improves what the retriever finds,
+not what the gate decides. Delivered recall is 100% visible and 97.4% holdout,
+completeness 96.1% and 97.4%, all above their gates.

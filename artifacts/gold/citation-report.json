@@ -1,17 +1,17 @@
 {
   "resolution": 1.0,
   "delivered_recall": 0.993103448275862,
-  "completeness": 0.9666666666666666,
-  "evidence_precision": 0.037928211052112075,
+  "completeness": 0.9643678160919541,
+  "evidence_precision": 0.04032064883124218,
   "packs": 204,
   "answered": 145,
   "abstained": 59,
   "unresolved": [],
   "release_manifest_id": "rm-pilot-2-chapters-0001",
   "corpus_checksum": "1e8f52f5e83c8c9474e42a9d8ea223dceb1ae89f1366f5dee5e68815172c0dfa",
-  "commit_sha": "95289884a38e92147318f880cb69a948aa8704c9",
+  "commit_sha": "dfbb12b827dd836761daa5469b5b504b8043d797",
   "approved_by": [],
   "lineage_failures": [],
-  "traced_candidates": 2916,
+  "traced_candidates": 3242,
   "note": "evidence_precision is a lower-bound proxy over gold blocks, NOT \u00a714's citation precision row, which needs generated sentences (Phase 3, Q5)."
 }
