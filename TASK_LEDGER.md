@@ -124,6 +124,8 @@
 
 ## Next, unblocked
 
+- [x] Concept expansion measured and **rejected** (R-051): six to nine more
+      answers, three to five unanswerable questions let through
 - [ ] Citation completeness is 95.2% visible against a 95% gate. Acceptance and
       completeness now trade visibly; the next change that buys answers may take
       it under

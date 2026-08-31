@@ -40,5 +40,12 @@ def search_query(plan: QueryPlan) -> str:
     if not plan.query_text.strip():
         return ""
 
+    # Scope only. Adding the concept as well was measured and rejected (R-051):
+    # it buys six to nine more answers and lets three to five unanswerable
+    # questions through, because scope says where the learner is standing while
+    # a concept asserts what the question is about -- and that is the thing the
+    # gate is deciding. "What is the function of chlorophyll" rises from 0.711 to
+    # 0.778 against a 0.737 floor once every query is prefixed with "chemical
+    # reactions and equations".
     curriculum = plan.curriculum
     return f"class {curriculum.grade} {curriculum.subject}, {plan.query_text}"

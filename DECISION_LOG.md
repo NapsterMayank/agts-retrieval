@@ -1184,3 +1184,34 @@ answering more questions means more chances to answer one incompletely. It still
 clears the >= 95% gate and it is now close to it, which is the honest reading:
 acceptance and completeness trade against each other, and that trade is visible
 for the first time.
+
+---
+
+### R-051 - An expansion may add context, never the answer under test
+**Status:** Active - 31 August 2026 - **measured and rejected**
+
+Scope expansion worked (R-049), so concept expansion was measured the same way:
+`class 10 science, chemical reactions and equations, {query}`. It buys six to
+nine more answers on the visible set and **lets three to five unanswerable
+questions through** - 28/31 refusals against 31/31, and 26/31 with concept alone.
+
+**Rejected**, and the reason generalises. Scope says *where the learner is
+standing*, which their sentence would have carried anyway, and cannot make an
+out-of-chapter question look in-chapter. Concept asserts *what the question is
+about*, which is precisely what the gate is deciding.
+
+The cases that leak show it exactly. "What is the function of chlorophyll in
+photosynthesis?" rises 0.711 -> 0.778 against a 0.737 floor. Chlorophyll appears
+in that chapter once, inside the photosynthesis equation, and its function is
+never taught - it is one of the deliberately adjacent cases. Prefixing every
+query with "chemical reactions and equations" answers the premise under test.
+
+**The rule:** an expansion may add what the learner's context already implies,
+never what the retrieval is being asked to determine.
+
+**And a measurement defect worth recording.** The first run of this experiment
+pre-expanded the plan while the retrievers also scope internally, so every query
+was scoped twice and the baseline read 87/109 instead of 90/109. It was caught
+because the baseline disagreed with a number measured an hour earlier. A
+comparison whose control does not reproduce a known figure is measuring
+something else.

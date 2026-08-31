@@ -1350,6 +1350,51 @@ visible figure fell toward the >= 95% bar it still clears. Worth watching rather
 than celebrating: the next change that buys acceptance may take completeness
 under the gate, and the two now trade against each other visibly.
 
+## Concept expansion: measured, and rejected - 31 August 2026
+
+Scope expansion (R-049) bought nine answers for nothing, so the obvious next step
+was to add the concept as well - `class 10 science, chemical reactions and
+equations, endothermic reactions`. Measured on the visible set alone under the
+declared rule, no leaks first and then most answers:
+
+| expansion | refuse | answer | short-form |
+|---|---|---|---|
+| none | 31/31 | 81/109 | 24/43 |
+| **`class 10 science, ...`** *(shipped)* | **31/31** | **90/109** | 33/43 |
+| `... , chemical reactions and equations, ...` | **28/31 leaks** | 96/109 | 34/43 |
+| concept without scope | **26/31 leaks** | 99/109 | 39/43 |
+
+**Rejected.** Concept expansion buys six to nine more answers and lets three to
+five unanswerable questions through.
+
+### Why scope helps and concept hurts
+
+The two look like the same trick and are opposites.
+
+**Scope says where the learner is standing.** A Class 10 science lesson is the
+context their sentence would have carried, and adding it cannot make an
+out-of-chapter question look in-chapter - `class 10 science, what is the pH of
+lemon juice` is still a question about pH.
+
+**Concept asserts what the question is about**, and that is the thing the gate
+exists to decide. Adding it answers the question in the prompt:
+
+| case | scope | scope + concept |
+|---|---:|---:|
+| *What is the function of chlorophyll in photosynthesis?* | 0.711 | **0.778** |
+| `chlorophyll function` | 0.695 | **0.784** |
+| *What is the distance formula between two points?* | 0.699 | **0.740** |
+
+The floor is 0.737. Chlorophyll appears in this chapter exactly once, inside the
+photosynthesis equation, and its function is never taught - it is one of the four
+cases written to be *deliberately adjacent* (R-024). Prefixing every query with
+"chemical reactions and equations" pushes it over the line by asserting the
+premise under test.
+
+**The general rule this earns:** an expansion may add what the learner's context
+already implies, never what the retrieval is being asked to determine. Scope is a
+property of the asker; concept is a property of the answer.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn
