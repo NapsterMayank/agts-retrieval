@@ -1215,3 +1215,25 @@ was scoped twice and the baseline read 87/109 instead of 90/109. It was caught
 because the baseline disagreed with a number measured an hour earlier. A
 comparison whose control does not reproduce a known figure is measuring
 something else.
+
+---
+
+### R-052 - Window adjacency measured and rejected; the frontier is real
+**Status:** Active - 31 August 2026
+
+21 of 25 false refusals are two retrievers agreeing on the section and
+disagreeing on the window. Counting adjacent windows as the same passage buys
+eight answers and leaks one unanswerable case (30/31); within two windows leaks
+two.
+
+**Rejected**, and with it a pattern worth stating: five relaxations have now been
+measured - lower floor (R-048), fewer shared objects (R-045), greater depth
+(R-045), concept expansion (R-051), window adjacency here - and **every one buys
+acceptance by leaking a refusal.** That is a frontier rather than a badly chosen
+parameter, and further tuning is not where the remaining acceptance lives.
+
+**Where it does live**, none of it free: reranking *within* an object so both
+retrievers choose the same window; overlapping chunk windows so adjacency becomes
+genuine block overlap (a re-measure of everything, including every stored
+vector); a third retriever so agreement can be two-of-three; and formula repair
+for the below-floor maths cases.

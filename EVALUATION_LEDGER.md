@@ -1395,6 +1395,57 @@ premise under test.
 already implies, never what the retrieval is being asked to determine. Scope is a
 property of the asker; concept is a property of the answer.
 
+## Why acceptance is stuck at 85%, and what would move it - 31 August 2026
+
+Every false refusal was traced. **21 of 25 are "no passage agreement"** - both
+retrievers found the right section and pointed at different windows in it. Only
+4 sit below the floor, and two of those are maths cases whose evidence is
+damaged formula text.
+
+So the lever is the agreement rule, not the floor and not a reranker. Loosening
+it was measured three ways, on the visible set:
+
+| what counts as the same passage | refuse | answer |
+|---|---|---|
+| **same window, or sharing a block** *(now)* | **31/31** | **90/109** |
+| or an adjacent window | 30/31 **leaks** | 98/109 |
+| or within two windows | 29/31 **leaks** | 98/109 |
+
+That makes five relaxations measured across this ledger - lower floor, fewer
+shared objects, greater depth, concept expansion, window adjacency - and **all
+five buy answers by letting an unanswerable question through.** The frontier is
+real, not an artefact of one bad parameter.
+
+### What would actually move it
+
+**Not the reranker.** It was measured (R-027) and moved pack recall by zero
+cases, because recall@20 and recall@pack are already identical here. There is a
+*different* use for it that has not been tried: reranking the windows *within*
+each object so both retrievers pick the same best window, which attacks the
+21 disagreements directly rather than reordering a list that is already short.
+
+**Overlapping windows.** Adjacent windows share no blocks, because chunking never
+overlaps them, so two retrievers one window apart can never agree by block
+overlap. Overlapping them would make adjacency agreement natural rather than a
+special case - and would change recall, completeness and every stored vector,
+so it is a re-measure of everything rather than a parameter.
+
+**A third retriever.** Agreement is currently two-of-two, so any disagreement is
+fatal. Two-of-three would tolerate one dissenter without loosening what agreement
+means.
+
+**Formula repair.** Two of the four below-floor cases are maths questions whose
+evidence is degraded formula text (R-037). 39 formulas are waiting on a human to
+pick among Chandra candidates.
+
+### And the thing worth saying plainly
+
+**100% acceptance is not a target that survives the refusal requirement.** For a
+tutor a refusal costs a question and a wrong answer costs the thing the gate
+exists to prevent, so the honest operating point is high refusal with acceptance
+as high as that allows. Today that is 24/24 and 34/40. Every measured attempt to
+raise the second lowered the first.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn
