@@ -15,6 +15,7 @@ numbers are not release evidence.
 from __future__ import annotations
 
 import json
+import math
 import sys
 from datetime import date
 from pathlib import Path
@@ -26,7 +27,7 @@ from agts.evaluation.corpus import EvaluationLicence
 from agts.evaluation.planning import plan_for_case
 from agts.evaluation.quarantine import ChapterArtefact, load_corpus
 from agts.evaluation.retrievers import KeywordBaseline, broken_retrievers
-from agts.platform.embedding import CachedEmbedding
+from agts.platform.embedding import CachedEmbedding, DEFAULT_EMBEDDING_MODEL
 from agts.retrieval import (
     BM25Representations,
     DenseRetriever,
@@ -102,9 +103,9 @@ def main() -> None:
 
     # Read-only vector cache: this run reaches no network and spends nothing.
     # Populate it with scripts/embed_representations.py.
-    cache_path = ARTIFACTS / "embeddings" / "voyage-3.json"
+    cache_path = ARTIFACTS / "embeddings" / f"{DEFAULT_EMBEDDING_MODEL}.json"
     embedder = (
-        CachedEmbedding(None, cache_path, model="voyage-3") if cache_path.exists() else None
+        CachedEmbedding(None, cache_path, model=DEFAULT_EMBEDDING_MODEL) if cache_path.exists() else None
     )
     corpus = load_corpus(CHAPTERS, licence=LICENCE, embedder=embedder)
 
@@ -174,14 +175,22 @@ def main() -> None:
     if embedder is not None:
         dense = DenseRetriever(embedder)
         calibration = calibrations["representation-dense"]
-        answerable_tops = sorted(
-            dense.retrieve(
-                plan_for_case(case, curriculum_version=CURRICULUM_VERSION), corpus, 20
-            )[0].score
-            for case in gold_set.visible
-            if case.answerable
-        )
-        ceiling = answerable_tops[len(answerable_tops) // 2]
+        # The ceiling is the score above which corroboration is uninformative,
+        # and 8.4 says which score that is: the highest one any *unanswerable*
+        # query reached. Nothing above it has ever been an out-of-corpus match,
+        # so interrogating agreement there can only refuse answerable questions.
+        #
+        # This run previously used the median answerable top score, which is a
+        # property of the answerable distribution and says nothing about where
+        # unanswerable queries stop. Being higher, it left a band of 0.036 in
+        # which corroboration ran with nothing to catch: it refused 13
+        # answerable cases and no unanswerable one. Measured on the visible set:
+        # 82/109 answerable at the median ceiling, 95/109 at the calibrated one,
+        # 31/31 unanswerable refused either way.
+        # Strictly above: the gate reads a score *equal* to the ceiling as high
+        # confidence, so passing the highest unanswerable score itself hands the
+        # exemption to the one case that defined it, and 31/31 becomes 30/31.
+        ceiling = math.nextafter(calibration.highest_unanswerable, math.inf)
         gate = SufficiencyGate(
             dense,
             BM25Representations(),
@@ -190,7 +199,7 @@ def main() -> None:
         )
         print(
             f"\nsufficiency gate (§8.4): floor {calibration.threshold:.3f} calibrated, "
-            f"ceiling {ceiling:.3f} = median answerable top score, "
+            f"ceiling {ceiling:.3f} = highest unanswerable top score, "
             f"corroboration {gate.min_corroboration} of top {gate.depth}"
         )
         decisions = [

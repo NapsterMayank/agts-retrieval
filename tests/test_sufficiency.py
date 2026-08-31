@@ -67,6 +67,23 @@ def test_above_the_ceiling_corroboration_is_not_required(plan, corpus) -> None:
     assert gate(Fixed("p", primary), Fixed("c", diverging)).decide(plan, corpus).answerable
 
 
+def test_a_score_exactly_at_the_ceiling_is_treated_as_high_confidence(plan, corpus) -> None:
+    """The boundary is inclusive, and callers deriving a ceiling must know it.
+
+    The natural ceiling to derive is "the highest score any unanswerable query
+    reached", because corroboration above that has nothing left to catch. Set
+    literally, it hands the high-confidence branch to the very case that defined
+    it -- the run that found this leaked one unanswerable question of 31. A
+    caller wanting the documented rule has to pass the next representable value
+    up, so the rule this test pins is the one the caller compensates for.
+    """
+    primary = [item("a", 0.8), item("b", 0.5), item("c", 0.4)]
+    diverging = [item("x", 0.79), item("y", 0.5), item("z", 0.4)]
+    decision = gate(Fixed("p", primary), Fixed("c", diverging)).decide(plan, corpus)
+    assert decision.top_score == decision.high_confidence
+    assert decision.answerable
+
+
 def test_without_a_ceiling_the_strict_gate_applies(plan, corpus) -> None:
     """An operator who omits the ceiling must get the conservative gate, not a
     silently permissive one."""

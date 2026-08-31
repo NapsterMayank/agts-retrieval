@@ -89,10 +89,21 @@ class DenseRetriever:
 class HybridRetriever:
     """Reciprocal rank fusion of BM25 and dense.
 
-    The fused score is `sum(1 / (k + rank))` over the lists an item appears in,
-    rescaled so a perfect item scores 1.0. The rescaling matters for abstention:
-    a raw RRF score depends on how many retrievers fired, not on how good the
-    match is.
+    **Fusion decides the order; it does not decide the score.** RRF is the right
+    way to merge two rankings that share no scale, and the wrong thing to hand a
+    calibrated abstention floor. `sum(1 / (k + rank))` at corroboration depth has
+    nine reachable values, so on the first real-content run 61 of 109 answerable
+    cases tied at exactly 1.0 — "both retrievers ranked it first" — and a
+    threshold placed inside that tie mass decided on rank-1-versus-rank-2 noise.
+    Hybrid scored 0.355 abstention accuracy where its own dense half scored
+    0.903 on the same cases.
+
+    So an item keeps a magnitude: the dense score of the window being returned.
+    Ordering stays rank-fused, scoring comes from the retriever that measures
+    similarity rather than agreement. A window the dense run cannot score — no
+    vector, or embedded by another model — keeps the score of whichever run did
+    rank it, because a missing embedding is an index defect and must not read as
+    a weak match.
     """
 
     name = "representation-hybrid"
@@ -120,14 +131,26 @@ class HybridRetriever:
                 if best is None or item.score > best.score:
                     source[item.object_id] = item
 
+        # Rank order from the fusion, magnitude from the dense run.
         ceiling = sum(1.0 / (self.rrf_k + 1) for _ in runs) or 1.0
-        items = [
-            RetrievedItem(
-                object_id=object_id,
-                block_ids=source[object_id].block_ids,
-                score=total / ceiling,
-                representation_id=source[object_id].representation_id,
+        windows = self.dense.score_windows(plan, corpus)
+
+        items = []
+        for object_id, total in fused.items():
+            chosen = source[object_id]
+            items.append(
+                (
+                    total / ceiling,
+                    RetrievedItem(
+                        object_id=object_id,
+                        block_ids=chosen.block_ids,
+                        score=windows.get(chosen.representation_id, chosen.score),
+                        representation_id=chosen.representation_id,
+                    ),
+                )
             )
-            for object_id, total in fused.items()
-        ]
-        return sorted(items, key=lambda i: (-i.score, i.object_id))[:k]
+
+        # Sorting on the fused rank, not on the reported score: they answer
+        # different questions and only the first one orders the pack.
+        items.sort(key=lambda pair: (-pair[0], pair[1].object_id))
+        return [item for _, item in items[:k]]
