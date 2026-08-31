@@ -34,6 +34,35 @@ refuses to boot without an explicit override; no human has adjudicated a single
 case; the gold set is 204 cases against §6.4's 300-500; and every number was
 produced under an evaluation licence over quarantined content.
 
+## Start here: the next three tasks, in order
+
+**1. Re-export the review sheets and get them adjudicated.** This is the only
+task that changes what any number here is worth. The set grew from 48 to **95
+release-critical cases** when paraphrases inherited that status, so a sheet
+exported before 31 August is a subset — re-export rather than reusing one:
+
+```
+PYTHONPATH=src python scripts/export_review_sheet.py     # a spreadsheet, 95 rows
+PYTHONPATH=src python scripts/review_cases.py --reviewer "Name"   # or one at a time
+PYTHONPATH=src python scripts/import_review_sheet.py a.csv b.csv --apply
+```
+
+Mayank and Sumit are named (Q6). **Both review every case** — splitting by
+subject gives each case one reviewer, which is what the two-adjudicator rule
+exists to prevent.
+
+**2. Attach the remaining formula LaTeX.** 39 formulas have Chandra candidates
+waiting on a human to choose among them; four are unreadable today and two of
+those cause below-floor refusals. The strict matcher (R-043) attaches only what
+cannot be a guess, so the rest is a person with the crops in
+`artifacts/quadratic-equations-quarantine/assets/`.
+
+**3. Then, and only then, chase acceptance.** It sits at 85% on the holdout and
+five ways to raise it have already been measured and rejected. The untried ones
+are listed under *Where the remaining acceptance lives* below. Do not start here:
+a number improved before the answer key is adjudicated is a number nobody can
+believe.
+
 ## The five rules this repository actually follows
 
 These are not style preferences. Each was earned by something going wrong, and
@@ -99,7 +128,7 @@ disagreeing on the *window*. None of these is free:
 | **Q1** named pilot curriculum | ingesting beyond two chapters | client |
 | **Q5** does this repo build §9 | the teaching loop, and §14's citation *precision* row | client |
 | **Q2** holdout seal timing | whether that gate binds | client |
-| Two adjudicators | believing any number | Mayank and Sumit, named 31 Aug |
+| **Q6** two adjudicators | believing any number here | Mayank and Sumit, named 31 Aug |
 | A working LLM key | the second-model pre-screen | anyone (all three keys 401) |
 | Mathpix key | formula recovery, though Chandra covers some | client |
 | GPU | curriculum-scale parsing | us |
@@ -124,6 +153,24 @@ python scripts/serve.py                   # the HTTP surface
 
 Every number in `EVALUATION_LEDGER.md` comes from one of those. If a claim has no
 script behind it, treat it as unverified.
+
+## The repository is public
+
+Pushed to `github.com/NapsterMayank/agts-retrieval` on 31 August, with full
+history, by operator decision after the exposure was measured and a private
+squashed push was recommended instead (R-053).
+
+**What that means for you.** History carries five review sheets with roughly
+twenty-five verbatim NCERT passages each — files removed from the working tree
+the same day, since removal takes a file out of future commits and not out of
+history. Assume anything you commit here is published. The gitignore covers the
+chapter artefacts, review sheets and verification packs; check it before adding
+a file that quotes the source.
+
+**Publishing changed no approval state.** No source is `APPROVED`, every manifest
+still reads `FORBIDDEN_PENDING_RIGHTS_RECORD`, and the service still refuses to
+boot without an explicit override. The repository being visible is a disclosure
+of working material, not an approval of content.
 
 ## Where the content is
 

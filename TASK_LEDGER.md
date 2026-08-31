@@ -126,7 +126,15 @@
 
 - [x] Concept expansion measured and **rejected** (R-051): six to nine more
       answers, three to five unanswerable questions let through
-- [ ] Citation completeness is 95.2% visible against a 95% gate. Acceptance and
+*Ordered. The first two change what the numbers are worth; the rest change the
+numbers, which is a lesser thing until the first two are done.*
+
+- [ ] **1. Re-export the review sheets and adjudicate.** 95 release-critical
+      cases, up from 48 once paraphrases inherited the status — a sheet exported
+      before 31 August is a subset. Mayank and Sumit named, neither started (Q6)
+- [ ] **2. Attach the remaining 39 formulas** from Chandra candidates, by hand.
+      Four are unreadable and two cause below-floor refusals
+- [ ] 3. Citation completeness is 95.2% visible against a 95% gate. Acceptance and
       completeness now trade visibly; the next change that buys answers may take
       it under
 
