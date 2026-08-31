@@ -13,11 +13,17 @@ real content is a decision someone made, not a default.
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from dataclasses import dataclass
 from pathlib import Path
 
 from agts.contracts.common import ApprovalState, AuthorityTier, Board, Language
-from agts.contracts.objects import LearningObject, SourceBlock, SourceRecord
+from agts.contracts.objects import (
+    LearningObject,
+    RightsRecord,
+    SourceBlock,
+    SourceRecord,
+)
 from agts.evaluation.corpus import Corpus, EvaluationLicence
 from agts.retrieval.chunking import represent_all
 
@@ -60,15 +66,53 @@ class ChapterArtefact:
             if line.strip()
         ]
 
+    def rights(self) -> RightsRecord | None:
+        """The signed rights record beside the manifest, if one has been filed.
+
+        Absent for a quarantined artefact, which is the normal state. Present
+        only once a human has filed one against this checksum -- see
+        `scripts/approve_source.py`.
+        """
+        path = self.directory / "rights.json"
+        if not path.exists():
+            return None
+        return RightsRecord.model_validate_json(path.read_text(encoding="utf-8"))
+
     def source(self) -> SourceRecord:
         manifest = self.manifest()
         state = ApprovalState(manifest["approval_state"])
-        if state is not ApprovalState.QUARANTINED:
-            # Approval is a human act against a checksum (§5). If an artefact
-            # ever claims otherwise, that is a defect in whatever wrote it.
+        if state not in (ApprovalState.QUARANTINED, ApprovalState.APPROVED):
+            # RETIRED and WITHDRAWN are how a rights holder takes content back.
+            # Neither is a state an evaluation artefact may be loaded in.
             raise ValueError(
-                f"{self.directory.name}: manifest claims {state}; artefacts are quarantined"
+                f"{self.directory.name}: manifest claims {state}; "
+                "only QUARANTINED or APPROVED artefacts load"
             )
+
+        rights = self.rights()
+        scanned = manifest.get("scanned_clean_at")
+        if state is ApprovalState.APPROVED:
+            # Checked here rather than trusted, because the manifest is a file
+            # and a file can be edited. Approval is per *checksum* (§5): a
+            # rights record filed against different bytes approves a different
+            # source, whatever the directory is called.
+            if rights is None:
+                raise ValueError(
+                    f"{self.directory.name}: manifest says APPROVED but no rights.json "
+                    "is filed. Approval is a human act against a checksum (§5); "
+                    "run scripts/approve_source.py rather than editing the manifest."
+                )
+            if manifest.get("rights_checksum_sha256") != manifest["sha256"]:
+                raise ValueError(
+                    f"{self.directory.name}: the rights record was filed against "
+                    f"{manifest.get('rights_checksum_sha256')} but the artefact is "
+                    f"{manifest['sha256']}. Re-approve against the current bytes."
+                )
+            if scanned is None:
+                raise ValueError(
+                    f"{self.directory.name}: APPROVED requires a completed scan (§7.1)"
+                )
+
         return SourceRecord(
             source_id=manifest["source_id"],
             title=self.title,
@@ -79,22 +123,30 @@ class ChapterArtefact:
             authority_tier=self.authority_tier,
             language=self.language,
             approval_state=state,
+            rights=rights,
+            scanned_clean_at=datetime.fromisoformat(scanned) if scanned else None,
         )
 
 
 def load_corpus(
     artefacts: list[ChapterArtefact],
     *,
-    licence: EvaluationLicence,
+    licence: EvaluationLicence | None = None,
     with_representations: bool = True,
     embedder=None,
 ) -> Corpus:
-    """Build a corpus over `artefacts`, licensed for evaluation only.
+    """Build a corpus over `artefacts`.
 
-    The licence is required rather than optional: a corpus of quarantined
-    content without one authorises nothing, and returning an empty candidate set
-    from every query reads as a broken retriever rather than as a permission the
-    caller never asked for.
+    A licence is required for **quarantined** artefacts and refused for
+    approved ones. It is not optional in the sense of "nice to have": a corpus
+    of quarantined content without one authorises nothing, and returning an
+    empty candidate set from every query reads as a broken retriever rather
+    than as a permission the caller never asked for.
+
+    Once a rights record is filed the licence stops being needed, and passing
+    one anyway is an error rather than a harmless leftover -- a run that quotes
+    a licence has to be a run that needed one, or the caveat "measurement, not
+    release evidence" stops meaning anything.
     """
     sources: dict[str, SourceRecord] = {}
     blocks: dict[str, SourceBlock] = {}
@@ -102,10 +154,17 @@ def load_corpus(
 
     for artefact in artefacts:
         source = artefact.source()
-        if not licence.covers(source.source_id):
+        if licence is not None and not licence.covers(source.source_id):
             raise ValueError(
                 f"{source.source_id} is not named by the evaluation licence"
             )
+        if source.approval_state is ApprovalState.QUARANTINED:
+            if licence is None:
+                raise ValueError(
+                    f"{source.source_id} is QUARANTINED and no evaluation licence was "
+                    "given. File a rights record with scripts/approve_source.py, or "
+                    "pass an EvaluationLicence naming this source to measure against it."
+                )
         sources[source.source_id] = source
         for block in artefact.blocks():
             blocks[block.block_id] = block
