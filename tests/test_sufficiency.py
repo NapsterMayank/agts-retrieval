@@ -194,3 +194,39 @@ def test_a_ceiling_equal_to_the_floor_is_refused() -> None:
     args = (Fixed("p", []), Fixed("c", []))
     with pytest.raises(ValueError):
         SufficiencyGate(*args, threshold=0.7, high_confidence=0.7)
+
+
+def test_agreeing_on_a_section_is_not_agreeing_on_a_passage(plan) -> None:
+    """The gate exists to ask whether two retrievers found the same answer. It
+    compared object ids, so "we both like this section" counted as agreement
+    while the two pointed at different paragraphs inside it."""
+    corpus = teaching_corpus()
+    mine = [
+        RetrievedItem(object_id="definition", block_ids=("blk-1",), score=0.6,
+                      representation_id="definition:v:1"),
+        RetrievedItem(object_id="other", block_ids=("blk-9",), score=0.55,
+                      representation_id="other:v:1"),
+        RetrievedItem(object_id="prose", block_ids=("blk-7",), score=0.5,
+                      representation_id="prose:v:1"),
+    ]
+    same_passages = [
+        RetrievedItem(object_id="definition", block_ids=("blk-1",), score=0.6,
+                      representation_id="definition:v:1"),
+        RetrievedItem(object_id="other", block_ids=("blk-9",), score=0.55,
+                      representation_id="other:v:1"),
+        RetrievedItem(object_id="z", block_ids=("blk-8",), score=0.5),
+    ]
+    other_passages = [
+        RetrievedItem(object_id="definition", block_ids=("blk-4",), score=0.6,
+                      representation_id="definition:v:7"),
+        RetrievedItem(object_id="other", block_ids=("blk-5",), score=0.55,
+                      representation_id="other:v:7"),
+        RetrievedItem(object_id="z", block_ids=("blk-8",), score=0.5),
+    ]
+
+    agreed = gate(Fixed("p", mine), Fixed("c", same_passages)).decide(plan, corpus)
+    diverged = gate(Fixed("p", mine), Fixed("c", other_passages)).decide(plan, corpus)
+
+    assert agreed.corroboration == 2
+    assert diverged.corroboration == 0, "same sections, different paragraphs, no agreement"
+    assert diverged.abstained

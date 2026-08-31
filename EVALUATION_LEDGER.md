@@ -1140,6 +1140,72 @@ No score moved. Every gate still passes at the same numbers - which is the point
 worth keeping: **nothing measured here would have caught the formula being wrong,
 and nothing measured here noticed it being fixed.**
 
+## R-042's three findings, fixed, and what correctness cost - 31 August 2026
+
+All three were left open on the argument that they interact and that
+half-fixing them moves published numbers for reasons unrelated to quality. Done
+together, measured after each:
+
+### 1. Agreement is now on the passage, not the section
+
+Both retrievers return their own best window per object, so comparing object ids
+counted *"we both like this section"* as *"we both found the answer"*. A shared
+object now counts only when the two windows are the same or share a block.
+
+**This is the expensive one.** Acceptance fell from 47/50 to 42/50 visible and
+26/29 to 23/29 holdout. Refusal held at 10/10 and 8/8.
+
+Four counts were measured on the **visible set only**, to choose without touching
+the holdout:
+
+| rule | refuse | answer |
+|---|---:|---:|
+| **passage agreement, 2 of top 3** | **10/10** | 42/50 |
+| passage agreement, 1 of top 3 | 9/10 | 47/50 |
+| passage agreement, 1 of top 5 | 9/10 | 48/50 |
+| passage agreement, 2 of top 5 | 9/10 | 47/50 |
+
+Every relaxation that recovers acceptance **leaks an unanswerable case**. For a
+tutor a refusal is cheap and a wrong answer is the failure the system exists to
+prevent, so the strict rule stays and the eight lost answers are the price of
+the gate meaning what its docstring says.
+
+### 2. A sibling window now needs both retrievers
+
+`_sibling_blocks` admitted windows on the primary's floor alone, in exactly the
+band where the gate demands two opinions, then merged them into the same
+evidence item under the same citation. `BM25Representations` gained the
+`score_windows` method dense already had, and a sibling must appear in both.
+
+**Cost: none worth reporting.** Citation completeness 97.2% -> 97.6% visible and
+96.2% -> 95.7% holdout, both still above the 95% gate.
+
+### 3. The statement a window continues is served and cited
+
+Rule 5 put a worked-example statement into `search_text` and never into
+`block_ids`, so a pack could carry *"the breadth of the hall is 12 m"* without
+the problem it answers - and a teaching model restating that problem would have
+been unsupported by the evidence it was given.
+
+`SearchRepresentation.context_block_ids` is a separate field, not more
+`block_ids`: these blocks are real, on real pages, so the pack serves **and
+cites** them, while recall still scores only what the window is made of. Four
+windows in this corpus carry one.
+
+### The score, before and after
+
+| | before | after |
+|---|---|---|
+| unanswerable refused, holdout | 8/8 (>= 69%) | **8/8 (>= 69%)** |
+| answerable answered, holdout | 26/29 (>= 75%) | **23/29 (>= 63%)** |
+| citation completeness, holdout | 96.2% | **95.7%** |
+| delivered recall, holdout | 96.2% | **95.7%** |
+
+**The system now refuses more real questions than it did this morning, and that
+is the improvement.** The gate previously accepted on a weaker notion of
+agreement than it claimed; the number went down because the claim got true. What
+did not move is the only column where a mistake reaches a learner.
+
 ## Holdout
 
 **Not yet sealed.** `fixture-0` has no holdout cases, because a holdout drawn

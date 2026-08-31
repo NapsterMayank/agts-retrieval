@@ -5,13 +5,13 @@
   "visible": {
     "abstained": 10,
     "unanswerable": 10,
-    "answered": 47,
+    "answered": 42,
     "answerable": 50
   },
   "holdout": {
     "abstained": 8,
     "unanswerable": 8,
-    "answered": 26,
+    "answered": 23,
     "answerable": 29
   }
 }

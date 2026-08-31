@@ -122,9 +122,11 @@
       queue already pairs each with its crop; this is 20 minutes of somebody's
       time and recovers the remaining 4 unusable blocks
 
-- [ ] **R-042's three open findings**, which interact: window-level corroboration,
-      sibling expansion consulting only the primary, and carried context that is
-      findable but never served
+- [x] R-042's three findings closed (R-045, R-046). Agreement is now on the
+      passage, siblings need both retrievers, and carried context is served and
+      cited. **Acceptance fell 26/29 to 23/29 on the holdout and refusal held at
+      8/8** - the gate had been accepting on a weaker notion of agreement than it
+      claimed
 
 - [ ] **Calibrate the gate, not one of its inputs.** `calibrate_abstention`
       measures the primary retriever's top score while the decision also reads

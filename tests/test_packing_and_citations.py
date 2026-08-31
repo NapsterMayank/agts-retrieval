@@ -258,3 +258,35 @@ def test_two_required_slots_of_the_same_role_are_not_satisfied_by_one_item(corpu
 
     assert pack.status is not PackStatus.SUFFICIENT
     assert any("s2" in reason for reason in pack.sufficiency.gap_reasons)
+
+
+def test_a_sibling_the_corroborator_does_not_rank_is_not_packed(case, corpus) -> None:
+    """Sibling expansion asked only the primary, in exactly the band where the
+    gate itself requires two retrievers to agree -- and then merged the result
+    into the same evidence item and citation as the corroborated window."""
+    decision = SufficiencyDecision(
+        answerable=True, top_score=0.9, corroboration=2, threshold=0.7,
+        items=[RetrievedItem(object_id="o1", block_ids=("doc:docling:texts-0",),
+                             score=0.9, representation_id="o1:v:1")],
+        window_scores={"o1:v:1": 0.9, "o1:v:2": 0.8},
+        corroborator_windows={"o1:v:1": 0.7},  # the corroborator never saw v:2
+    )
+    packed = {b for item in pack_for(case, decision, corpus).evidence for b in item.span.block_ids}
+    assert "doc:docling:texts-1" not in packed
+
+
+def test_the_statement_a_window_continues_is_served_and_cited(case, corpus) -> None:
+    """A pack could carry "the breadth of the hall is 12 m" without the problem
+    it answers, so any restatement of that problem was unsupported by the
+    evidence it came with."""
+    corpus.representations["o1:v:2"] = corpus.representations["o1:v:2"].model_copy(
+        update={"context_block_ids": ["doc:docling:texts-0"]}
+    )
+    decision = SufficiencyDecision(
+        answerable=True, top_score=0.9, corroboration=2, threshold=0.7,
+        items=[RetrievedItem(object_id="o1", block_ids=("doc:docling:texts-1",),
+                             score=0.9, representation_id="o1:v:2")],
+    )
+    item = pack_for(case, decision, corpus).evidence[0]
+    assert "doc:docling:texts-0" in item.span.block_ids, "context must be citable, not just findable"
+    assert "Body text number 0" in item.text

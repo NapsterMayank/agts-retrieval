@@ -92,6 +92,38 @@ class BM25Representations:
         self._index[key] = built
         return built
 
+    def score_windows(self, plan: QueryPlan, corpus: Corpus) -> dict[str, float]:
+        """Every authorised window's score, keyed by representation id.
+
+        The mirror of `DenseRetriever.score_windows`, added so the pack builder
+        can ask *both* retrievers about a sibling window instead of admitting it
+        on the primary's word alone -- in precisely the band where the gate
+        requires two retrievers to agree (R-045).
+        """
+        idf, frequencies, lengths, average_length = self._build(corpus)
+        query = _tokens(plan.query_text)
+        if not query:
+            return {}
+        default = max(idf.values(), default=1.0)
+        weights = {term: idf.get(term, default) for term in set(query)}
+        ceiling = sum(w * (self.k1 + 1) / self.k1 for w in weights.values()) or 1.0
+
+        scores: dict[str, float] = {}
+        for rep, _ in corpus.authorised_representations(plan):
+            counts = frequencies.get(rep.representation_id)
+            if counts is None:
+                continue
+            length = lengths.get(rep.representation_id, 0)
+            norm = self.k1 * (1 - self.b + self.b * length / average_length)
+            total = sum(
+                weight * (counts.get(term, 0) * (self.k1 + 1)) / (counts.get(term, 0) + norm)
+                for term, weight in weights.items()
+                if counts.get(term, 0)
+            )
+            if total > 0.0:
+                scores[rep.representation_id] = total / ceiling
+        return scores
+
     def retrieve(self, plan: QueryPlan, corpus: Corpus, k: int) -> list[RetrievedItem]:
         idf, frequencies, lengths, average_length = self._build(corpus)
         query = _tokens(plan.query_text)

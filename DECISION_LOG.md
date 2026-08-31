@@ -1044,3 +1044,46 @@ a footnote. Nothing measured here would have caught the formula being wrong, and
 nothing measured here noticed it being fixed. Content quality sits outside every
 gate in this repository, and R-037's usability measure is the only thing that
 looks at it.
+
+---
+
+### R-045 - Corroboration is agreement on a passage, and siblings need two opinions
+**Status:** Active - 31 August 2026 - **closes two thirds of R-042**
+
+**Agreement was measured on `object_id`** while both retrievers return their own
+best window per object, so two retrievers pointing at different paragraphs of the
+same section counted as agreeing. A shared object now counts only when the
+windows match or share a block.
+
+Measured on the visible set alone, every relaxation that recovers the lost
+acceptance leaks an unanswerable case: 1-of-3 and 2-of-5 both drop refusal to
+9/10. The strict rule stays. **Acceptance fell 47/50 to 42/50 visible and 26/29
+to 23/29 holdout; refusal held at 10/10 and 8/8.**
+
+That trade is deliberate. A refusal costs a learner a question; a wrong answer
+costs them the thing the gate exists to prevent. And the number fell because the
+claim became true, not because the system got worse.
+
+**Sibling expansion asked only the primary**, in the band where the gate itself
+requires two opinions, then merged the result into one evidence item under one
+citation. `BM25Representations.score_windows` mirrors the dense method, and a
+sibling must now clear the floor *and* be ranked by the corroborator. Completeness
+held at 95.7% holdout, above the 95% gate.
+
+---
+
+### R-046 - Context is served and cited, or it is not context
+**Status:** Active - 31 August 2026 - **closes the last third of R-042**
+
+Rule 5 (R-022) carries a worked-example statement into `search_text` and never
+into `block_ids`, so the window that continues an example is findable by it. The
+consequence, unwritten until an outside reviewer named it: the pack could serve
+*"the breadth of the hall is 12 m"* with no trace of the problem it answers, and
+a teaching model restating that problem would have been making an unsupported
+claim while holding a citation.
+
+**Decision:** `SearchRepresentation.context_block_ids`, a separate field rather
+than more `block_ids`. The distinction is the whole point - these blocks are real
+and on real pages, so the pack **serves and cites** them, while recall continues
+to score only the blocks the window is made of. Counting them as the window's own
+evidence would inflate every recall number in this repository.

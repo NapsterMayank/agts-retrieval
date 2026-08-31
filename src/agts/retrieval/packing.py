@@ -80,12 +80,22 @@ def _sibling_blocks(
     if not decision.window_scores:
         return {}
 
+    # Both retrievers, not one. A sibling clearing the primary's floor entered
+    # the pack on a single opinion, in exactly the band where the gate itself
+    # requires two -- and was then merged into the same evidence item and
+    # covered by the same citation as the corroborated window (R-045).
+    corroborated = set(decision.corroborator_windows)
+
     out: dict[str, list[str]] = {}
     for rep in corpus.representations.values():
         if rep.object_id not in object_ids:
             continue
         score = decision.window_scores.get(rep.representation_id)
         if score is None or score < decision.threshold:
+            continue
+        # An empty corroborator map means the corroborator cannot score windows
+        # at all; requiring its assent then would silently disable expansion.
+        if corroborated and rep.representation_id not in corroborated:
             continue
         out.setdefault(rep.object_id, []).extend(rep.block_ids)
     return out
@@ -163,8 +173,18 @@ def build_pack(
 
         # The ranked window, plus the siblings of this section that cleared the
         # same floor. Order preserved, duplicates dropped.
+        # The window's own blocks, its corroborated siblings, and the statement
+        # it continues. The statement was findable and unservable, so a pack
+        # could carry "the breadth of the hall is 12 m" without the problem it
+        # answers -- and any restatement of that problem was unsupported by the
+        # evidence it came with (R-046). These are real blocks on real pages, so
+        # serving them means citing them.
+        context = []
+        representation = corpus.representations.get(retrieved.representation_id or "")
+        if representation is not None:
+            context = [b for b in representation.context_block_ids if b in corpus.blocks]
         block_ids = list(
-            dict.fromkeys([*retrieved.block_ids, *siblings.get(obj.object_id, ())])
+            dict.fromkeys([*context, *retrieved.block_ids, *siblings.get(obj.object_id, ())])
         )
         # `text or latex`, matching what the chunker made searchable.
         # Rendering only `text` meant a latex-only block was ranked on its

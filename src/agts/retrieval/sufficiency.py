@@ -59,6 +59,19 @@ CORROBORATION_DEPTH = 3
 TEACHING_TYPES = frozenset({ObjectType.DEFINITION, ObjectType.CONCEPT})
 
 
+def _same_passage(mine: RetrievedItem, theirs: RetrievedItem) -> bool:
+    """Whether two retrievers landed on the same passage, not just the same section.
+
+    Same window, or windows sharing a block. Block overlap rather than window
+    identity because the two retrievers pick their own best window per object and
+    adjacent windows can legitimately carry the same evidence -- but two windows
+    with no block in common are two different answers.
+    """
+    if mine.representation_id and mine.representation_id == theirs.representation_id:
+        return True
+    return bool(set(mine.block_ids) & set(theirs.block_ids))
+
+
 @dataclass(frozen=True)
 class SufficiencyDecision:
     """Whether the pack may be answered from, and why."""
@@ -76,6 +89,10 @@ class SufficiencyDecision:
     #: them. The pack builder uses these to pull in sibling windows that clear
     #: the same floor; without them it packs only the ranked windows.
     window_scores: dict[str, float] = field(default_factory=dict)
+    #: The corroborator's view of the same windows. The pack builder needs it to
+    #: admit a sibling on two opinions rather than one -- the sibling band is
+    #: exactly where the gate itself demands agreement (R-045).
+    corroborator_windows: dict[str, float] = field(default_factory=dict)
     items: list[RetrievedItem] = field(default_factory=list)
     reasons: tuple[str, ...] = ()
 
@@ -140,8 +157,17 @@ class SufficiencyGate:
         other = self.corroborator.retrieve(plan, corpus, max(k, self.depth))
 
         top_score = items[0].score if items else 0.0
-        shared = {i.object_id for i in items[: self.depth]} & {
-            i.object_id for i in other[: self.depth]
+        # Agreement is on the *passage*, not merely the section. Both retrievers
+        # return their own best window per object, so comparing object ids alone
+        # counted "we both like this section" as "we both found the answer" --
+        # they could be pointing at different paragraphs. A shared object counts
+        # only when the two windows are the same, or overlap in blocks.
+        mine = {i.object_id: i for i in items[: self.depth]}
+        theirs = {i.object_id: i for i in other[: self.depth]}
+        shared = {
+            object_id
+            for object_id in mine.keys() & theirs.keys()
+            if _same_passage(mine[object_id], theirs[object_id])
         }
         corroboration = len(shared)
 
@@ -183,9 +209,11 @@ class SufficiencyGate:
             )
 
         score_windows = getattr(self.primary, "score_windows", None)
+        other_windows = getattr(self.corroborator, "score_windows", None)
         return SufficiencyDecision(
             primary_name=getattr(self.primary, "name", "retrieval"),
             window_scores=score_windows(plan, corpus) if score_windows else {},
+            corroborator_windows=other_windows(plan, corpus) if other_windows else {},
             answerable=not reasons,
             top_score=top_score,
             corroboration=corroboration,

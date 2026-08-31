@@ -238,6 +238,13 @@ class SearchRepresentation(Frozen):
     embedding_version: str | None = None
     vector: list[float] | None = Field(default=None, min_length=1)
 
+    #: Blocks this window is *findable by* but is not made of: the statement a
+    #: worked example continues (rule 5). They are real blocks with real pages,
+    #: so the pack can serve and cite them -- what they must never do is count
+    #: as this window's own evidence, which is why they are a separate field
+    #: rather than more `block_ids` (R-046).
+    context_block_ids: list[str] = Field(default_factory=list)
+
     #: Copied from the parent for reporting and slicing only. Authorisation
     #: still resolves through the parent object -- duplicating a disclosure class
     #: onto the child would create two answers to "may this be shown".

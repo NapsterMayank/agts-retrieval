@@ -225,12 +225,12 @@ def represent(
         # Rule 5: carry the previous window's last prose block. It goes into
         # search_text and never into block_ids -- this window can be found by
         # that sentence and can never cite it.
-        carried = ""
+        carried, carried_id = "", None
         if number > 1:
             for block in reversed(windows[number - 2][-4:]):
                 text = _text_of(block)
                 if block.block_type not in _FORMULA_LIKE and _is_exercise_statement(text):
-                    carried = text
+                    carried, carried_id = text, block.block_id
                     break
         # Rule 4: the heading is context the window cannot carry on its own.
         search_text = "\n".join(p for p in (obj.heading_path, carried, body) if p)
@@ -244,6 +244,7 @@ def represent(
                 content_hash=hashlib.sha256(search_text.encode("utf-8")).hexdigest(),
                 heading_path=obj.heading_path,
                 modality=_window_modality(window),
+                context_block_ids=[carried_id] if carried_id else [],
             )
         )
     return representations
