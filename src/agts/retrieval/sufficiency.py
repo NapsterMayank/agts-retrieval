@@ -53,6 +53,25 @@ MIN_CORROBORATION = 2
 #: twenty is agreement about the corpus, not about the answer.
 CORROBORATION_DEPTH = 3
 
+#: The floor and ceiling the service runs with, and the embedding model they
+#: were derived under (R-048). They live beside the gate because two scripts
+#: previously carried them as literals, and a threshold copied by hand is a
+#: threshold that goes stale silently: a floor is a property of one model's
+#: score distribution, so quoting it against another model's scores reports on
+#: a system nobody runs. Callers must check :data:`SHIPPED_UNDER_MODEL` against
+#: the embedder they hold before trusting the pair.
+#: Derived on the visible set of pilot-2-chapters-v1 under voyage-4-large
+#: (R-060), by the declared rule: the floor is the calibrated midpoint, the
+#: ceiling is the highest unanswerable top score rounded up to three decimals -
+#: rounding *up* because the gate reads a score equal to the ceiling as high
+#: confidence, so rounding down would hand the exemption to the case that
+#: defined it. Both are quoted to three decimals because the provider does not
+#: return bit-identical vectors across runs and the fourth decimal is noise.
+#: The rounded pair reproduces the exact pair's decisions case for case.
+SHIPPED_FLOOR = 0.744
+SHIPPED_CEILING = 0.765
+SHIPPED_UNDER_MODEL = "voyage-4-large"
+
 #: Object types that mean "this section teaches the concept" rather than
 #: "this section mentions it". They come from the hand-written section map
 #: (R-009) — a curriculum judgement made by a human, not a parser or a model.

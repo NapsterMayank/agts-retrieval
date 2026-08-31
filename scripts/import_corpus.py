@@ -24,7 +24,7 @@ from agts.evaluation.cases import load_gold_set
 from agts.evaluation.corpus import EvaluationLicence
 from agts.evaluation.quarantine import ChapterArtefact, load_corpus as load_from_files
 from agts.evaluation.scorer import score
-from agts.platform.embedding import CachedEmbedding
+from agts.platform.embedding import CachedEmbedding, DEFAULT_EMBEDDING_MODEL
 from agts.platform.repository import connect, database_url, load_corpus, migrate, save_corpus
 from agts.retrieval import BM25Representations, DenseRetriever
 
@@ -46,8 +46,8 @@ def main() -> None:
     if not database_url():
         raise SystemExit("set AGTS_DATABASE_URL")
 
-    cache = ARTIFACTS / "embeddings" / "voyage-3.json"
-    embedder = CachedEmbedding(None, cache, model="voyage-3") if cache.exists() else None
+    cache = ARTIFACTS / "embeddings" / f"{DEFAULT_EMBEDDING_MODEL}.json"
+    embedder = CachedEmbedding(None, cache, model=DEFAULT_EMBEDDING_MODEL) if cache.exists() else None
     licence = EvaluationLicence(
         reason="import of quarantined chapters for retrieval from Postgres",
         granted_by="mayank", granted_on=date(2026, 8, 30),

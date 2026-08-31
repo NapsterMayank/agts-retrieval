@@ -13,6 +13,7 @@ choosing anything.
 from __future__ import annotations
 
 import json
+import math
 import sys
 from datetime import date
 from pathlib import Path
@@ -26,18 +27,20 @@ from agts.evaluation.corpus import EvaluationLicence
 from agts.evaluation.planning import plan_for_case
 from agts.evaluation.quarantine import ChapterArtefact, load_corpus
 from agts.evaluation.scorer import calibrate_abstention
-from agts.platform.embedding import CachedEmbedding
+from agts.platform.embedding import CachedEmbedding, DEFAULT_EMBEDDING_MODEL
 from agts.retrieval import BM25Representations, DenseRetriever
-from agts.retrieval.sufficiency import SufficiencyGate
+from agts.retrieval.sufficiency import (
+    SHIPPED_CEILING,
+    SHIPPED_FLOOR,
+    SHIPPED_UNDER_MODEL,
+    SufficiencyGate,
+)
 
 ROOT = Path(__file__).parents[1]
 ARTIFACTS = ROOT / "artifacts"
 GOLD = ARTIFACTS / "gold" / "pilot-2-chapters-v1.json"
 CURRICULUM_VERSION = "2026-27"
 
-#: The pair the service runs with, chosen on the visible set (R-048).
-SHIPPED_FLOOR = 0.737
-SHIPPED_CEILING = 0.800
 
 CHAPTERS = [
     ChapterArtefact(directory=ARTIFACTS / "chemical-reactions-quarantine",
@@ -66,10 +69,10 @@ def report(name, decisions):
 
 def main() -> None:
     gold_set = load_gold_set(GOLD)
-    cache = ARTIFACTS / "embeddings" / "voyage-3.json"
+    cache = ARTIFACTS / "embeddings" / f"{DEFAULT_EMBEDDING_MODEL}.json"
     if not cache.exists():
         raise SystemExit("no vector cache; run scripts/embed_representations.py")
-    embedder = CachedEmbedding(None, cache, model="voyage-3")
+    embedder = CachedEmbedding(None, cache, model=DEFAULT_EMBEDDING_MODEL)
     licence = EvaluationLicence(
         reason="holdout validation of the sufficiency gate",
         granted_by="mayank", granted_on=date(2026, 8, 30),
@@ -95,16 +98,27 @@ def main() -> None:
     calibration = calibrate_abstention(
         visible_only, dense, corpus, curriculum_version=CURRICULUM_VERSION
     )
-    tops = sorted(
-        dense.retrieve(plan_for_case(c, curriculum_version=CURRICULUM_VERSION), corpus, 20)[0].score
-        for c in gold_set.visible if c.answerable
-    )
-    ceiling = tops[len(tops) // 2]
+    # The rule R-057 and R-060 ship: the highest unanswerable top score, taken
+    # strictly above because the gate reads a score equal to the ceiling as high
+    # confidence. This line previously reported the median answerable top score,
+    # which was the rule R-057 replaced -- a suggestion printed beside the
+    # shipped pair has to be computed the way the shipped pair was.
+    ceiling = math.nextafter(calibration.highest_unanswerable, math.inf)
     # What ships, not what calibration would suggest today. The two differ:
     # calibration re-derives from the current score distribution every run, and
     # a report that silently follows it is scoring a system nobody is running.
     # The shipped pair was chosen on the visible set under a declared rule and
     # is recorded in EVALUATION_LEDGER (R-048).
+    if embedder.model != SHIPPED_UNDER_MODEL:
+        raise SystemExit(
+            f"the shipped pair (floor {SHIPPED_FLOOR}, ceiling {SHIPPED_CEILING}) was "
+            f"calibrated under {SHIPPED_UNDER_MODEL}, but the cache holds "
+            f"{embedder.model} vectors. Scoring one model's thresholds against "
+            "another model's scores is not a validation. Re-derive the pair on the "
+            "visible set, record it in EVALUATION_LEDGER (R-048), update "
+            "SHIPPED_UNDER_MODEL, and only then spend a holdout consultation."
+        )
+
     shipped_floor, shipped_ceiling = SHIPPED_FLOOR, SHIPPED_CEILING
     print(f"shipped:     floor {shipped_floor:.3f}, ceiling {shipped_ceiling:.3f}")
     print(f"calibration would suggest: floor {calibration.threshold:.3f}, ceiling {ceiling:.3f}"

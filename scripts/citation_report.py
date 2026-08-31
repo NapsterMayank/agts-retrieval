@@ -24,12 +24,17 @@ from agts.evaluation.corpus import EvaluationLicence
 from agts.evaluation.planning import plan_for_case
 from agts.evaluation.quarantine import ChapterArtefact, load_corpus
 from agts.evaluation.scorer import calibrate_abstention
-from agts.platform.embedding import CachedEmbedding
+from agts.platform.embedding import CachedEmbedding, DEFAULT_EMBEDDING_MODEL
 from agts.retrieval import BM25Representations, DenseRetriever
 from agts.retrieval.chunking import REPRESENTATION_VERSION
 from agts.retrieval.packing import build_pack
 from agts.retrieval.provenance import build_manifest, build_trace, lineage_failures
-from agts.retrieval.sufficiency import SufficiencyGate
+from agts.retrieval.sufficiency import (
+    SHIPPED_CEILING,
+    SHIPPED_FLOOR,
+    SHIPPED_UNDER_MODEL,
+    SufficiencyGate,
+)
 
 ROOT = Path(__file__).parents[1]
 ARTIFACTS = ROOT / "artifacts"
@@ -48,11 +53,11 @@ CHAPTERS = [
 
 def main() -> None:
     gold_set = load_gold_set(GOLD)
-    cache = ARTIFACTS / "embeddings" / "voyage-3.json"
+    cache = ARTIFACTS / "embeddings" / f"{DEFAULT_EMBEDDING_MODEL}.json"
     if not cache.exists():
         raise SystemExit("no vector cache; run scripts/embed_representations.py")
 
-    embedder = CachedEmbedding(None, cache, model="voyage-3")
+    embedder = CachedEmbedding(None, cache, model=DEFAULT_EMBEDDING_MODEL)
     licence = EvaluationLicence(
         reason="citation scoring over quarantined chapters",
         granted_by="mayank", granted_on=date(2026, 8, 30),
@@ -72,7 +77,17 @@ def main() -> None:
     # The shipped pair, not what calibration suggests today (R-048). Measuring
     # citations against a configuration nobody runs reports on a system that
     # does not exist.
-    gate = SufficiencyGate(dense, lexical, threshold=0.737, high_confidence=0.800)
+    if embedder.model != SHIPPED_UNDER_MODEL:
+        raise SystemExit(
+            f"the shipped pair (floor {SHIPPED_FLOOR}, ceiling {SHIPPED_CEILING}) was "
+            f"calibrated under {SHIPPED_UNDER_MODEL}, but the cache holds "
+            f"{embedder.model} vectors. A citation report built on it would describe "
+            "a configuration nobody runs. Re-derive the pair and record it in "
+            "EVALUATION_LEDGER (R-048) first."
+        )
+    gate = SufficiencyGate(
+        dense, lexical, threshold=SHIPPED_FLOOR, high_confidence=SHIPPED_CEILING
+    )
 
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"], capture_output=True, text=True
@@ -85,7 +100,7 @@ def main() -> None:
         versions={
             "representation": REPRESENTATION_VERSION,
             "composition": "section-v1",
-            "embedding": "voyage-3",
+            "embedding": DEFAULT_EMBEDDING_MODEL,
         },
     )
     print(f"release manifest {manifest.release_manifest_id}: "

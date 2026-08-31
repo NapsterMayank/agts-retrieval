@@ -25,7 +25,7 @@ from agts.evaluation.cases import load_gold_set
 from agts.evaluation.corpus import EvaluationLicence
 from agts.evaluation.quarantine import ChapterArtefact, load_corpus
 from agts.evaluation.scorer import score
-from agts.platform.embedding import CachedEmbedding
+from agts.platform.embedding import CachedEmbedding, DEFAULT_EMBEDDING_MODEL
 from agts.platform.reranking import CachedReranker, IdentityReranker, VoyageReranker
 from agts.retrieval import BM25Representations, DenseRetriever, HybridRetriever, RerankedRetriever
 
@@ -46,11 +46,11 @@ CHAPTERS = [
 
 def main() -> None:
     gold_set = load_gold_set(GOLD)
-    cache = ARTIFACTS / "embeddings" / "voyage-3.json"
+    cache = ARTIFACTS / "embeddings" / f"{DEFAULT_EMBEDDING_MODEL}.json"
     if not cache.exists():
         raise SystemExit("no vector cache; run scripts/embed_representations.py")
 
-    embedder = CachedEmbedding(None, cache, model="voyage-3")
+    embedder = CachedEmbedding(None, cache, model=DEFAULT_EMBEDDING_MODEL)
     licence = EvaluationLicence(
         reason="rerank benchmark over quarantined chapters",
         granted_by="mayank", granted_on=date(2026, 8, 30),

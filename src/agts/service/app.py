@@ -71,7 +71,7 @@ from agts.contracts.runtime import (
     QueryPlan,
 )
 from agts.evaluation.corpus import Corpus
-from agts.platform.embedding import CachedEmbedding
+from agts.platform.embedding import CachedEmbedding, DEFAULT_EMBEDDING_MODEL
 from agts.retrieval import BM25Representations, DenseRetriever
 from agts.retrieval.chunking import REPRESENTATION_VERSION
 from agts.retrieval.packing import build_pack
@@ -193,7 +193,7 @@ def build_state(config: ServiceConfig) -> ServiceState:
         from agts.platform.embedding import VoyageEmbedding
 
         inner = VoyageEmbedding(config.embedding_api_key)
-    embedder = CachedEmbedding(inner, Path(config.embedding_cache), model="voyage-3")
+    embedder = CachedEmbedding(inner, Path(config.embedding_cache), model=DEFAULT_EMBEDDING_MODEL)
 
     gate = SufficiencyGate(
         DenseRetriever(embedder),
@@ -208,7 +208,7 @@ def build_state(config: ServiceConfig) -> ServiceState:
         commit_sha=config.commit_sha,
         versions={
             "representation": REPRESENTATION_VERSION,
-            "embedding": "voyage-3",
+            "embedding": DEFAULT_EMBEDDING_MODEL,
             "abstain_floor": f"{config.abstain_floor:.6f}",
             "high_confidence": f"{config.high_confidence:.6f}",
         },

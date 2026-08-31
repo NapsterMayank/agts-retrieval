@@ -47,6 +47,21 @@ def cosine(a: Sequence[float], b: Sequence[float]) -> float:
     return dot / (na * nb) if na and nb else 0.0
 
 
+#: The embedding model this build ships. It lives here as one name because it
+#: was previously eight string literals across the scripts and the service, and
+#: R-016 makes the model part of every representation's identity: a run whose
+#: cache says one model and whose service says another is not a slower system,
+#: it is a wrong one. Cache files are named after it, so switching models leaves
+#: the old vectors on disk rather than mixing two models in one file.
+#:
+#: voyage-4-large replaced voyage-3 on 2026-08-31, measured over the visible set
+#: of pilot-2-chapters-v1: recall@pack 0.899 -> 0.954, and the sufficiency gate
+#: 95/109 -> 107/109 answerable at 31/31 unanswerable. voyage-3.5 scored the
+#: best raw recall of the five tested (0.972) and the second-worst gate outcome
+#: (89/109) -- recall the calibration cannot separate is not accuracy.
+DEFAULT_EMBEDDING_MODEL = "voyage-4-large"
+
+
 class VoyageEmbedding:
     """Voyage AI embeddings over HTTPS.
 
@@ -59,7 +74,7 @@ class VoyageEmbedding:
     def __init__(
         self,
         api_key: str | None = None,
-        model: str = "voyage-3",
+        model: str = DEFAULT_EMBEDDING_MODEL,
         *,
         batch_size: int = 64,
         timeout: float = 60.0,
