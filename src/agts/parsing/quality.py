@@ -45,6 +45,19 @@ LOOSE_TOKEN_RATIO = 0.55
 #: terse rather than broken.
 MIN_TOKENS = 4
 
+#: Above this, no relation excuses the text. `_has_balanced_relation` exists
+#: because a chemical equation is legitimately mostly single characters --
+#: `Mg + O 2 -> MgO` -- and refusing those would make a backlog of the whole
+#: chemistry chapter. It excused the quadratic formula too: `x = 2 - 4 2 b b ac
+#: a +/- -` has an equals sign with operands on both sides and is eleven single
+#: characters out of twelve. It went to a learner as readable.
+#:
+#: Measured over both chapters: the loosest chemistry block scores 0.75, and the
+#: mangled mathematics blocks start at 0.90. 0.85 sits between them. It is not a
+#: judgement about formulas, it is the point past which there is no sentence
+#: left to read.
+HOPELESS_TOKEN_RATIO = 0.85
+
 _RELATION = re.compile(r"[=<>≤≥→]|->|xrightarrow|rightarrow")
 
 
@@ -81,6 +94,8 @@ def is_unusable(text: str | None) -> bool:
     if len(tokens) < MIN_TOKENS:
         return False
     loose = sum(1 for token in tokens if len(token) == 1) / len(tokens)
+    if loose > HOPELESS_TOKEN_RATIO:
+        return True
     return loose > LOOSE_TOKEN_RATIO and not _has_balanced_relation(text)
 
 

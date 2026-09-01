@@ -34,20 +34,31 @@ def test_a_real_extracted_formula_becomes_readable() -> None:
     assert "−" in decoded and "=" in decoded
 
 
-def test_the_decode_alone_can_rescue_a_block_the_quality_gate_rejected() -> None:
-    # quadratic-equations:docling:texts-125, page 6. The equals sign was set in
-    # Symbol, so the gate saw a wall of single characters and no relation at all.
-    #
-    # The whole block, not the head of it. This fixture used to stop at the
-    # first equals sign, which left the relation with nothing on its right --
-    # and a later, stricter check refused it for that truncation rather than
-    # for anything the decode did or did not do. On disk the block continues.
+def test_the_decode_removes_the_private_use_characters_it_is_for() -> None:
+    """quadratic-equations:docling:texts-125, page 6.
+
+    This test used to assert that decoding alone made the block readable, and
+    R-054 counted four blocks rescued that way. Both were measured with a
+    quality gate that excused any text carrying a relation symbol, and this
+    block carries three. Under the corrected gate it is still unusable, which is
+    the honest reading: `( ) ( ) 3 2 3 2 0 x x - - = Now, 3 2 0 x - = for 2 3 x
+    = .` has lost the structure of the polynomial, and no reader reconstructs
+    `(3x - 2)` from it.
+
+    The decode did its job -- there are no private-use characters left, and the
+    relations are real relations. It was never going to fix reading order, and
+    the count that said otherwise was the gate flattering itself.
+    """
     raw = (
         f"{LPAREN} {RPAREN} {LPAREN} {RPAREN} 3 2 3 2 0 x x {MINUS} {MINUS} {EQUALS} "
         f"Now, 3 2 0 x {MINUS} {EQUALS} for 2 3 x {EQUALS} ."
     )
-    assert is_unusable(raw)
-    assert not is_unusable(decode_symbol_font(raw))
+    decoded = decode_symbol_font(raw)
+
+    assert undecoded_private_use(decoded) == set()
+    assert "=" in decoded and "−" in decoded
+    # Still needs LaTeX, and now says so instead of passing as prose.
+    assert is_unusable(decoded)
 
 
 def test_the_decode_does_not_pretend_to_fix_a_scrambled_formula() -> None:

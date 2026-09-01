@@ -113,8 +113,19 @@ def main() -> None:
         print(f"      -- page {page}, {len(blocks)} blocks cited, "
               f"first {blocks[0].split(':')[-1] if blocks else '?'}")
 
-    print(f"\n  {len(body['evidence'])} passages. Citations resolve to block ids in the "
-          "release manifest.")
+    spans = [len((item.get("citation") or {}).get("block_ids") or [])
+             for item in body["evidence"]]
+    widest = max(spans) if spans else 0
+    total = sum(spans)
+    print(
+        "\n  %d passages, %d block citations (%d in the widest)."
+        % (len(body["evidence"]), total, widest)
+    )
+    if widest > 20:
+        print(
+            "  A span that wide resolves and is still too broad to check by hand."
+            "\n  That is evidence precision, and it is what generation has to earn down."
+        )
 
 
 if __name__ == "__main__":

@@ -1319,6 +1319,14 @@ derived from them must be rebuilt before anything here is quoted again.
 
 ---
 
+**Correction, 1 September 2026 (R-072).** The "4 made readable" in this entry
+was measured with a quality gate that excused any text carrying a relation
+symbol. Three of those blocks carry relations and are not readable: the decode
+fixed their encoding and left their reading order scrambled. Under the corrected
+gate the decode rescues none of them by itself. What it did was real -- no
+private-use characters survive anywhere in either chapter -- and the rescue
+count was the gate flattering itself.
+
 ### R-055 - Quarantined output is ignored by allowlist, not by name
 **Status:** Active - 31 August 2026
 

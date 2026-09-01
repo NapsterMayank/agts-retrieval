@@ -85,3 +85,26 @@ def test_a_relation_with_operands_on_both_sides_still_excuses_it() -> None:
 
 def test_text_is_kept_when_there_is_no_latex() -> None:
     assert readable_text("Mg + O 2 -> MgO", None) == "Mg + O 2 -> MgO"
+
+
+def test_a_relation_cannot_excuse_text_with_no_sentence_left() -> None:
+    """The quadratic formula, served to a learner as readable text.
+
+    `x = 2 - 4 2 b b ac a +/- -` carries an equals sign with operands on both
+    sides, so the balanced-relation rule excused it -- and it is eleven single
+    characters out of twelve. The triage that decides who has to look at a block
+    called it fine, so nobody ever did.
+
+    Measured over both chapters: the loosest chemical equation scores 0.75 and
+    the mangled mathematics blocks start at 0.90, so no chemistry block changes.
+    """
+    assert is_unusable("x = 2 - 4 2 b b ac a \u00b1 \u2212")
+    assert is_unusable("2 a 2 2 a a 2 a \u2212 \u22c5")
+    assert is_unusable("x = 2 3 or x = 1 2 \u2212")
+
+
+def test_a_chemical_equation_is_still_readable() -> None:
+    """Every one of these is mostly single characters and perfectly clear."""
+    assert not is_unusable("3 Fe + 4 H 2 O \u2192 Fe 3 O4 + 4 H 2 (1.8)")
+    assert not is_unusable("Zn + H 2 SO 4 \u2192 ZnSO 4 + H 2 (1.3)")
+    assert not is_unusable("Mg + O 2 \u2192 MgO")
