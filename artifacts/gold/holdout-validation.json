@@ -5,7 +5,7 @@
   "visible": {
     "abstained": 31,
     "unanswerable": 31,
-    "answered": 107,
+    "answered": 106,
     "answerable": 109
   },
   "holdout": {

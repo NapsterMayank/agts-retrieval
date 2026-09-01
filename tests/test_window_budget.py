@@ -20,9 +20,16 @@ def scored(*values: float) -> list[tuple[float, str]]:
 
 
 def test_a_near_tie_admits_the_runner_up() -> None:
-    """0.007 apart is the case this exists for."""
+    """0.007 apart is the case this exists for.
+
+    Asserts the runner-up is admitted, not the exact count: the budget is a
+    measured constant and moved from two to three when correcting six sentences
+    reshuffled which window of a section wins (R-074).
+    """
     kept = windows_for_object(scored(0.7917, 0.7846, 0.7807))
-    assert [name for _, name in kept] == ["w0", "w1"]
+    names = [name for _, name in kept]
+    assert names[:2] == ["w0", "w1"]
+    assert len(names) <= WINDOWS_PER_OBJECT
 
 
 def test_a_clear_winner_stays_alone() -> None:

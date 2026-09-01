@@ -1849,3 +1849,46 @@ exists to hold rather than resolve.
 Retrieval is unchanged -- 99.1% candidate and pack recall, gate 107/109 and
 31/31 -- because the index reads `block.text` and only the pack reads the LaTeX
 (R-069). What changed is what a learner sees, which was the point.
+
+---
+
+### R-074 - Restoring mathematics inside a sentence
+**Status:** Active - 1 September 2026
+
+Six blocks read as ordinary prose while the answers inside them were destroyed.
+"Therefore, the roots of 6 x 2 - x - 2 = 0 are 2 1 . and - 3 2" passes every
+quality check -- `is_unusable` counts words and finds plenty -- and its two roots
+are unreadable. A learner asking for the roots was served that.
+
+This edits `text`, which `attach_reviewed_formulas` never does, so it carries
+heavier rules. The original is recorded in each entry and in
+`text-corrections.json`, and the script refuses to run when what is on disk is
+neither the original nor the correction: a re-parse invalidates a correction the
+way it invalidates an approval. Notation is restored, wording is not touched.
+The notation is Unicode rather than LaTeX because the index reads this field
+(R-069) and `\frac{2}{3}` is not words.
+
+Two came from page crops. Four are paragraphs with no crop at all, so the value
+was derived from the equation in the same sentence and checked against a
+neighbour already carrying verified LaTeX -- `6x^2 - x - 2 = (3x - 2)(2x + 1)`
+gives 2/3 and -1/2, and texts-125's crop independently shows the root that
+texts-127 states. Codex read all six from context alone and agreed on four;
+where it disagreed, it was completing sentences the page does not complete, and
+the crop won.
+
+**The correction cost recall, and the fix was measured rather than assumed.**
+Changing six sentences changed their windows' embeddings, which reshuffled which
+window of a section ranks first, and candidate recall fell 99.1% to 98.2% on
+cases whose right *object* was still retrieved -- R-070 again, from a new cause.
+Raising the window budget from two to three restores 99.1%; four measures
+identically, so three is where it saturates rather than a number chosen to hit a
+target. It costs one block per pack.
+
+The visible set lost one answerable case at the gate, 107/109 to 106/109, and
+the holdout did not move: 24/24 and 38/40. Delivering correct text is worth one
+visible-set case, and the holdout is the number that was not tuned on.
+
+**Not finished.** A scan for lost fraction bars afterwards found eight more
+blocks of the same kind -- texts-107, 122, 126, 141, 194, 195, 196, 225 -- which
+the eyeball pass that produced these six had missed. The class is bigger than
+the list, and the list was never the class.

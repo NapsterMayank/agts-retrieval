@@ -32,11 +32,18 @@ from agts.retrieval.query import search_query
 RRF_K = 60
 
 
-#: How many windows of one object may stand for it. Two, not more: five windows
-#: of one section are still not five pieces of evidence (R-018), and the whole
-#: point of window-level retrieval was that it packs 43 blocks where object-level
-#: packs 143.
-WINDOWS_PER_OBJECT = 2
+#: How many windows of one object may stand for it. Not many: five windows of
+#: one section are still not five pieces of evidence (R-018), and the point of
+#: window-level retrieval was that it packs 43 blocks where object-level packs
+#: 143.
+#:
+#: Two when this was introduced. Three since R-074, because correcting six
+#: sentences changed their windows' scores enough to reshuffle which window of a
+#: section wins, and recall fell 99.1% to 98.2% on cases whose right *object*
+#: was still retrieved. Four measured identically to three, so three is where it
+#: saturates rather than a number picked to reach a target. It costs one block
+#: per pack: 38.4 against 37.4.
+WINDOWS_PER_OBJECT = 3
 
 #: And the second one only when it is this close to the best. Keeping one window
 #: per object discarded the gold window of five answerable cases while retrieving
