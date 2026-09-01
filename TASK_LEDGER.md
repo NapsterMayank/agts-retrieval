@@ -135,19 +135,21 @@ numbers, which is a lesser thing until the first two are done.*
       started. Both review all 95, not half each (Q6)
 - [x] Symbol-font decode (R-054): 27 blocks corrected, 4 made readable, and the
       formula backlog re-counted honestly -- it was 39 by the wrong measure
-- [ ] **2. Attach LaTeX for the last 3 formulas** -- texts-153, texts-159,
-      texts-198. Scrambled in reading order, so a person with the page crops.
-      Roughly ten minutes, not the day the old "39" implied
-- [ ] **Re-embed 12 changed window texts** and re-run the holdout, citation and
-      completeness reports. Needs VOYAGE_API_KEY. Every number on file predates
-      the decode
-- [ ] 3. Citation completeness is 95.2% visible against a 95% gate. Acceptance and
+- [x] **Attach LaTeX for the queued formulas** (R-073) -- texts-153, texts-198,
+      texts-151, texts-119, texts-123, texts-125 attached, each read off its crop
+      and cross-checked by an independent Codex reading of the surrounding text
+- [ ] **texts-159 still refused, twice.** Its crop is clipped at the top and the
+      two readings disagree the same way both times. A person with the page
+- [x] **Re-embedded and re-ran everything** on 1 September under
+      `voyage-4-large`. No number on file predates a corpus change now
+- [ ] 3. Citation completeness is 96.1% visible against a 95% gate. Acceptance and
       completeness now trade visibly; the next change that buys answers may take
       it under
 
-- [ ] **3 formulas need a human to choose among Chandra candidates.** The review
-      queue already pairs each with its crop; this is 20 minutes of somebody's
-      time and recovers the remaining 4 unusable blocks
+- [ ] **Eight sentences with destroyed inline mathematics** (R-074): texts-107,
+      122, 126, 141, 194, 195, 196, 225. Six are derivable from the equation in
+      the sentence; 141 and 225 need crops. Found by a scan *after* six others
+      were fixed by eye -- the eyeball pass finds instances, not the class
 
 - [x] R-042's three findings closed (R-045, R-046). Agreement is now on the
       passage, siblings need both retrievers, and carried context is served and
@@ -204,3 +206,39 @@ embedding adapter were listed here and are done — R-008, R-013, R-016.)*
 - [ ] 300-500 adjudicated cases across the §6.4 conditions
 - [ ] Seal the holdout
 - [ ] First embedding/reranker benchmark on real content
+
+
+## Done — 1 September 2026
+
+- [x] **voyage-4-large adopted** (R-058) over four alternatives, chosen on the
+      gate rather than on recall: voyage-3.5 has the best raw recall of the five
+      and the second-worst gate outcome, because its score distributions overlap
+- [x] **The shipped pair re-derived** (R-060) under the new model, 0.744 / 0.765,
+      by a rule stated before the numbers were read
+- [x] **Corrected blocks reach the database** (R-071). `blocks` took `ON CONFLICT
+      DO NOTHING`, so every correction since the first import stopped at the
+      artefacts and the service served the original. Every check passed while it
+      was wrong, because they compared retrieval scores rather than block text
+- [x] **The section-versus-window failure closed** (R-070). Candidate recall
+      95.4% -> 99.1%, dense failing gating slices 22 -> 0
+- [x] **Reranking answered and rejected** (Q4). Zero cases on top of dense
+- [x] **95 release-critical cases screened by Codex** (R-068): 94 agree, one
+      disagrees -- `h-chem-03`, where the answer key quotes text that states a
+      rule without explaining it, and the gate had already refused it on the
+      holdout for the same reason. **The label was not changed**
+- [x] **A way to try it by hand**: `scripts/serve.ps1` and `scripts/ask.py`
+
+## Next, unblocked — 1 September 2026
+
+*Ordered. The first is the only one that changes what the numbers are worth.*
+
+- [ ] **1. Adjudicate the 95-case answer key.** Unchanged and still the top of
+      the list. Mayank and Sumit named, neither started. Both review all 95
+- [ ] **2. Finish the damaged mathematics** -- one formula and eight sentences,
+      above
+- [ ] **3. Generation (§9, Q5).** Nothing writes an answer, so citation
+      *precision* cannot be measured at all: a pack spans 38 blocks and about one
+      is gold. It is the only remaining lever on that §14 row
+- [ ] **4. More corpus.** Two chapters and 204 cases against §6.4's 300-500.
+      Chapters three and four move every threshold and are the real test of
+      whether any of this generalises

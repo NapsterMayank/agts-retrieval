@@ -6,27 +6,29 @@ Build Guide** (revised 22 August 2026).
 This repository is Track B. It does not modify, refactor or migrate Foxxy's
 `retrieval` module, which stays live and demoed.
 
-## Status — 31 August 2026
+## Status — 1 September 2026
 
 A grounded retrieval pipeline runs end to end over two real NCERT chapters:
 parse, compose, chunk, embed, rank, decide whether the question can be answered
 at all, assemble a cited evidence pack, record what produced it — and serve the
 whole thing over HTTP.
 
-> **These numbers predate the Symbol-font decode of 31 August (R-054).** That
-> change corrected 27 blocks and altered 12 window texts, so the embeddings
-> behind every figure below are stale. Re-run `embed_representations.py`,
-> `holdout_validation.py` and `citation_report.py` before quoting any of them.
-> The thresholds do not move afterwards, whatever the re-measurement shows
-> (R-036).
+The embedding model is `voyage-4-large` (R-058) and the gate runs on floor
+0.744 and ceiling 0.765 (R-060). Every figure below was re-measured on 1
+September, after the last correction to the corpus.
 
 | | visible 140 | holdout 64 |
 |---|---:|---:|
 | Unanswerable questions refused | 31/31 | **24/24** — supports ≥88% |
-| Answerable questions answered | 90/109 | **34/40** — supports ≥73% |
-| Citation completeness (§14 bar ≥95%) | 95.2% | **97.1%** |
+| Answerable questions answered | 106/109 | **38/40** — supports ≥85% |
+| Citation completeness (§14 bar ≥95%) | 96.1% | **97.4%** |
 | Citation ID resolution (§14 bar 100%) | 100% | **100%** |
 | Lineage failures (§14 bar 0) | 0 | **0** |
+
+Retrieval, measured on the visible set: candidate recall and pack recall both
+**99.1%**, at 38 blocks per pack, zero invariant violations. The ruler still
+separates all four deliberately broken retrievers, and flags BM25 alone as
+below the bar (R-070).
 
 The bounds are exact one-sided Clopper-Pearson at 95% (R-039). The set covers
 four phrasings of the same questions — textbook, short, spoken and
@@ -98,8 +100,8 @@ AGTS_DATABASE_URL=postgresql://agts:agts_dev_password@localhost:5434/agts_dev \
 ```
 docker compose -f docker/compose.yml up -d
 AGTS_DATABASE_URL=postgresql://agts:agts_dev_password@localhost:5434/agts_dev \
-AGTS_EMBEDDING_CACHE=artifacts/embeddings/voyage-3.json \
-AGTS_ABSTAIN_FLOOR=0.737 AGTS_HIGH_CONFIDENCE=0.800 \
+AGTS_EMBEDDING_CACHE=artifacts/embeddings/voyage-4-large.json \
+AGTS_ABSTAIN_FLOOR=0.744 AGTS_HIGH_CONFIDENCE=0.765 \
 AGTS_RELEASE_MANIFEST_ID=rm-pilot-2-chapters-0001 \
 AGTS_API_TOKENS=dev-token:tenant-dev VOYAGE_API_KEY=... \
 PYTHONPATH=src python scripts/serve.py

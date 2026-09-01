@@ -5,7 +5,7 @@ evaluation but are never the sole release authority.
 
 Last measured 31 August 2026 over two quarantined chapters, **204 gold cases in
 four phrasings** (textbook, short, spoken, mistyped). Figures are for the
-**shipped** thresholds, floor 0.737 and ceiling 0.800, not for what calibration
+**shipped** thresholds, floor 0.744 and ceiling 0.765 (R-060), not for what calibration
 would derive today (R-050).
 "Measured" below means a number exists in `EVALUATION_LEDGER.md`; it does not
 mean the gate is satisfied for release, which additionally needs a real gold set,
@@ -27,7 +27,7 @@ a sealed holdout and human sign-off.
 | Recall@20 — multi-hop, visual, multilingual | ≥90% each | `ScoreReport.failing_slices`, now pairwise (R-031) | reported per slice; several below bar |
 | Citation ID resolution | 100% | `EvidencePack` validator + `citations.score_citations` | **100%** |
 | Citation precision | ≥98% | **not measurable until generation exists** — the proxy is named `evidence_precision` and is not this row (R-026) | not claimed |
-| Citation completeness | ≥95% | `citations.score_citations` | **95.2% visible, 97.1% holdout** — the visible figure is close to the bar, and acceptance now trades against it visibly (R-050) |
+| Citation completeness | ≥95% | `citations.score_citations` | **96.1% visible, 97.4% holdout** (1 September) — the visible figure stays close to the bar, and acceptance trades against it visibly (R-050) |
 | Supported consequential claims | ≥95%, no unsupported safety- or assessment-critical claim | `VerificationResult` | not built (Phase 3) |
 | Graded-solution leakage | 0 | `DisclosurePolicy`, `LearningObject` validator and a CHECK constraint, `disclosure_violations` counter | **0** |
 | Mathematical tool-proof failure on tool-required cases | 0 accepted outputs | not yet built (Phase 3) | — |

@@ -1611,3 +1611,62 @@ readings are recorded here; neither informed a threshold.
 
 **Still a measurement, not release evidence.** The content is quarantined and
 the rights records are outstanding (Q3).
+
+## Run of 1 September 2026 — after the window budget and the text corrections
+
+Same corpus, same gold set, `voyage-4-large`, shipped pair 0.744 / 0.765. This
+supersedes the 31 August table above; the changes between them are R-070
+(a near-tie between two windows is not a decision), R-073 (four formulas
+attached) and R-074 (six sentences corrected).
+
+| retriever | recall@20 | recall@pack5 | blocks/pack | failing gating slices |
+|---|---|---|---|---|
+| keyword-baseline | 1.000 | 0.954 | 137.1 | 2 |
+| representation-keyword | 0.936 | 0.881 | 41.3 | 50 |
+| representation-bm25 | 0.844 | 0.789 | 39.6 | 76 |
+| **representation-dense** | **0.991** | **0.991** | **38.4** | **0** |
+| representation-hybrid | 0.954 | 0.936 | 40.8 | 22 |
+
+Dense has no failing gating slice for the first time. The three axes that failed
+in every earlier run -- `modality=equation` at 0.900, `question_type=multi_hop`
+at 0.909, `subject=mathematics` at 0.904 -- were one defect, and it was not
+ranking: every missing case retrieved the right *object* and the wrong *window*
+inside it.
+
+**Sufficiency gate**, floor 0.744, ceiling 0.765, corroboration 2 of top 3:
+
+| set | unanswerable refused | answerable answered |
+|---|---|---|
+| visible (tuned on) | 31/31 (100%) | 106/109 (97%) |
+| **holdout** | **24/24 (100%)** | **38/40 (95%)** |
+
+The visible set lost one answerable case against 31 August, and the holdout did
+not move. Correcting six sentences changed their windows' embeddings, which
+reshuffled which window of a section ranks first -- the same failure R-070 had
+just fixed, arriving from a new direction. The window budget went from two to
+three, measured: four is identical to three, so three saturates.
+
+**Citations**, same run:
+
+| | visible | holdout |
+|---|---|---|
+| resolution (§14: 100%) | 100% | 100% |
+| delivered recall | 100% | 97.4% |
+| completeness (§14: ≥95%) | 96.1% | 97.4% |
+| evidence precision (§14: ≥98%) | 4.2% | 3.5% |
+
+Evidence precision is not a failure to report, it is a metric that cannot mean
+anything yet: a pack spans 38 blocks and roughly one is gold. Narrowing it is
+generation's job, and generation does not exist (R-026).
+
+### What is measured and not adopted
+
+`rerank-2` over the dense retriever's top 20 moved pack recall by zero cases and
+the holdout by zero cases, for a per-query API call and its latency. It recovers
+5.5 points for BM25 and 1.8 for hybrid, which is buying back damage a weaker
+retriever caused. Q4 is answered: not adopted.
+
+### Still a measurement
+
+The content is quarantined and no rights record is filed, so every number here
+was produced under an evaluation licence and none of it is release evidence.

@@ -13,7 +13,7 @@ generate text: the teaching loop that would write sentences is §9, and whether
 this repository builds it is open question Q5. The whole design assumes that
 answering wrongly is the expensive failure and refusing is the cheap one.
 
-## Where it stands, 31 August 2026
+## Where it stands, 1 September 2026
 
 Two NCERT Class 10 chapters — Science ch1 and Mathematics ch4 — parsed,
 composed, chunked, embedded, persisted in Postgres, and served over HTTP.
@@ -21,18 +21,24 @@ composed, chunked, embedded, persisted in Postgres, and served over HTTP.
 | | visible 140 | holdout 64 |
 |---|---:|---:|
 | Unanswerable questions refused | 31/31 | **24/24** — supports ≥88% |
-| Answerable questions answered | 90/109 | **34/40** — supports ≥73% |
+| Answerable questions answered | 106/109 | **38/40** — supports ≥85% |
 | Citation ID resolution (§14: 100%) | 100% | 100% |
-| Citation completeness (§14: ≥95%) | 95.2% | 97.1% |
+| Citation completeness (§14: ≥95%) | 96.1% | 97.4% |
 | Lineage failures (§14: 0) | 0 | 0 |
+
+Retrieval on the visible set: candidate and pack recall both **99.1%** at 38
+blocks per pack, zero invariant violations, zero failing gating slices for the
+dense retriever.
 
 Bounds are exact one-sided Clopper-Pearson at 95% (R-039). **Quote the holdout
 column**, and quote the bound rather than the fraction.
 
-**But do not quote them yet.** The Symbol-font decode of 31 August (R-054)
-changed 12 window texts, so the embeddings behind this table are stale. Re-embed
-and re-run both reports first — it is the top of the task list below, and it
-needs `VOYAGE_API_KEY`.
+These were measured on 1 September with `voyage-4-large` (R-058) and the shipped
+pair 0.744 / 0.765 (R-060), after the last correction to the corpus. Any change
+to a block's text changes the index, so re-embed and re-run both reports before
+quoting them again — `scripts/embed_representations.py`, then
+`real_content_baseline.py`, `holdout_validation.py` and `citation_report.py`.
+They need `VOYAGE_API_KEY`.
 
 **Nothing here is releasable.** No source has a rights record, so the service
 refuses to boot without an explicit override; no human has adjudicated a single
@@ -52,8 +58,8 @@ PYTHONPATH=src python scripts/citation_report.py
 ```
 
 Do not re-tune the thresholds afterwards (R-036). Watch citation completeness in
-particular: it sits at 95.2% against a 95% bar, and four newly readable blocks
-are four more chances to cite incompletely.
+particular: it sits at 96.1% visible against a 95% bar, and every newly readable
+block is another chance to cite incompletely.
 
 **1. Get the answer key adjudicated.** This is the task that changes what every
 number here is *worth*, as opposed to what it is. The sheet is already exported
@@ -72,21 +78,25 @@ Mayank and Sumit are named (Q6), neither has started. **Both review every case**
 — splitting by subject gives each case one reviewer, which is exactly what the
 two-adjudicator rule exists to prevent.
 
-**2. Attach LaTeX for the last three formulas.** texts-153, texts-159 and
-texts-198. Each is scrambled in reading *order*, not encoding, so no automatic
-rule can fix them and the strict matcher (R-043) correctly refuses to guess --
-it is a person with the crops in
-`artifacts/quadratic-equations-quarantine/assets/`, and about ten minutes.
+**2. Finish the damaged mathematics.** Two lists, and neither is long:
 
-`scripts/export_formula_sheet.py` writes the sheet: the broken text beside the
-second parser's LaTeX from that page and its neighbours, ranked by symbol
-overlap. It also shows why the matcher refuses — texts-153's top two candidates
-score 1.00 and are each other's sign flip. The right answer ranks third.
+- **One formula**, `texts-159`, whose crop is clipped at the top. Two
+  independent readings disagreed about it twice (R-068, R-073), so it needs a
+  person with the page rather than another model.
+- **Eight sentences** whose inline mathematics was destroyed and which read as
+  ordinary prose: texts-107, 122, 126, 141, 194, 195, 196, 225 (R-074). Six are
+  derivable from the equation in the sentence; 141 and 225 need crops.
 
-Do not trust an older doc saying *39 formulas*: that counted formulas lacking a
-LaTeX field, when most of those read perfectly well without one (R-054).
+`scripts/triage_formula_queue.py` reports what is actually outstanding,
+`attach_reviewed_formulas.py` writes a verified LaTeX field, and
+`attach_reviewed_text.py` corrects a sentence while keeping the original.
 
-**3. Then, and only then, chase acceptance.** It sits at 85% on the holdout and
+Do not trust an older doc saying *39 formulas* or *73*: both counted formulas
+lacking a LaTeX field, when most of those read perfectly well without one
+(R-054, R-067). And do not build the list by eye — the six corrected on 1
+September were found that way, and the scan afterwards found eight more.
+
+**3. Then, and only then, chase acceptance.** It sits at 95% on the holdout and
 five ways to raise it have already been measured and rejected. The untried ones
 are listed under *Where the remaining acceptance lives* below. Do not start here:
 a number improved before the answer key is adjudicated is a number nobody can
@@ -124,7 +134,10 @@ Do not spend time on these without new evidence — each was measured:
 
 | idea | result |
 |---|---|
-| Reranking (`rerank-2`) | moved pack recall by **zero cases** (R-027) |
+| Reranking (`rerank-2`) | moved pack recall by **zero cases** on top of dense, twice: R-027, and again under `voyage-4-large` where it also changed the holdout by nothing (Q4 answered) |
+| Putting LaTeX in the search index | costs a case of recall; `rac{-b}{2a}` is not words. Index the text, show the LaTeX (R-069) |
+| Making LaTeX outrank text unconditionally | breaks the case where good text sits beside a wrong attachment. The defect was in the discriminator (R-066) |
+| Hybrid fusion as a shipped retriever | loses to its own dense half on both recall and abstention, and costs a second retrieval (R-062) |
 | Lower abstention floor | leaks an unanswerable case (R-048) |
 | Fewer shared objects, or greater depth | leaks (R-045) |
 | Expanding the query with the concept name | leaks 3-5 cases (R-051) |
@@ -137,17 +150,33 @@ acceptance by leaking a refusal.** That is a frontier, not a mistuned parameter.
 
 ## Where the remaining acceptance lives
 
-21 of 25 false refusals are the two retrievers agreeing on the *section* and
-disagreeing on the *window*. None of these is free:
+**The section-versus-window problem is solved.** It was not a ranking failure:
+dense retrieval kept one window per object, so a 0.007 score difference decided
+which paragraph of the right section a learner saw. An object may now be
+represented by up to three windows when their scores tie (R-070, R-074), and
+candidate recall went 95.4% to 99.1% with the dense retriever's failing gating
+slices going 22 to 0.
 
-1. **Rerank within an object**, so both retrievers pick the same window. The one
-   untried use of a reranker, and it attacks the 21 directly.
-2. **Overlapping chunk windows**, so adjacency becomes genuine block overlap.
-   Re-measures everything, including every stored vector.
-3. **A third retriever**, so agreement can be two-of-three rather than
+Three false refusals remain on the visible set, and they are not one problem:
+
+1. `maths-023` misses the floor by **0.0015** and `maths-024-p1` by 0.021. A
+   lower floor leaks an unanswerable case, measured four ways (R-030, R-048).
+2. `maths-022-p1` fails corroboration. Relaxing that leaks two (R-063).
+
+So the cheap moves are gone. What is left that is not a relaxation:
+
+1. **Generation** (§9, Q5). Until something writes an answer, citation
+   *precision* cannot be measured at all — a pack spans 38 blocks and about one
+   is gold, which reads as 3.5% and is really "nobody has narrowed it yet".
+2. **A third retriever**, so agreement can be two-of-three rather than
    two-of-two.
-4. **Formula repair** — 3 formulas await a human choosing among candidates
-   (R-054 re-counted this; it was never really 39).
+3. **More corpus.** Everything here is calibrated on two chapters and 204 cases
+   against §6.4's 300-500. Adding chapters three and four moves every threshold
+   and is the real test of whether any of this generalises.
+4. **Formula and sentence repair.** One formula awaits a human (`texts-159`,
+   whose crop is clipped), and a scan on 1 September found eight more sentences
+   whose inline mathematics is destroyed — see R-074. Picking these by eye finds
+   instances; only the scan finds the class.
 
 ## What is blocked, and on whom
 
@@ -166,7 +195,7 @@ disagreeing on the *window*. None of these is free:
 
 ```
 pip install -e ".[dev]"
-python -m pytest -q                  # 208 pass, 7 skip without a database
+python -m pytest -q                  # 248 pass; 7 skip without a database
 docker compose -f docker/compose.yml up -d
 ```
 
@@ -175,15 +204,32 @@ Then, with `AGTS_DATABASE_URL` and `VOYAGE_API_KEY` set:
 ```
 python scripts/decode_symbol_font.py      # once per parse; see R-054
 python scripts/embed_representations.py   # once; cached by content hash
+python scripts/real_content_baseline.py   # retrieval, the ruler, the gate
 python scripts/holdout_validation.py      # the number that gets quoted
 python scripts/citation_report.py         # §14 citation and lineage rows
 python scripts/import_corpus.py           # write to Postgres and re-score from it
-python scripts/serve.py                   # the HTTP surface
-python scripts/export_formula_sheet.py    # the three formulas a person must choose
+python scripts/triage_formula_queue.py    # what damage is actually outstanding
 ```
 
-Every number in `EVALUATION_LEDGER.md` comes from one of those. If a claim has no
-script behind it, treat it as unverified.
+**Scripts do not need `PYTHONPATH`** — each inserts `src` itself. An older
+instruction said otherwise, and on PowerShell `PYTHONPATH=src python ...` is a
+parse error rather than a setting.
+
+To try it by hand, in two terminals:
+
+```
+.\scripts\serve.ps1                                  # PowerShell; reads .env
+python scripts/ask.py "what is the nature of roots"
+python scripts/ask.py --subject science "what is rancidity"
+python scripts/ask.py "how do I solve by completing the square"   # refuses
+```
+
+The third is the one worth watching: that phrase appears in the chapter and is
+never taught there, and the gate refuses it anyway. `ask.py` prints the refusal
+reason, and prints no passage when it refuses.
+
+Every number in `EVALUATION_LEDGER.md` comes from one of those scripts. If a
+claim has no script behind it, treat it as unverified.
 
 ## The repository is public
 

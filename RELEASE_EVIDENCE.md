@@ -5,15 +5,15 @@ Build guide §12. One reproducible candidate, or nothing.
 **No release candidate exists**, and none can: no source is `APPROVED`, so
 nothing here may be served to a learner (§5, Q3). What has changed since this
 file was written is that most rows now point at something real rather than at an
-intention. Updated 30 August 2026.
+intention. Updated 1 September 2026.
 
 | Required by §12 | State |
 |---|---|
 | Commit and immutable artifact IDs | Commits exist; every `ReleaseManifest` carries `commit_sha` and a corpus checksum |
 | Schema and migration versions | `migrations/001_core.sql` and `002_pgvector.sql`, applied and tested against Postgres 17 + pgvector 0.8.6 |
 | Source and release manifests | **Built** — `provenance.build_manifest` hashes the corpus itself; `rm-pilot-2-chapters-0001` covers 38 objects and 2 sources |
-| Model, embedding, reranker, parser and prompt versions | Recorded in every trace: `voyage-3`, `rerank-2`, Docling 2.122.0, `block-window-v2`, no prompt (nothing generates) |
-| Decision and contract traceability | `DECISION_LOG.md` (R-001…R-035), `CONTRACT_REGISTRY.md`, `docs/00-authority.md` |
+| Model, embedding, reranker, parser and prompt versions | Recorded in every trace: `voyage-4-large` (R-058), no reranker (measured, not adopted — R-062), Docling 2.122.0, `block-window-v2`, no prompt (nothing generates) |
+| Decision and contract traceability | `DECISION_LOG.md` (R-001…R-074), `CONTRACT_REGISTRY.md`, `docs/00-authority.md` |
 | Unedited test and benchmark results | `EVALUATION_LEDGER.md`, plus `artifacts/gold/*.json` written by the scripts themselves |
 | RLS / authorization matrix | Partial — the §5 filter exists in Python **and** in SQL, with a test asserting they agree. No row-level security policy in the database |
 | Hidden-holdout runner config | `scripts/holdout_validation.py`, 38 unseen cases. **The seal is not real** — the cases are agent-drafted and unadjudicated (Q2) |
@@ -38,9 +38,9 @@ holdout column is the one that leaves this repository (R-024).
 | | visible 140 | holdout 64 |
 |---|---:|---:|
 | Unanswerable questions refused | 31/31 | **24/24** — supports ≥88% |
-| Answerable questions answered | 90/109 | **34/40** — supports ≥73% |
+| Answerable questions answered | 106/109 | **38/40** — supports ≥85% |
 | Citation ID resolution | 100% | 100% |
-| Citation completeness (§14 ≥95%) | 95.2% | **97.1%** |
+| Citation completeness (§14 ≥95%) | 96.1% | **97.4%** |
 | Delivered recall | 98.9% | 100% |
 | Lineage failures | 0 | 0 |
 | Zero-tolerance counter violations | 0 | 0 |

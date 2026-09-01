@@ -9,7 +9,7 @@
 | Approved source files delivered | Client | §7.2 parsing | Not delivered |
 | Curriculum reviewer availability | Client | §6.1 sign-off, §13 adjudication | Unconfirmed |
 | Privacy / security reviewer | Client | §13, §14 | Unconfirmed |
-| Embedding + rerank credentials (Voyage) | Us | §7.3, §7.4 | **Provisioned and used** — `voyage-3` embeddings and `rerank-2`, both cached to disk so a scored run reaches no network |
+| Embedding + rerank credentials (Voyage) | Us | §7.3, §7.4 | **Provisioned and used** — `voyage-4-large` embeddings (R-058), cached to disk so a scored run reaches no network. `rerank-2` was measured and **not adopted**: it moved pack recall by zero cases on top of dense (R-062, Q4 answered) |
 | Generation credentials (VLM, teaching model) | Us / client | §9.2, and the model pre-screen of the gold set | **Present but rejected.** `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` and `GEMINI_API_KEY` all exist in Foxxy's env and all three return 401. Only `VOYAGE_API_KEY` works |
 | Postgres with vector support | Us | §7.4, §8.2 | **Provisioned** — own container, `docker/compose.yml` port 5434, pgvector 0.8.6 (R-029) |
 | **GPU for parsing** | Us / client | §7.3 at any real corpus size | **Not provisioned — now a requirement, see below** |

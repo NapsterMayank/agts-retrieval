@@ -81,6 +81,16 @@ problem whose cause is three stages upstream.
 Already computed as `ScoreReport.recall_at_pack`; this is a one-line change to
 the gate table, not new work.
 
+**Answered, 1 September 2026, for the reranker half of it.** `rerank-2` over the
+dense retriever's top 20 moved pack recall by zero cases and the holdout by zero
+cases. It recovers 5.5 points for BM25 and 1.8 for hybrid, which is buying back
+damage a weaker retriever caused and never exceeding the retriever that did not
+cause it. Not adopted.
+
+The gate-table ask stands and is unaffected: pack recall is worth gating on
+whether or not a reranker is in the path. Dense currently reports 99.1% pack
+recall with no failing gating slice.
+
 **Update, 30 August — the ask is now sharper.** Building the evidence pack showed
 that *two* pack numbers exist and they disagree:
 
