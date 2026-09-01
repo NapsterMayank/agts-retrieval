@@ -22,6 +22,16 @@ import sys
 import urllib.error
 import urllib.request
 
+# The Windows console is cp1252 and the chapters are full of characters it has
+# no encoding for -- minus signs, plus-or-minus, reaction arrows. Printing a
+# passage raised UnicodeEncodeError halfway through the first result, which
+# reads as a broken service rather than a console that cannot spell. Nothing
+# here is worth losing a character over, so unmappable ones degrade to a
+# placeholder instead of stopping the run.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 DEFAULT_URL = os.environ.get("AGTS_URL", "http://localhost:8000")
 DEFAULT_TOKEN = os.environ.get("AGTS_TOKEN", "dev-token")
 
@@ -58,7 +68,12 @@ def main() -> None:
         raise SystemExit(f"HTTP {error.code}: {error.read()[:300].decode('utf-8', 'replace')}")
     except urllib.error.URLError as error:
         raise SystemExit(
-            f"cannot reach {args.url}: {error.reason}. Is scripts/serve.py running?"
+            f"cannot reach {args.url}: {error.reason}\n"
+            "\nThe service is not running. Start it in another terminal:\n"
+            "    PowerShell:  .\\scripts\\serve.ps1\n"
+            "    bash:        see the header of scripts/serve.py\n"
+            "\nIt needs the database up first:\n"
+            "    docker compose -f docker/compose.yml up -d"
         )
 
     print(f"\nQ: {payload['query']}   [{args.subject}, grade {args.grade}]")
