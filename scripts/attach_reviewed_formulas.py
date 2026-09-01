@@ -39,11 +39,56 @@ CHAPTER = ROOT / "artifacts" / "quadratic-equations-quarantine"
 #: against an independent Codex proposal built from the surrounding text alone
 #: with no sight of the image (`artifacts/gold/formula-proposals-codex.json`).
 #:
-#: texts-159 is deliberately absent. Its crop is clipped at the top and the two
-#: readings disagree: the crop shows `-b/2a +/- 0, i.e., x = -b/2a or -b/2a`
-#: while Codex proposed only the pair of roots. Neither is safe to write, and a
-#: formula nobody can read twice is exactly what the queue is for.
+#: texts-159 is deliberately absent, for the second review running. Its crop is
+#: clipped at the top -- the numerators of three fractions are cut off -- and the
+#: two readings disagree the same way both times: the crop shows
+#: `-b/2a +/- 0, i.e., x = -b/2a or -b/2a` and Codex proposes only the pair of
+#: roots. The mathematics is not in doubt; which characters are in this block is.
+#: Writing a formula on that basis is how a wrong one gets in, and a formula
+#: nobody can read twice is exactly what the queue is for.
 VERIFIED = {
+    "quadratic-equations:docling:texts-151": {
+        # The quadratic formula itself. The matcher proposed exactly this at
+        # confidence 1.000 and withheld it on order margin -- correctly, since
+        # the extracted text is scrambled. Crop and Codex agree character for
+        # character, which is the only reason it is written here rather than
+        # left for the matcher to keep refusing.
+        "latex": 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
+        "crop": "assets/151.png",
+        "read_by": "claude-opus-5, from the crop",
+        "cross_checked_by": "codex, from the surrounding text only",
+        "countersigned_by": None,
+    },
+    "quadratic-equations:docling:texts-119": {
+        # The extracted text lost both fraction bars and the minus, leaving
+        # "x = 2 3 or x = 1 2 -". Codex derived the negative second root from
+        # the factors in the surrounding text without seeing the page.
+        "latex": 'x = \\frac{2}{3} \\text{ or } x = -\\frac{1}{2}',
+        "crop": "assets/119.png",
+        "read_by": "claude-opus-5, from the crop",
+        "cross_checked_by": "codex, from the surrounding text only",
+        "countersigned_by": None,
+    },
+    "quadratic-equations:docling:texts-123": {
+        # Every square root vanished from the extraction: the page reads
+        # 3x^2 - 2*sqrt(6)x + 2 and the text kept "2 3 2 6 2 x x". Three lines
+        # of one derivation, which is why it is an aligned block.
+        "latex": '\\text{Solution : } \\begin{aligned} 3x^2 - 2\\sqrt{6}x + 2 &= 3x^2 - \\sqrt{6}x - \\sqrt{6}x + 2 \\\\ &= \\sqrt{3}x(\\sqrt{3}x - \\sqrt{2}) - \\sqrt{2}(\\sqrt{3}x - \\sqrt{2}) \\\\ &= (\\sqrt{3}x - \\sqrt{2})(\\sqrt{3}x - \\sqrt{2}) \\end{aligned}',
+        "crop": "assets/123.png",
+        "read_by": "claude-opus-5, from the crop",
+        "cross_checked_by": "codex, from the surrounding text only",
+        "countersigned_by": None,
+    },
+    "quadratic-equations:docling:texts-125": {
+        # The square roots are gone here too, which is what made "3 2 3 2 0 x x"
+        # out of (sqrt(3)x - sqrt(2))(sqrt(3)x - sqrt(2)) = 0. R-054 counted this
+        # block as rescued by the Symbol-font decode; it was not.
+        "latex": '(\\sqrt{3}x - \\sqrt{2})(\\sqrt{3}x - \\sqrt{2}) = 0\\text{. Now, } \\sqrt{3}x - \\sqrt{2} = 0 \\text{ for } x = \\sqrt{\\frac{2}{3}}.',
+        "crop": "assets/125.png",
+        "read_by": "claude-opus-5, from the crop",
+        "cross_checked_by": "codex, from the surrounding text only",
+        "countersigned_by": None,
+    },
     "quadratic-equations:docling:texts-153": {
         # The page shows the two fractions separately rather than over a common
         # denominator. Codex proposed the combined form from the text alone --
@@ -82,6 +127,7 @@ def main() -> None:
     ]
     by_id = {block.block_id: block for block in blocks}
 
+    already: list[str] = []
     for block_id, entry in VERIFIED.items():
         missing = [f for f in ("crop", "read_by", "cross_checked_by") if not entry.get(f)]
         if missing:
@@ -96,10 +142,14 @@ def main() -> None:
         block = by_id[block_id]
         if block.block_type is not BlockType.FORMULA:
             raise SystemExit(f"{block_id} is not a formula block")
+        if block.latex == entry["latex"]:
+            already.append(block_id)
+            continue
         if block.latex:
             raise SystemExit(
-                f"{block_id} already carries LaTeX. Attaching over it would silently "
-                "replace a matched formula with a read one."
+                f"{block_id} already carries different LaTeX. Attaching over it would "
+                "silently replace one reading with another; delete the old one "
+                "deliberately if that is what you mean."
             )
         countersign = entry.get("countersigned_by") or "NOBODY YET"
         print(f"{block_id.split(':')[-1]}  ({entry['crop']})")

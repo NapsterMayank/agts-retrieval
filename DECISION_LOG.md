@@ -1814,3 +1814,38 @@ the safer failure; it is the one nobody sees.
 
 Found by re-running the serving path after a retrieval change rather than
 assuming it still held. It had not held for a long time.
+
+---
+
+### R-073 - Four of the five queued formulas attached
+**Status:** Active - 1 September 2026
+
+The queue R-072 opened has been worked. Each block was read off its page crop
+and, separately, proposed by Codex from the surrounding text with no sight of
+the image. Four agreed and are attached; one did not and stays queued.
+
+| block | what the extraction lost | agreement |
+|---|---|---|
+| texts-151 | the whole quadratic formula, to `x = 2 - 4 2 b b ac a +/- -` | exact |
+| texts-119 | both fraction bars and the minus, to `x = 2 3 or x = 1 2 -` | exact |
+| texts-123 | every square root, so `2 sqrt(6) x` became `2 6 x` | exact |
+| texts-125 | every square root again, and the factor structure with it | exact |
+
+**texts-151 is the one worth noting.** The matcher had proposed exactly this
+LaTeX at confidence 1.000 and refused it on the order margin, which was correct:
+the extracted text is scrambled, so nothing about *reading order* supported the
+match. Two readings that never saw each other's answer supply what the ranking
+could not, and the value written is the one the matcher wanted all along.
+
+**texts-159 is refused for the second review running.** Its crop is clipped --
+the numerators of three fractions are cut off -- and the two readings disagree
+the same way both times: the crop shows `-b/2a +/- 0, i.e., x = -b/2a or -b/2a`
+and Codex proposes only the pair of roots. The mathematics is not in doubt;
+which characters belong to this block is. That is exactly the case the queue
+exists to hold rather than resolve.
+
+    formula queue: 5 -> 1
+
+Retrieval is unchanged -- 99.1% candidate and pack recall, gate 107/109 and
+31/31 -- because the index reads `block.text` and only the pack reads the LaTeX
+(R-069). What changed is what a learner sees, which was the point.

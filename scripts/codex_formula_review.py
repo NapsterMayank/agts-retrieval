@@ -66,6 +66,23 @@ def main() -> None:
     ]
     order = {block["block_id"]: i for i, block in enumerate(blocks)}
     queue = json.loads((CHAPTER / "formula-review-queue.json").read_text(encoding="utf-8"))
+
+    # The queue keeps whatever candidates it was built with, and triage drops
+    # them for entries it adds later. Read them from the second parse instead,
+    # so a block that entered the queue today is not reviewed with less context
+    # than one that entered last week.
+    chandra: dict[int, list[str]] = {}
+    try:
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location(
+            "attach", Path(__file__).parent / "attach_chandra_latex.py"
+        )
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        chandra = module.chandra_by_page()
+    except Exception as error:  # the second parse is optional, not required
+        print(f"  (no second-parser candidates available: {error})")
     if not queue:
         raise SystemExit("the review queue is empty; nothing to propose")
 
@@ -85,7 +102,9 @@ def main() -> None:
             lines.append(f"    {marker} {text[:220]}")
             if latex:
                 lines.append(f"       (latex already attached: {latex[:150]})")
-        candidates = item.get("rejected_candidates") or []
+        candidates = item.get("rejected_candidates") or chandra.get(
+            blocks[index]["region"]["page"], []
+        )
         lines.append(f"  CANDIDATE LATEX FROM THE SECOND PARSER ({len(candidates)}), none matched:")
         for candidate in candidates:
             lines.append(f"    - {candidate[:220]}")
